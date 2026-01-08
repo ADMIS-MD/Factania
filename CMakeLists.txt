@@ -20,14 +20,20 @@ else()
     target_compile_definitions(factoryds PUBLIC ARM9)
 endif()
 
+find_program(MELONDS_PATH "melonDS")
+
+if(NOT MELONDS_PATH)
+    if(UNIX)
+        set(MELONDS_PATH "./melonDS")
+    elseif(WIN32)
+        set(MELONDS_PATH "melonDS.exe")
+    endif()
+endif()
+
 if(UNIX)
     set(NDS_BUILD_SCRIPT "./build.sh")
-    set(MELONDS_PATH "./melonDS.exe")
 elseif(WIN32)
     set(NDS_BUILD_SCRIPT "build.bat")
-    set(MELONDS_PATH "melonDS")
-else()
-
 endif()
 
 add_custom_target(Build_NDS
