@@ -22,8 +22,10 @@ endif()
 
 if(UNIX)
     set(NDS_BUILD_SCRIPT "build.sh")
+    set(MELONDS_PATH "melonDS.exe")
 elseif(WIN32)
     set(NDS_BUILD_SCRIPT "build.bat")
+    set(MELONDS_PATH "melonDS")
 else()
 
 endif()
@@ -31,3 +33,10 @@ endif()
 add_custom_target(Build_NDS
     COMMAND ${NDS_BUILD_SCRIPT}
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/scripts)
+
+add_custom_target(Melon_NDS
+    COMMAND scripts/melonds/${MELONDS_PATH} build/factoryds.nds
+    DEPENDS Build_NDS
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Melon_NDS)

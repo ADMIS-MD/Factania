@@ -2,3 +2,5 @@ build/
 .vscode/
 .idea/
 visual_studio/
+scripts/melonds/melonDS.toml
+scripts/melonds/rtc.bin
