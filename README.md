@@ -1,3 +1,4 @@
-# Factory Builder DS Game Project (Final Title) 2026 !!NEW!!
+# Factania
 ---
-we'll probably have some more stuff here one day :^)
+Factania is a DS Factory Builder set in the SHUTTLEFALL universe.  
+After a crash landing, it's up to you to scrounge for resources and launch back to the Titania Mothership.
