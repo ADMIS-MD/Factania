@@ -1,0 +1,1 @@
+docker build -q -t factory-ds .

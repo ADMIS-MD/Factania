@@ -1,1 +1,2 @@
-docker run --rm -v "../":/work -it --entrypoint bash $(docker build -q .) ./scripts/build-toolchained.sh
+./setup.sh
+docker run --rm -v "../":/work -it --entrypoint bash factory-ds:latest ./scripts/build-toolchained.sh
