@@ -8,4 +8,6 @@ For a quick build, run build.bat or build.sh in the scripts directory
 ## Development environment
 
 ### First time setup:
-run `git submodule init`
+- Run `git submodule init`
+- Run `scripts/generate_visual_studio.bat` if you want to use visual studio
+  - This will generate the project in the `visual_studio` directory
