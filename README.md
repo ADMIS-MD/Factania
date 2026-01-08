@@ -8,6 +8,8 @@ For a quick build, run build.bat or build.sh in the scripts directory
 ## Development environment
 
 ### First time setup:
+- Install docker
+  - It is recommended that you install docker desktop on windows as most configuration is handled for you, including adding docker to the path both on windows and WSL. 
 - Run `git submodule init`
 - Run `scripts/generate_visual_studio.bat` if you want to use visual studio
   - This will generate the project in the `visual_studio` directory
