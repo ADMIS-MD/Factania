@@ -12,4 +12,8 @@ For a quick build, run build.bat or build.sh in the scripts directory
   - It is recommended that you install docker desktop on windows as most configuration is handled for you, including adding docker to the path both on windows and WSL. 
 - Run `git submodule init`
 - Run `scripts/generate_visual_studio.bat` if you want to use visual studio
-  - This will generate the project in the `visual_studio` directory
+  - This will generate the project in the `visual_studio` directory. Visual studio will be very confused if you ask to debug any fo the targets, so instead only build.
+- Targets
+  - `Build_NDS` will create a .nds file in the build directory.
+  - `Melon_NDS` will build and run the .nds file in the bundled MelonDS app.
+  - `factoryds` is where the sources are contained. In the visual studio project, this is where you edit files. 
