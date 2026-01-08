@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(factoryds LANGUAGES C)
+project(Factania LANGUAGES C)
 
 include(scripts/cmake/git.cmake)
 
