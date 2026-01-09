@@ -14,9 +14,6 @@
  *    - It's 
  */
 
-enum SolveNodes {
-
-}
 
 /*
  *  Simple example
@@ -79,10 +76,11 @@ enum TTA_BatchOperations {
                 // 11b
   TTAOP_PushResult, // {a} {variable_out} -- puts value into variable_out
                     // 6b
-}
+};
 
 /*
  * Example but with operations:
+ *
  *
  *  s1: 
  *    - Result 1 [s1]
@@ -120,6 +118,73 @@ enum TTA_BatchOperations {
  *  This is great! How do we create this?
  */
 
-void basic_example() {
-  
-}/
+/*
+ *  Tower type:
+ *      - Simple processor: turns item A into item B in 5 seconds. stores 64 items in input and output slot
+ *
+ *  Definition pseudocode:
+       if(input.count > 1) {
+           enter producing state
+           start_time = now
+       }
+       if(producing state) {
+            transform 1 item from input into output when productive-ticks % 50 == 0
+            if(output.count) == 64
+                stop producing
+            if(input.count) == 0
+                stop producing
+       }
+
+    Definition data:
+        Storage
+            define input
+                max size 64
+                holds smeltables
+            define output
+                max size 64
+        State 0 (non producing) (default)
+            state change:
+                to state 1:
+                    input count > 0 && ouput count > 64 && input type is smeltable
+        State 1 (producing)
+            track change_state_time
+            action:
+                transfrom input to output using smelt using (current_time - change_state_time) / 50
+            change state:
+                to state 0:
+                    upon input count < 1 || output count > 63
+
+    Optimziable definition?:
+        Size = [1, 1]
+        Storage:
+            input:
+                max size 64
+                filter smeltables
+                port:
+                    in [0, 0] // position [0, 0] inserts into this object. Since size is 1, could be replaced by all
+            output:
+                max size 64
+                port:
+                    out all
+        Action:
+            a1:
+                from input
+                to output
+                using smelt
+                every 50 ticks
+                batch-size 2 // smelts 2 at a time (as an example lol)
+                requires power .2 per tick
+
+
+ */
+
+// This should be removed!
+typedef struct TTA_TileObj {
+} TTA_TileObj;
+
+TTA_TileObj* tta_get_tile_obj_output(TTA_TileObj* obj);
+void tta_get_tile_obj_output_tree(TTA_TileObj* obj, int count, TTA_TileObj* tree_out);
+
+void basic_pseudo(TTA_TileObj* obj_a) {
+    // for [a] -> [b]
+}

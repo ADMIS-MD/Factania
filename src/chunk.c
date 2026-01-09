@@ -49,4 +49,17 @@ typedef struct TTA_ChunkNode {
   TTA_Chunk* chunk_refs[TTA_CHUNK_NODE_SIZE];
 } TTA_ChunkNode;
 
+typedef struct TTA_OreType {
+
+} TTA_OreType;
+
+void generate_chunk_from_seed(uint32_t seed) {
+    // 1 in 8 to generate an ore vein
+    if ((seed & 0x111) == 0x111) {
+        int sub_seed = (seed >> 3) & 0x111;
+        switch (sub_seed) {
+
+        }
+    }
+}
 

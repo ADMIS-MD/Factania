@@ -6,6 +6,11 @@ include(scripts/cmake/git.cmake)
 
 add_executable(factoryds 
 	src/main.c
+    src/batcher.c
+        src/factory_obj.c
+        src/factory_obj.h
+        src/chunk.c
+        src/rng.h
 )
 
 target_include_directories(factoryds PRIVATE sdk/libs/libnds/include)

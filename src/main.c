@@ -79,6 +79,7 @@ int main(int argc, char **argv)
 
     glEnable(GL_ANTIALIAS);
     glEnable(GL_BLEND);
+    lcdMainOnBottom();
 
     // The background must be fully opaque and have a unique polygon ID
     // (different from the polygons that are going to be drawn) so that
