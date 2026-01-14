@@ -15,5 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build -q -t factory-ds . && docker run --rm -v "./":/work -t --entrypoint bash factory-ds:latest ./scripts/build-toolchained.sh
+      run: docker build -q -t factory-ds ./scripts && docker run --rm -v "./":/work -t --entrypoint bash factory-ds:latest ./scripts/build-toolchained.sh
 
