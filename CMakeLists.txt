@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
-if(NINENTDO_DS)
-    set(CMAKE_CXX_COMPILER_WORKS 1)
-endif()
+# Force the compiler to work no matter what
+set(CMAKE_CXX_COMPILER_WORKS 1)
 
 project(Factania LANGUAGES C CXX)
 
