@@ -15,7 +15,7 @@ add_executable(Factania
 target_include_directories(Factania PRIVATE sdk/libs/libnds/include)
 
 if(NINTENDO_DS)
-    nds_create_rom(factania
+    nds_create_rom(Factania
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
         AUTHOR "ADMIS Manufacturing Division"
