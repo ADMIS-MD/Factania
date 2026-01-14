@@ -7,9 +7,13 @@
 // fully solid. For example, you could have an empty cube where all the faces
 // are translucent pieces of plastic.
 
+#include <errno.h>
+#include <dlfcn.h>
 #include <stdio.h>
 
 #include <nds.h>
+#include <sys/time.h>
+#include "test.h"
 
 void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
 {
@@ -111,10 +115,11 @@ int main(int argc, char **argv)
     consoleClear();
 
     // Print some controls
-    printf("PAD:     Move\n");
+    printf("PAD:     Moveeeee\n");
     printf("A,B,X,Y: Rotate\n");
     printf("\n");
     printf("START:   Exit to loader\n");
+    printf("%\n", stupid_fn);
 
     while (1)
     {

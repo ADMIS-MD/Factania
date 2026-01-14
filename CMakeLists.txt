@@ -1,11 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Factania LANGUAGES C)
+if(NINENTDO_DS)
+    set(CMAKE_CXX_COMPILER_WORKS 1)
+endif()
+
+project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
 
 add_executable(factoryds 
 	src/main.c
+    src/test.cpp
 )
 
 target_include_directories(factoryds PRIVATE sdk/libs/libnds/include)
@@ -46,3 +51,4 @@ add_custom_target(Melon_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Melon_NDS)
+
