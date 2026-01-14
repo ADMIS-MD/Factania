@@ -10,6 +10,8 @@ include(scripts/cmake/git.cmake)
 add_executable(factoryds 
 	src/main.c
     src/test.cpp
+    src/chunk.cpp
+    src/chunk.hpp
 )
 
 target_include_directories(factoryds PRIVATE sdk/libs/libnds/include)
