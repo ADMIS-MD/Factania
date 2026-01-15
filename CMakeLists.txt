@@ -13,7 +13,7 @@ set(SOURCE_FILES
 )
 
 set(HEADER_FILES
-  src/engine.hpp
+  src/engine.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
