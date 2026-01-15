@@ -10,10 +10,13 @@
 #include <errno.h>
 #include <dlfcn.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <filesystem.h>
 
 #include <nds.h>
-#include <sys/time.h>
 #include "test.h"
+#include "save.h"
+#include <fat.h> 
 
 void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
 {
@@ -74,6 +77,34 @@ void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
 
 int main(int argc, char **argv)
 {
+    bool init_ok = fatInitDefault();
+    if (!init_ok) {
+        // Handle error
+        consoleDemoInit();
+
+        // Print error
+        printf("fatInitDefault() failed: %d", errno);
+
+        while (1)
+            swiWaitForVBlank();
+    }
+
+    /* init_ok = nitroFSInit(NULL);
+    if (!init_ok) {
+        consoleDemoInit();
+        printf("nitroFSInit() failed: %d", errno);
+        while (1)
+            swiWaitForVBlank();
+    }
+
+    if (chdir("nitro:/") != 0) {
+        consoleDemoInit();
+        printf("chdir(nitro:/) failed: %d\n", errno);
+        while (1)
+            swiWaitForVBlank();
+    }*/
+    // load after this
+
     // Setup sub screen for the text console
     consoleDemoInit();
 
@@ -114,12 +145,32 @@ int main(int argc, char **argv)
 
     consoleClear();
 
+    SaveData savedata;
+    memset(&savedata, 0, sizeof(savedata));
+
+    bool loaded = save_load(&savedata);
+
+    if (loaded) {
+        x = savedata.x; 
+        y = savedata.y;
+        z = savedata.z;
+        angle_x = savedata.angle_x;
+        angle_z = savedata.angle_z;
+
+        printf("Save file loaded: Revision %i\n", savedata.save_count);
+    }
+    else {
+        printf("Save file not found\n");
+    }
+
     // Print some controls
     printf("PAD:     Moveeeee\n");
     printf("A,B,X,Y: Rotate\n");
     printf("\n");
     printf("START:   Exit to loader\n");
-    printf("%\n", stupid_fn);
+    printf("SELECT:  Save\n");
+    printf("Close:   Delete Save\n");
+    //printf("%\n", stupid_fn);
 
     while (1)
     {
@@ -132,6 +183,7 @@ int main(int argc, char **argv)
         scanKeys();
 
         uint16_t keys = keysHeld();
+        uint16_t down = keysDown();
 
         if (keys & KEY_LEFT)
             x -= 0.05;
@@ -155,6 +207,33 @@ int main(int argc, char **argv)
 
         if (keys & KEY_START)
             break;
+
+        if (down & KEY_SELECT) {
+            savedata.save_count++;
+            savedata.x = x;
+            savedata.y = y;
+            savedata.z = z;
+            savedata.angle_x = angle_x;
+            savedata.angle_z = angle_z;
+
+            if (save_write(&savedata)) {
+                printf("Saved. Revision number: %i\n", savedata.save_count);
+            }
+            else {
+                printf("Save failed\n");
+            }
+        }
+        
+        if (down & KEY_LID) {
+            bool deleted = save_delete();
+            
+            if (deleted) {
+                printf("Save file deleted\n");
+            }
+            else {
+                printf("Failed to delete save file\n");
+            }
+        }
 
         // Render 3D scene
         // ---------------

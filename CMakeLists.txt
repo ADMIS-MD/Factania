@@ -3,13 +3,14 @@ cmake_minimum_required(VERSION 3.16)
 # Force the compiler to work no matter what
 set(CMAKE_CXX_COMPILER_WORKS 1)
 
-project(Factania LANGUAGES C CXX)
+project(Factania LANGUAGES C)
 
 include(scripts/cmake/git.cmake)
 
 add_executable(Factania 
 	src/main.c
-    src/test.cpp
+    src/test.c
+    src/save.c
 )
 
 target_include_directories(Factania PRIVATE sdk/libs/libnds/include)
