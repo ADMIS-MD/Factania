@@ -7,12 +7,18 @@ project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
 
-add_executable(Factania 
-	src/main.c
-    src/test.cpp
+set(SOURCE_FILES
+  src/main.c
+  src/engine.cpp
 )
 
-target_include_directories(Factania PRIVATE sdk/libs/libnds/include)
+set(HEADER_FILES
+  src/engine.hpp
+)
+
+add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
+
+target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
 
 if(NINTENDO_DS)
     nds_create_rom(Factania
