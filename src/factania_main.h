@@ -1,0 +1,1 @@
+int factania_main();
