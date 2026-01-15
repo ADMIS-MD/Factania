@@ -18,14 +18,19 @@
 
 namespace core {
 
-	Engine::Engine()
+	engine::engine()
 	{
 
 	}
 
-	Engine::~Engine()
+	engine::~engine()
 	{
 
+	}
+
+	void engine::run()
+	{
+		
 	}
 
 }

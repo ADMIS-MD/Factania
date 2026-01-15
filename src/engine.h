@@ -1,9 +1,12 @@
 namespace core {
 
-	class Engine
+	class engine
 	{
-		Engine();
-		~Engine();
+	public:
+		engine();
+		~engine();
+
+		void run();
 	};
 
 }
