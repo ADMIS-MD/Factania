@@ -17,6 +17,10 @@ set(SOURCE_FILES
   src/Engine.cpp
   src/FactaniaMain.cpp
   src/RenderSystem.cpp
+  src/debug_menu/debug_menu.cpp
+  src/debug_menu/memory_debug_info.cpp
+  src/debug_menu/build_details_menu.cpp
+)
 )
 
 set(HEADER_FILES
@@ -24,11 +28,8 @@ set(HEADER_FILES
   src/FactaniaMain.h
   src/System.h
   src/RenderSystem.h
-  src/debug_menu/debug_menu.cpp
   src/debug_menu/debug_menu.h
-  src/debug_menu/memory_debug_info.cpp
   src/debug_menu/memory_debug_info.h
-  src/debug_menu/build_details_menu.cpp
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
 )
