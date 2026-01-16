@@ -16,11 +16,12 @@
 //-----------------------------------------------------------------------------
 //	Functions
 //-----------------------------------------------------------------------------
+extern "C" {
+	int factania_main(void)
+	{
+		core::engine engine;
+		engine.run();
 
-int factania_main(void)
-{
-	core::engine engine;
-	engine.run();
-
-	return 0;
+		return 0;
+	}
 }
