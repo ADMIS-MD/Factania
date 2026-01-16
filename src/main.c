@@ -9,6 +9,7 @@
 //-----------------------------------------------------------------------------
 
 #include "FactaniaMain.h"
+#include "nds/exceptions.h"
 
 //-----------------------------------------------------------------------------
 //	Functions
@@ -16,5 +17,6 @@
 
 int main(void)
 {
+  defaultExceptionHandler();
 	return factania_main();
 }

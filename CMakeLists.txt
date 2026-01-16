@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
+
+configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
 set(SOURCE_FILES
   src/main.c
@@ -16,16 +19,25 @@ set(SOURCE_FILES
   src/RenderSystem.cpp
 )
 
+
 set(HEADER_FILES
   src/Engine.h
   src/FactaniaMain.h
   src/System.h
   src/RenderSystem.h
+  src/debug_menu/debug_menu.cpp
+  src/debug_menu/debug_menu.h
+  src/debug_menu/memory_debug_info.cpp
+  src/debug_menu/memory_debug_info.h
+  src/debug_menu/build_details_menu.cpp
+  src/debug_menu/build_details_menu.h
+  generated/generated_defines.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
 
 target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
+target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
     nds_create_rom(Factania
