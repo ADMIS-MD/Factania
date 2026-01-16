@@ -33,12 +33,6 @@ namespace core {
     // Setup sub screen for the text console
     consoleDemoInit();
 
-    glEnable(GL_ANTIALIAS);
-    glEnable(GL_BLEND);
-
-    // The background must be fully opaque and have a unique polygon ID
-    // (different from the polygons that are going to be drawn) so that
-    // alpha blending works.
     glClearColor(0, 0, 0, 31);
     glClearPolyID(63);
 
@@ -53,13 +47,6 @@ namespace core {
 
     // Switch to model view matrix
     glMatrixMode(GL_MODELVIEW);
-
-    angle_x = 45;
-    angle_z = 45;
-
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
 
     shouldQuit = false;
 
@@ -81,67 +68,12 @@ namespace core {
 
   void Engine::Update()
   {
-    scanKeys();
 
-    uint16_t keys = keysHeld();
-
-    if (keys & KEY_LEFT)
-      x -= 0.05;
-    if (keys & KEY_RIGHT)
-      x += 0.05;
-
-    if (keys & KEY_UP)
-      y += 0.05;
-    if (keys & KEY_DOWN)
-      y -= 0.05;
-
-    if (keys & KEY_A)
-      angle_x += 3;
-    if (keys & KEY_Y)
-      angle_x -= 3;
-
-    if (keys & KEY_X)
-      angle_z += 3;
-    if (keys & KEY_B)
-      angle_z -= 3;
-
-    if (keys & KEY_START)
-      shouldQuit = true;
   }
 
   void Engine::Draw()
   {
-    // Synchronize game loop to the screen refresh
 
-    // Setup camera
-    glLoadIdentity();
-    gluLookAt(0.0, 0.0, 4.0,  // Position
-      0.0, 0.0, 0.0,  // Look at
-      0.0, 1.0, 0.0); // Up
-
-    // Move and rotate the view before drawing a box
-    glTranslatef(x, y, z);
-
-    glRotateY(angle_z);
-    glRotateX(angle_x);
-
-    // Use a different polygon ID for front-facing polygons and back-facing
-    // polygons. Draw the back-facing polygons first, then the front-facing
-    // ones.
-    //
-    // We don't know which polygons are front-facing or back-facing, so we
-    // use culling to select them for us (but we need to send the polygons
-    // to the GPU twice.
-
-    glPolyFmt(POLY_ALPHA(10) | POLY_ID(0) | POLY_CULL_FRONT);
-
-    draw_box(-0.75, -0.75, -0.75,
-      0.75, 0.75, 0.75);
-
-    glPolyFmt(POLY_ALPHA(10) | POLY_ID(1) | POLY_CULL_BACK);
-
-    draw_box(-0.75, -0.75, -0.75,
-      0.75, 0.75, 0.75);
   }
 
    System* Engine::GetSystem(E_SYSTEM_TYPE type)
