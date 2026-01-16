@@ -11,12 +11,14 @@ set(SOURCE_FILES
   src/main.c
   src/engine.cpp
   src/factania_main.cpp
+  src/rendersystem.cpp
 )
 
 set(HEADER_FILES
   src/engine.h
   src/factania_main.h
   src/system.h
+  src/rendersystem.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})

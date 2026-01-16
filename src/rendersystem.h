@@ -1,25 +1,31 @@
 //-----------------------------------------------------------------------------
 //
-//	File:   system.h
+//	File:   RenderSystem.h
 //  Author: Nicholas Brennan
 //  Date:   01/15/2026
 //
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
+//	Includes
+//-----------------------------------------------------------------------------
+
+#include "system.h"
+
+//-----------------------------------------------------------------------------
 //	Class Definition
 //-----------------------------------------------------------------------------
 
-namespace core {
+namespace render {
 
-	class system
+	class RenderSystem : public core::system
 	{
-	public:
-		virtual ~system() {}
+		RenderSystem();
+		~RenderSystem();
 
-		virtual void update() = 0;
-		virtual void draw() = 0;
-		
+		void BeginFrame();
+		void EndFrame();
+
 	};
 
 }
