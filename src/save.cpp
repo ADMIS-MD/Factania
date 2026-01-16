@@ -1,5 +1,4 @@
-﻿// save.c
-#include "save.h"
+﻿#include "save.h"
 
 #include <fat.h>
 #include <stdio.h>
@@ -14,8 +13,8 @@ static bool build_save_paths(char out_path[SAVE_PATH_MAX], char out_tmp[SAVE_PAT
         return false;
     }
 
-    snprintf(out_path, SAVE_PATH_MAX, "%sFactania.sav", cwd);
-    snprintf(out_tmp, SAVE_PATH_MAX, "%sFactania.tmp", cwd);
+    snprintf(out_path, SAVE_PATH_MAX, "%sfactoryds.sav", cwd);
+    snprintf(out_tmp, SAVE_PATH_MAX, "%sfactoryds.tmp", cwd);
 
     free(cwd);
     return true;

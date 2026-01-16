@@ -3,27 +3,31 @@ cmake_minimum_required(VERSION 3.16)
 # Force the compiler to work no matter what
 set(CMAKE_CXX_COMPILER_WORKS 1)
 
-project(Factania LANGUAGES C)
+project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
 
 
 add_executable(factoryds
 	src/main.c
-    src/test.c
-    src/save.c
-    src/engine.h
+    src/save.cpp
     src/engine.cpp
     src/factania_main.cpp
-    src/factania_main.h
-    src/test.h
     src/test.cpp
 )
 
-target_include_directories(factoryds PRIVATE sdk/libs/libnds/include)
-target_include_directories(factoryds PRIVATE extern)
+target_include_directories(factoryds PRIVATE "${CMAKE_SOURCE_DIR}/sdk/libs/libnds/include")
+target_link_directories(factoryds PRIVATE "${CMAKE_SOURCE_DIR}/sdk/libs/libnds/lib")
 
 if(NINTENDO_DS)
+
+    target_link_libraries(factoryds PRIVATE
+        "-Wl,--start-group"
+        nds9
+        c
+        "-Wl,--end-group"
+    )
+
     nds_create_rom(factoryds
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"

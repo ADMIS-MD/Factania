@@ -16,6 +16,9 @@ namespace core {
 		int angle_x, angle_z;
 
 		bool shouldQuit;
+
+		// save
+		SaveData savedata;
 	};
 
 }

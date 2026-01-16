@@ -2,6 +2,9 @@
 #pragma once
 
 #include <stdbool.h>
+#include <filesystem.h>
+#include <fat.h> 
+#include <unistd.h>
 
 typedef struct SaveData {
     float x, y, z;
