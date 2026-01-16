@@ -16,13 +16,15 @@
 #include "System.h"
 
 //-----------------------------------------------------------------------------
-//	Defines
+//	Defines & Globals
 //-----------------------------------------------------------------------------
 
 enum E_SYSTEM_TYPE {
 	SYSTEM_RENDER,
 	NUM_SYSTEMS
 };
+
+bool g_shouldQuit;
 
 //-----------------------------------------------------------------------------
 //	Class Definition
@@ -43,14 +45,7 @@ namespace core {
 
 		void Run();
 	private:
-		// test variables
-		float x, y, z;
-		int angle_x, angle_z;
-
-		bool shouldQuit;
-
 		System* m_systems[NUM_SYSTEMS];
-		int m_numSystems = 0;
 	};
 
 }

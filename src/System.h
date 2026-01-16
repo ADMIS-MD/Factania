@@ -19,8 +19,8 @@ namespace core {
 	public:
 		virtual ~System() {}
 
-		virtual void Update() {};
-		virtual void Draw() {};
+		virtual void Update() {}
+		virtual void Draw() {}
 		
 	};
 
