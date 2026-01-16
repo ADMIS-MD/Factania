@@ -19,4 +19,4 @@ After a crash landing, it's up to you to scrounge for resources and launch back 
 - Targets
   - `Build_NDS` will create a .nds file in the build directory.
   - `Melon_NDS` will build and run the .nds file in the bundled MelonDS app.
-  - `factoryds` is where the sources are contained. In the visual studio project, this is where you edit files. 
+  - `Factania` is where the sources are contained. In the visual studio project, this is where you edit files. 
