@@ -25,6 +25,9 @@ namespace render {
 	{
 		videoSetMode(MODE_0_3D);
 		glInit();
+
+		glEnable(GL_ANTIALIAS);
+		glEnable(GL_BLEND);
 	}
 
 	RenderSystem::~RenderSystem()

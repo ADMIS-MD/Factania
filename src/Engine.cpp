@@ -20,93 +20,20 @@
 #include <debug_menu/debug_menu.h>
 #include <sys/time.h>
 
+#include "RenderSystem.h"
+
 //-----------------------------------------------------------------------------
 //	Method Declarations
 //-----------------------------------------------------------------------------
-
-// SPDX-License-Identifier: CC0-1.0
-//
-// SPDX-FileContributor: Antonio Ni�o D�az, 2024-2025
-
-// This example shows how to draw a translucent 3D box in which you can see all
-// faces. This is how you would see 3D objects that are translucent, but not
-// fully solid. For example, you could have an empty cube where all the faces
-// are translucent pieces of plastic.
-
-static void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
-{
-  // Begin and end coordinates
-  int bx = floattov16(bx_);
-  int ex = floattov16(ex_);
-  int by = floattov16(by_);
-  int ey = floattov16(ey_);
-  int bz = floattov16(bz_);
-  int ez = floattov16(ez_);
-
-  glBegin(GL_QUADS);
-
-  glColor3f(1, 0, 0);
-
-  glVertex3v16(bx, by, bz);
-  glVertex3v16(bx, ey, bz);
-  glVertex3v16(ex, ey, bz);
-  glVertex3v16(ex, by, bz);
-
-  glColor3f(0, 1, 0);
-
-  glVertex3v16(bx, by, ez);
-  glVertex3v16(ex, by, ez);
-  glVertex3v16(ex, ey, ez);
-  glVertex3v16(bx, ey, ez);
-
-  glColor3f(0, 0, 1);
-
-  glVertex3v16(bx, by, bz);
-  glVertex3v16(ex, by, bz);
-  glVertex3v16(ex, by, ez);
-  glVertex3v16(bx, by, ez);
-
-  glColor3f(1, 0, 1);
-
-  glVertex3v16(bx, ey, bz);
-  glVertex3v16(bx, ey, ez);
-  glVertex3v16(ex, ey, ez);
-  glVertex3v16(ex, ey, bz);
-
-  glColor3f(0, 1, 1);
-
-  glVertex3v16(bx, by, bz);
-  glVertex3v16(bx, by, ez);
-  glVertex3v16(bx, ey, ez);
-  glVertex3v16(bx, ey, bz);
-
-  glColor3f(1, 1, 0);
-
-  glVertex3v16(ex, by, bz);
-  glVertex3v16(ex, ey, bz);
-  glVertex3v16(ex, ey, ez);
-  glVertex3v16(ex, by, ez);
-
-  glEnd();
-}
 
 namespace core {
 
   Engine::Engine()
 	{
+    m_systems[SYSTEM_RENDER] = new render::RenderSystem();
     // Setup sub screen for the text console
     consoleDemoInit();
 
-    videoSetMode(MODE_0_3D);
-
-    glInit();
-
-    glEnable(GL_ANTIALIAS);
-    glEnable(GL_BLEND);
-
-    // The background must be fully opaque and have a unique polygon ID
-    // (different from the polygons that are going to be drawn) so that
-    // alpha blending works.
     glClearColor(0, 0, 0, 31);
     glClearPolyID(63);
 
@@ -121,13 +48,6 @@ namespace core {
 
     // Switch to model view matrix
     glMatrixMode(GL_MODELVIEW);
-
-    angle_x = 45;
-    angle_z = 45;
-
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
 
     shouldQuit = false;
 
@@ -149,42 +69,13 @@ namespace core {
 
   void Engine::Update()
   {
-    scanKeys();
 
-    uint16_t keys = keysHeld();
-
-    if (keys & KEY_LEFT)
-      x -= 0.05;
-    if (keys & KEY_RIGHT)
-      x += 0.05;
-
-    if (keys & KEY_UP)
-      y += 0.05;
-    if (keys & KEY_DOWN)
-      y -= 0.05;
-
-    if (keys & KEY_A)
-      angle_x += 3;
-    if (keys & KEY_Y)
-      angle_x -= 3;
-
-    if (keys & KEY_X)
-      angle_z += 3;
-    if (keys & KEY_B)
-      angle_z -= 3;
-
-    if (keys & KEY_START)
-      shouldQuit = true;
   }
 
   void Engine::Draw()
   {
-    // Synchronize game loop to the screen refresh
-    swiWaitForVBlank();
 
-    // Render 3D scene
-    // ---------------
-
+<<<<<<< HEAD
     // Setup camera
     glLoadIdentity();
     gluLookAt(0.0, 0.0, 4.0,  // Position
@@ -204,29 +95,28 @@ namespace core {
     // We don't know which polygons are front-facing or back-facing, so we
     // use culling to select them for us (but we need to send the polygons
     // to the GPU twice.
-
-    glPolyFmt(POLY_ALPHA(10) | POLY_ID(0) | POLY_CULL_FRONT);
-
-    draw_box(-0.75, -0.75, -0.75,
-      0.75, 0.75, 0.75);
-
-    glPolyFmt(POLY_ALPHA(10) | POLY_ID(1) | POLY_CULL_BACK);
-
-    draw_box(-0.75, -0.75, -0.75,
-      0.75, 0.75, 0.75);
-
-    // Tell the hardware that we have sorted translucent polygons manually.
-
-    glFlush(GL_TRANS_MANUALSORT);
+=======
+>>>>>>> 549cef7 (Renamed files)
   }
+
+   System* Engine::GetSystem(E_SYSTEM_TYPE type)
+   {
+     return m_systems[type];
+   }
 
 	void Engine::Run()
 	{
     while (1)
     {
       check_debug_menu();
+      swiWaitForVBlank();
+
       Update();
+
+      render::BeginFrame();
       Draw();
+      render::EndFrame();
+
 
       if (shouldQuit)
         break;

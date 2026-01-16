@@ -6,11 +6,13 @@
 //
 //-----------------------------------------------------------------------------
 
+#pragma once
+
 //-----------------------------------------------------------------------------
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "system.h"
+#include "System.h"
 
 //-----------------------------------------------------------------------------
 //	Class Definition
@@ -20,12 +22,11 @@ namespace render {
 
 	class RenderSystem : public core::System
 	{
+	public:
 		RenderSystem();
 		~RenderSystem();
-
-		void BeginFrame();
-		void EndFrame();
-
 	};
 
+	void BeginFrame();
+	void EndFrame();
 }

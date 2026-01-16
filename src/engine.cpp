@@ -34,12 +34,6 @@ namespace core {
     // Setup sub screen for the text console
     consoleDemoInit();
 
-    glEnable(GL_ANTIALIAS);
-    glEnable(GL_BLEND);
-
-    // The background must be fully opaque and have a unique polygon ID
-    // (different from the polygons that are going to be drawn) so that
-    // alpha blending works.
     glClearColor(0, 0, 0, 31);
     glClearPolyID(63);
 
@@ -54,13 +48,6 @@ namespace core {
 
     // Switch to model view matrix
     glMatrixMode(GL_MODELVIEW);
-
-    angle_x = 45;
-    angle_z = 45;
-
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
 
     shouldQuit = false;
 
@@ -82,38 +69,13 @@ namespace core {
 
   void Engine::Update()
   {
-    scanKeys();
 
-    uint16_t keys = keysHeld();
-
-    if (keys & KEY_LEFT)
-      x -= 0.05;
-    if (keys & KEY_RIGHT)
-      x += 0.05;
-
-    if (keys & KEY_UP)
-      y += 0.05;
-    if (keys & KEY_DOWN)
-      y -= 0.05;
-
-    if (keys & KEY_A)
-      angle_x += 3;
-    if (keys & KEY_Y)
-      angle_x -= 3;
-
-    if (keys & KEY_X)
-      angle_z += 3;
-    if (keys & KEY_B)
-      angle_z -= 3;
-
-    if (keys & KEY_START)
-      shouldQuit = true;
   }
 
   void Engine::Draw()
   {
-    // Synchronize game loop to the screen refresh
 
+<<<<<<< HEAD
     // Setup camera
     glLoadIdentity();
     gluLookAt(0.0, 0.0, 4.0,  // Position
@@ -133,6 +95,8 @@ namespace core {
     // We don't know which polygons are front-facing or back-facing, so we
     // use culling to select them for us (but we need to send the polygons
     // to the GPU twice.
+=======
+>>>>>>> 549cef7 (Renamed files)
   }
 
    System* Engine::GetSystem(E_SYSTEM_TYPE type)
