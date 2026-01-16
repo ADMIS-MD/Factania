@@ -2,43 +2,59 @@
 
 #include <nds/ndstypes.h>
 #include <stdlib.h>
+#include <entt.hpp>
+#include <nds/arm9/videoGL.h>
+
+#include "transform.hpp"
 
 /* Ores are rendered as entities over the base tile-sheet
  *
  */
 
-// 512 byte chunk
+// Chunks in their most beefy state
 struct Chunk {
-    u16 pallete_indices[64];
-    u16 top_entity_ids[64]; // The topmost object's entity id, if it has an entity
+    Sprite cached_sprites[64];
+    entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
+    entt::entity surrounding_chunks[8];
 };
+
+class ChunkLookup {
+    std::unordered_map<u32, entt::entity> chunks;
+};
+
+u32 reinterpret_array_as_u32(u16 arr[2]);
 
 struct OreType {
 	u16 weight;
 	u16 item_id;
 	u32 base_amount;
 	u32 amount_variance;
+    rgb color;
     u8 splotch_gen_chance;
 };
 
 // Sohuld be moved
 struct OreContext {
-	OreType* ores;
+    u16 ore_count;
+    u16 ore_chance;
+    OreType* ores;
     // Binary search this from 0 to u16-max
 	u16* generated_probabilities;
-	u8 ore_count;
-	u8 ore_chance;
 };
 
 // T = type, ST = size type
 template<typename T, typename ST>
 T bsearch_T(T value, T const* list, ST size) {
+    if(size == 1)
+        return *list;
+    if (size == 0)
+        return -1;
+
 	ST half = size/2;
 	T const* mid = list + size/2;
-	ST vmid = *mid;
+	T vmid = *mid;
 
-	if(size == 1)
-		return *list;
+
 
 	if(value > vmid) {
 		return half + bsearch_T<T, ST>(value, mid, size - half);
@@ -49,54 +65,7 @@ T bsearch_T(T value, T const* list, ST size) {
 	}
 }
 
-void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {
-	u32 sum = 0;
-	for(int i = 0; i < count; ++i) {
-		sum += ores[i].weight;
-	}
-
-	u32 multiplier = UINT32_MAX / sum;
-	u32 acc = 0;
-	for(int i = 0; i < count - 1; ++i) {
-		acc += ores[i].weight;
-		u32 outv = acc * multiplier;
-		out[i] = static_cast<u16>(outv << 16);
-	}
-}
-
-u32 next_seed_a(u32 seed) {
-    srand(seed);
-    rand();
-}
-
-u32 scale_to(u32 max, u32 value) {
-    u32 scalar = UINT32_MAX / max;
-    return value / scalar;
-}
-
-void make_chunk(u32 local_seed, OreContext* context) {
-	//  8 bits for ore spawn chance
-	u8 ore_chance = static_cast<u8>(local_seed);
-	u16 ore_type = static_cast<u16>(local_seed << 8);
-    u8 ore_spawn_amount = static_cast<u8>(local_seed << 24);
-
-	// Spawn ore?
-    // TODO: Wave function collapse ? Perlin noise
-	if(ore_chance > context->ore_chance) {
-		u8 ore_idx = bsearch_T<u16, u8>(ore_type, context->generated_probabilities, context->ore_count)++;
-		u8 probability_v = context->generated_probabilities[ore_idx];
-	    if (ore_type < probability_v)
-	        ore_idx = 0;
-
-        OreType* ore = context->ores[ore_idx];
-
-	    u32 ore_seed = local_seed;
-	    for (int i = 0; i < ore_spawn_amount; ++i) {
-            ore_seed = next_seed_a(ore_seed);
-	        u8 pos = static_cast<u8>(ore_seed);
-            u32 ore_amount = scale_to(ore->amount_variance, ore_seed);
-	        ore_amount = ore->base_amount + ore_amount - ore_amount / 2;
-	        // TODO: set ore at position `pos` to `ore_amount`
-	    }
-	}
-}
+entt::entity make_chunk(u32 local_seed, FactoryTransform* chunk_position, OreContext& context, entt::registry& registry);
+FactoryLayer chunk_push_entity(Chunk &storage, u8 position, Sprite sprite, entt::entity e, entt::registry& registry);
+void chunk_pop_entity(Chunk &storage, u8 position, FactoryLayer& layer, entt::registry &registry);
+void chunk_update_entity(Chunk &storage, u8 position, entt::registry &registry);

@@ -7,20 +7,38 @@ project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
 
-add_executable(factoryds 
+
+add_executable(factoryds
 	src/main.c
     src/test.cpp
     src/chunk.cpp
     src/chunk.hpp
+
+    extern/entt.hpp
+        src/entity.cpp
+        src/entity.h
+        src/transform.cpp
+        src/transform.hpp
+        src/test.h
 )
 
+#find_package(grit QUIET)
+#add_custom_command(
+#        TARGET factoryds
+#        PRE_LINK
+#        COMMAND ${GRIT_EXECUTABLE}
+#        ARGS ${GRIT_IMAGES} -ftc -W1 -o${CMAKE_CURRENT_BINARY_DIR}
+#)
+
 target_include_directories(factoryds PRIVATE sdk/libs/libnds/include)
+target_include_directories(factoryds PRIVATE extern)
 
 if(NINTENDO_DS)
     nds_create_rom(factoryds
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
         AUTHOR "ADMIS Manufacturing Division"
+        NITROFS fs
     )
 else()
     target_compile_definitions(factoryds PUBLIC ARM9)

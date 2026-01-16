@@ -14,6 +14,7 @@
 #include <nds.h>
 #include <sys/time.h>
 #include "test.h"
+#include <filesystem.h>
 
 void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
 {
@@ -74,6 +75,8 @@ void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
 
 int main(int argc, char **argv)
 {
+    defaultExceptionHandler();
+
     // Setup sub screen for the text console
     consoleDemoInit();
 
@@ -114,12 +117,16 @@ int main(int argc, char **argv)
 
     consoleClear();
 
+    if (!nitroFSInit(NULL)) {
+        perror("NitroFS init error!");
+    }
+
     // Print some controls
     printf("PAD:     Moveeeee\n");
     printf("A,B,X,Y: Rotate\n");
     printf("\n");
     printf("START:   Exit to loader\n");
-    printf("%\n", stupid_fn);
+    printf("%i\n", stupid_fn());
 
     while (1)
     {
@@ -159,35 +166,37 @@ int main(int argc, char **argv)
         // Render 3D scene
         // ---------------
 
+
+
         // Setup camera
-        glLoadIdentity();
-        gluLookAt(0.0, 0.0, 4.0,  // Position
-                  0.0, 0.0, 0.0,  // Look at
-                  0.0, 1.0, 0.0); // Up
-
-        // Move and rotate the view before drawing a box
-        glTranslatef(x, y, z);
-
-        glRotateY(angle_z);
-        glRotateX(angle_x);
-
-        // Use a different polygon ID for front-facing polygons and back-facing
-        // polygons. Draw the back-facing polygons first, then the front-facing
-        // ones.
+        // glLoadIdentity();
+        // gluLookAt(0.0, 0.0, 4.0,  // Position
+        //           0.0, 0.0, 0.0,  // Look at
+        //           0.0, 1.0, 0.0); // Up
         //
-        // We don't know which polygons are front-facing or back-facing, so we
-        // use culling to select them for us (but we need to send the polygons
-        // to the GPU twice.
-
-        glPolyFmt(POLY_ALPHA(10) | POLY_ID(0) | POLY_CULL_FRONT);
-
-        draw_box(-0.75, -0.75, -0.75,
-                 0.75, 0.75, 0.75);
-
-        glPolyFmt(POLY_ALPHA(10) | POLY_ID(1) | POLY_CULL_BACK);
-
-        draw_box(-0.75, -0.75, -0.75,
-                 0.75, 0.75, 0.75);
+        // // Move and rotate the view before drawing a box
+        // glTranslatef(x, y, z);
+        //
+        // glRotateY(angle_z);
+        // glRotateX(angle_x);
+        //
+        // // Use a different polygon ID for front-facing polygons and back-facing
+        // // polygons. Draw the back-facing polygons first, then the front-facing
+        // // ones.
+        // //
+        // // We don't know which polygons are front-facing or back-facing, so we
+        // // use culling to select them for us (but we need to send the polygons
+        // // to the GPU twice.
+        //
+        // glPolyFmt(POLY_ALPHA(10) | POLY_ID(0) | POLY_CULL_FRONT);
+        //
+        // draw_box(-0.75, -0.75, -0.75,
+        //          0.75, 0.75, 0.75);
+        //
+        // glPolyFmt(POLY_ALPHA(10) | POLY_ID(1) | POLY_CULL_BACK);
+        //
+        // draw_box(-0.75, -0.75, -0.75,
+        //          0.75, 0.75, 0.75);
 
         // Tell the hardware that we have sorted translucent polygons manually.
 
