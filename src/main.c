@@ -1,11 +1,12 @@
-// SPDX-License-Identifier: CC0-1.0
+//-----------------------------------------------------------------------------
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2024-2025
+//	File: main.c
+//
+//-----------------------------------------------------------------------------
 
-// This example shows how to draw a translucent 3D box in which you can see all
-// faces. This is how you would see 3D objects that are translucent, but not
-// fully solid. For example, you could have an empty cube where all the faces
-// are translucent pieces of plastic.
+//-----------------------------------------------------------------------------
+//	Includes
+//-----------------------------------------------------------------------------
 
 #include <errno.h>
 #include <dlfcn.h>
@@ -17,8 +18,13 @@
 #include "test.h"
 #include "save.h"
 #include <fat.h> 
+#include "factania_main.h"
 
-void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
+//-----------------------------------------------------------------------------
+//	Functions
+//-----------------------------------------------------------------------------
+
+int main(void)
 {
     // Begin and end coordinates
     int bx = floattov16(bx_);
@@ -274,4 +280,5 @@ int main(int argc, char **argv)
     }
 
     return 0;
+	return factania_main();
 }
