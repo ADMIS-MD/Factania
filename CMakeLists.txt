@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 # Force the compiler to work no matter what
 set(CMAKE_CXX_COMPILER_WORKS 1)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True) 
 
 project(Factania LANGUAGES C CXX)
 
