@@ -10,12 +10,11 @@ string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 
 configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
+
 set(SOURCE_FILES
   src/main.c
-  src/engine.cpp
   src/factania_main.cpp
 )
-
 
 set(HEADER_FILES
   src/engine.h
@@ -39,6 +38,7 @@ if(NINTENDO_DS)
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
         AUTHOR "ADMIS Manufacturing Division"
+        NITROFS fs
     )
 else()
     target_compile_definitions(Factania PUBLIC ARM9)
@@ -65,7 +65,7 @@ add_custom_target(Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/scripts)
 
 add_custom_target(Melon_NDS
-    COMMAND scripts/melonds/${MELONDS_PATH} build/factania.nds
+    COMMAND scripts/melonds/${MELONDS_PATH} build/Factania.nds
     DEPENDS Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
