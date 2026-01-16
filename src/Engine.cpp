@@ -21,7 +21,7 @@
 #include <sys/time.h>
 
 #include "RenderSystem.h"
-
+#include <gl2d.h>
 //-----------------------------------------------------------------------------
 //	Method Declarations
 //-----------------------------------------------------------------------------
@@ -31,72 +31,31 @@ namespace core {
   Engine::Engine()
 	{
     m_systems[SYSTEM_RENDER] = new render::RenderSystem();
-    // Setup sub screen for the text console
     consoleDemoInit();
-
-    glClearColor(0, 0, 0, 31);
-    glClearPolyID(63);
-
-    glClearDepth(0x7FFF);
-
-    glViewport(0, 0, 255, 191);
-
-    // Setup perspective
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(70, 256.0 / 192.0, 0.1, 40);
-
-    // Switch to model view matrix
-    glMatrixMode(GL_MODELVIEW);
-
-    shouldQuit = false;
-
-    // Print some text in the demo console
-    consoleClear();
-
-    // Print some controls
-    printf("PAD:     Move\n");
-    printf("A,B,X,Y: Rotate\n");
-    printf("\n");
-    printf("START:   Exit to loader\n");
-    printf("Printing from Engine");
 	}
 
   Engine::~Engine()
 	{
-
+    for (uint8 i = 0; i < NUM_SYSTEMS; ++i)
+    {
+      delete m_systems[i];
+    }
 	}
 
   void Engine::Update()
   {
-
+    for (uint8 i = 0; i < NUM_SYSTEMS; ++i)
+    {
+      m_systems[i]->Update();
+    }
   }
 
   void Engine::Draw()
   {
-
-<<<<<<< HEAD
-    // Setup camera
-    glLoadIdentity();
-    gluLookAt(0.0, 0.0, 4.0,  // Position
-      0.0, 0.0, 0.0,  // Look at
-      0.0, 1.0, 0.0); // Up
-
-    // Move and rotate the view before drawing a box
-    glTranslatef(x, y, z);
-
-    glRotateY(angle_z);
-    glRotateX(angle_x);
-
-    // Use a different polygon ID for front-facing polygons and back-facing
-    // polygons. Draw the back-facing polygons first, then the front-facing
-    // ones.
-    //
-    // We don't know which polygons are front-facing or back-facing, so we
-    // use culling to select them for us (but we need to send the polygons
-    // to the GPU twice.
-=======
->>>>>>> 549cef7 (Renamed files)
+    for (uint8 i = 0; i < NUM_SYSTEMS; ++i)
+    {
+      m_systems[i]->Draw();
+    }
   }
 
    System* Engine::GetSystem(E_SYSTEM_TYPE type)
@@ -118,7 +77,7 @@ namespace core {
       render::EndFrame();
 
 
-      if (shouldQuit)
+      if (g_shouldQuit)
         break;
     }
 	}
