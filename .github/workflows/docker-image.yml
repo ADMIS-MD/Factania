@@ -22,4 +22,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rom
-          path: build/factoryds.nds
+          path: build/Factania.nds
