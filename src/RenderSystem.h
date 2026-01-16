@@ -6,20 +6,11 @@
 //
 //-----------------------------------------------------------------------------
 
-#pragma once
-
 //-----------------------------------------------------------------------------
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "System.h"
-
-//-----------------------------------------------------------------------------
-//  Defines
-//-----------------------------------------------------------------------------
-
-#define TOP_SCREEN_WIDTH  256
-#define TOP_SCREEN_HEIGHT 192
+#include "system.h"
 
 //-----------------------------------------------------------------------------
 //	Class Definition
@@ -29,14 +20,12 @@ namespace render {
 
 	class RenderSystem : public core::System
 	{
-	public:
 		RenderSystem();
 		~RenderSystem();
 
-		void Draw() override;
+		void BeginFrame();
+		void EndFrame();
 
 	};
 
-	void BeginFrame();
-	void EndFrame();
 }

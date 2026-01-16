@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //
-//	File:   system.h
+//	File:   System.h
 //  Author: Nicholas Brennan
 //  Date:   01/15/2026
 //
@@ -12,13 +12,13 @@
 
 namespace core {
 
-	class system
+	class System
 	{
 	public:
-		virtual ~system() {}
+		virtual ~System() {}
 
-		virtual void update() = 0;
-		virtual void draw() = 0;
+		virtual void Update() = 0;
+		virtual void Draw() = 0;
 		
 	};
 

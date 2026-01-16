@@ -6,14 +6,19 @@
 //
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+//	Class Definition
+//-----------------------------------------------------------------------------
+
 namespace core {
 
-	class system
+	class System
 	{
-		virtual ~system() {}
+	public:
+		virtual ~System() {}
 
-		virtual void update() = 0;
-		virtual void draw() = 0;
+		virtual void Update() = 0;
+		virtual void Draw() = 0;
 		
 	};
 

@@ -10,7 +10,7 @@
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "rendersystem.h"
+#include "RenderSystem.h"
 
 #include <nds.h>
 #include <gl2d.h>

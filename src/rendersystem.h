@@ -18,7 +18,7 @@
 
 namespace render {
 
-	class RenderSystem : public core::system
+	class RenderSystem : public core::System
 	{
 		RenderSystem();
 		~RenderSystem();

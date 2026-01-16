@@ -21,7 +21,6 @@ set(SOURCE_FILES
   src/debug_menu/memory_debug_info.cpp
   src/debug_menu/build_details_menu.cpp
 )
-)
 
 set(HEADER_FILES
 src/FactaniaMain.h
