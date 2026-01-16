@@ -9,16 +9,16 @@ include(scripts/cmake/git.cmake)
 
 set(SOURCE_FILES
   src/main.c
-  src/engine.cpp
-  src/factania_main.cpp
-  src/rendersystem.cpp
+  src/Engine.cpp
+  src/FactaniaMain.cpp
+  src/RenderSystem.cpp
 )
 
 set(HEADER_FILES
-  src/engine.h
-  src/factania_main.h
-  src/system.h
-  src/rendersystem.h
+  src/Engine.h
+  src/FactaniaMain.h
+  src/System.h
+  src/RenderSystem.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})

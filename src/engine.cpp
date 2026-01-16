@@ -10,7 +10,7 @@
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "engine.h"
+#include "Engine.h"
 
 #include <errno.h>
 #include <dlfcn.h>
@@ -18,7 +18,6 @@
 
 #include <nds.h>
 #include <sys/time.h>
-#include "test.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -92,7 +91,7 @@ static void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, floa
 
 namespace core {
 
-	engine::engine()
+  Engine::Engine()
 	{
     // Setup sub screen for the text console
     consoleDemoInit();
@@ -142,12 +141,12 @@ namespace core {
     printf("Printing from Engine");
 	}
 
-	engine::~engine()
+  Engine::~Engine()
 	{
 
 	}
 
-  void engine::update()
+  void Engine::Update()
   {
     scanKeys();
 
@@ -177,7 +176,7 @@ namespace core {
       shouldQuit = true;
   }
 
-  void engine::draw()
+  void Engine::Draw()
   {
     // Synchronize game loop to the screen refresh
     swiWaitForVBlank();
@@ -220,12 +219,12 @@ namespace core {
     glFlush(GL_TRANS_MANUALSORT);
   }
 
-	void engine::run()
+	void Engine::Run()
 	{
     while (1)
     {
-      update();
-      draw();
+      Update();
+      Draw();
 
       if (shouldQuit)
         break;
