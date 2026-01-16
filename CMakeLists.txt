@@ -39,14 +39,14 @@ target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
 target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
-    nds_create_rom(factoryds
+    nds_create_rom(Factania
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
         AUTHOR "ADMIS Manufacturing Division"
         NITROFS fs
     )
 else()
-    target_compile_definitions(factoryds PUBLIC ARM9)
+    target_compile_definitions(Factania PUBLIC ARM9)
 endif()
 
 find_program(MELONDS_PATH "melonDS")
@@ -70,7 +70,7 @@ add_custom_target(Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/scripts)
 
 add_custom_target(Melon_NDS
-    COMMAND scripts/melonds/${MELONDS_PATH} build/factoryds.nds
+    COMMAND scripts/melonds/${MELONDS_PATH} build/Factania.nds
     DEPENDS Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 

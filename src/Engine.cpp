@@ -77,7 +77,7 @@ namespace core {
       render::EndFrame();
 
 
-      if (g_shouldQuit)
+      if (m_shouldQuit)
         break;
     }
 	}

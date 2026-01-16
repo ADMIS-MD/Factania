@@ -23,8 +23,6 @@ enum E_SYSTEM_TYPE {
 	NUM_SYSTEMS
 };
 
-bool g_shouldQuit;
-
 //-----------------------------------------------------------------------------
 //	Class Definition
 //-----------------------------------------------------------------------------
@@ -45,6 +43,7 @@ namespace core {
 		void Run();
 	private:
 		System* m_systems[NUM_SYSTEMS];
+		bool m_shouldQuit;
 	};
 
 }
