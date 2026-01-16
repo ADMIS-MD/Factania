@@ -14,16 +14,17 @@ configure_file(src/generated_defines.h.in generated/generated_defines.h)
 set(SOURCE_FILES
   src/main.c
   src/factania_main.cpp
+  src/engine.cpp
+  src/debug_menu/debug_menu.cpp
+  src/debug_menu/memory_debug_info.cpp
+  src/debug_menu/build_details_menu.cpp
 )
 
 set(HEADER_FILES
   src/engine.h
   src/factania_main.h
-  src/debug_menu/debug_menu.cpp
   src/debug_menu/debug_menu.h
-  src/debug_menu/memory_debug_info.cpp
   src/debug_menu/memory_debug_info.h
-  src/debug_menu/build_details_menu.cpp
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
 )
