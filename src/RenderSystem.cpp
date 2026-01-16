@@ -35,6 +35,7 @@ namespace render {
 
 	void RenderSystem::Draw()
 	{
+		// test box
 		glBoxFilledGradient(0, 0,
 			TOP_SCREEN_WIDTH / 2 - 1, TOP_SCREEN_HEIGHT / 2- 1,
 			RGB15(31, 0, 0),

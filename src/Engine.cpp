@@ -11,17 +11,11 @@
 //-----------------------------------------------------------------------------
 
 #include "Engine.h"
-
-#include <errno.h>
-#include <dlfcn.h>
-#include <stdio.h>
-
-#include <nds.h>
-#include <debug_menu/debug_menu.h>
-#include <sys/time.h>
-
 #include "RenderSystem.h"
-#include <gl2d.h>
+
+#include "debug_menu/debug_menu.h"
+#include <nds.h>
+
 //-----------------------------------------------------------------------------
 //	Method Declarations
 //-----------------------------------------------------------------------------
@@ -29,18 +23,18 @@
 namespace core {
 
   Engine::Engine()
-	{
+  {
     m_systems[SYSTEM_RENDER] = new render::RenderSystem();
     consoleDemoInit();
-	}
+  }
 
   Engine::~Engine()
-	{
+  {
     for (uint8 i = 0; i < NUM_SYSTEMS; ++i)
     {
       delete m_systems[i];
     }
-	}
+  }
 
   void Engine::Update()
   {
@@ -58,13 +52,13 @@ namespace core {
     }
   }
 
-   System* Engine::GetSystem(E_SYSTEM_TYPE type)
-   {
-     return m_systems[type];
-   }
+  System* Engine::GetSystem(E_SYSTEM_TYPE type)
+  {
+    return m_systems[type];
+  }
 
-	void Engine::Run()
-	{
+  void Engine::Run()
+  {
     while (1)
     {
       check_debug_menu();
@@ -80,6 +74,5 @@ namespace core {
       if (m_shouldQuit)
         break;
     }
-	}
-
+  }
 }
