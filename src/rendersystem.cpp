@@ -23,8 +23,8 @@ namespace render {
 
 	RenderSystem::RenderSystem()
 	{
-		glScreen2D();
 		videoSetMode(MODE_0_3D);
+		glInit();
 	}
 
 	RenderSystem::~RenderSystem()
@@ -32,15 +32,20 @@ namespace render {
 
 	}
 
-	void RenderSystem::BeginFrame()
+	void BeginFrame()
 	{
-		glBegin2D();
+		//glBegin();
 	}
 
-	void RenderSystem::EndFrame()
+	void EndFrame()
 	{
-		glEnd2D();
-		glFlush(0);
+		glEnd();
+		glFlush(GL_TRANS_MANUALSORT);
+	}
+
+	void SetClearColor(uint8 r, uint8 g, uint8 b, uint8 a)
+	{
+		glClearColor(r, g, b, a);
 	}
 
 }
