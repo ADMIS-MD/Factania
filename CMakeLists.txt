@@ -31,6 +31,7 @@ src/FactaniaMain.h
   src/debug_menu/memory_debug_info.h
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
+  src/save.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
@@ -39,6 +40,13 @@ target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
 target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
+    target_link_libraries(Factania PRIVATE
+        "-Wl,--start-group"
+        nds9
+        c
+        "-Wl,--end-group"
+    )
+
     nds_create_rom(Factania
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"

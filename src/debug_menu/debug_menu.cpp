@@ -16,6 +16,10 @@ std::vector<DebugNode*> main_nodes = {
     new SubmenuDebugNode{"Build Info", build_details_debug_page}
 };
 
+void add_debug_node_to_root(DebugNode* node) {
+    main_nodes.push_back(node);
+}
+
 struct DebugState {
     std::vector<DebugNode*>& nodes;
     int idx;
@@ -42,10 +46,19 @@ void debug_print(std::vector<DebugState>& node_stack, bool& selected) {
         }
 
         if (keysDown() & KEY_A) {
-            if (auto submenu = dynamic_cast<SubmenuDebugNode*>(top->nodes[top->idx]); submenu != nullptr) {
+            /* if (auto submenu = dynamic_cast<SubmenuDebugNode*>(top->nodes[top->idx]); submenu != nullptr) {
                 node_stack.push_back({submenu->nodes, 0, submenu->name});
                 top = &node_stack.back();
             } else {
+                selected = true;
+            } */
+            DebugNode* curr = top->nodes[top->idx];
+            if (curr->has_children()) {
+                curr->on_enter();
+                node_stack.push_back({ curr->children(), 0, curr->child_menu_name() });
+                top = &node_stack.back();
+            }
+            else {
                 selected = true;
             }
         }
@@ -66,12 +79,13 @@ void debug_print(std::vector<DebugState>& node_stack, bool& selected) {
 
         top->nodes[i]->update(selected);
     }
+    printf("\nB: Back\n");
 }
 
 SubmenuDebugNode::SubmenuDebugNode(const char *_name, std::vector<DebugNode *> &_nodes): name(_name), nodes(_nodes) {}
 
 void SubmenuDebugNode::update(bool &selected) {
-    printf("%s >>\n", name);
+    printf("%-*.*s >>\n", MENU_WIDTH, MENU_WIDTH, name);
 }
 
 void MarkerDebugNode::update(bool &selected) {
@@ -104,5 +118,13 @@ void check_debug_menu() {
 
         consoleClear();
         consoleDebugInit(DebugDevice_NULL);
+
+        // Print some controls
+        printf("PAD:     Move\n");
+        printf("A,B,X,Y: Rotate\n");
+        printf("\n");
+        printf("START:   Exit to loader\n");
+        printf("SELECT:  Open Debug Menu\n");
+        printf("\nPrinting from Engine\n");
     }
 };
