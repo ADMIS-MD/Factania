@@ -14,8 +14,8 @@ configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
 set(SOURCE_FILES
   src/main.c
-  src/Engine.cpp
   src/FactaniaMain.cpp
+  src/Engine.cpp
   src/RenderSystem.cpp
   src/debug_menu/debug_menu.cpp
   src/debug_menu/memory_debug_info.cpp
@@ -24,8 +24,8 @@ set(SOURCE_FILES
 )
 
 set(HEADER_FILES
+src/FactaniaMain.h
   src/Engine.h
-  src/FactaniaMain.h
   src/System.h
   src/RenderSystem.h
   src/debug_menu/debug_menu.h
