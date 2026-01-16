@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 #include <nds.h>
+#include <debug_menu/debug_menu.h>
 #include <sys/time.h>
 #include "test.h"
 
@@ -26,7 +27,7 @@
 
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2024-2025
+// SPDX-FileContributor: Antonio Niï¿½o Dï¿½az, 2024-2025
 
 // This example shows how to draw a translucent 3D box in which you can see all
 // faces. This is how you would see 3D objects that are translucent, but not
@@ -224,6 +225,7 @@ namespace core {
 	{
     while (1)
     {
+      check_debug_menu();
       update();
       draw();
 
