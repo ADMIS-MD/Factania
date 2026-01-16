@@ -8,9 +8,22 @@
 #include <functional>
 #include <string>
 
+#define MENU_WIDTH 12
+
 class DebugNode {
 public:
+    virtual ~DebugNode() = default;
     virtual void update(bool& selected) = 0;
+    virtual bool has_children() const { return false; }
+
+    virtual std::vector<DebugNode*>& children() {
+        static std::vector<DebugNode*> empty;
+        return empty;
+    }
+
+    virtual const char* child_menu_name() const { return ""; }
+
+    virtual void on_enter() {}
 };
 
 class SubmenuDebugNode : public DebugNode {
@@ -19,6 +32,10 @@ public:
     const char* name;
     std::vector<DebugNode*>& nodes;
     void update(bool& selected) override;
+
+    bool has_children() const override { return true; }
+    std::vector<DebugNode*>& children() override { return nodes; }
+    const char* child_menu_name() const override { return name; }
 };
 
 class MarkerDebugNode : public DebugNode {
@@ -33,6 +50,24 @@ public:
     FunctionResultNode(const std::function<std::string()>& _func) : func(_func) {};
     std::function<std::string()> func;
     void update(bool& selected) override;
+};
+
+class CallbackDebugNode : public DebugNode {
+public:
+    CallbackDebugNode(const char* _name, std::function<std::string()> _callback);
+    void update(bool& selected) override;
+
+    bool has_children() const override { return true; }
+    std::vector<DebugNode*>& children() override { return result_page; }
+    const char* child_menu_name() const override { return name; }
+
+    void on_enter() override;
+private:
+    const char* name;
+    std::function<std::string()> callback;
+
+    std::string result;
+    std::vector<DebugNode*> result_page;
 };
 
 void check_debug_menu();

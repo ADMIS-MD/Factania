@@ -10,7 +10,6 @@ string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 
 configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
-
 set(SOURCE_FILES
   src/main.c
   src/factania_main.cpp
@@ -18,6 +17,8 @@ set(SOURCE_FILES
   src/debug_menu/debug_menu.cpp
   src/debug_menu/memory_debug_info.cpp
   src/debug_menu/build_details_menu.cpp
+  src/debug_menu/save_debug_menu.cpp
+  src/save.cpp
 )
 
 set(HEADER_FILES
@@ -27,6 +28,7 @@ set(HEADER_FILES
   src/debug_menu/memory_debug_info.h
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
+  src/save.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
@@ -35,6 +37,13 @@ target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
 target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
+    target_link_libraries(Factania PRIVATE
+        "-Wl,--start-group"
+        nds9
+        c
+        "-Wl,--end-group"
+    )
+
     nds_create_rom(Factania
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
