@@ -18,7 +18,6 @@
 
 #include <nds.h>
 #include <debug_menu/debug_menu.h>
-#include <sys/time.h>
 #include "test.h"
 #include "save.h"
 
@@ -98,6 +97,7 @@ namespace core {
     {
         // Initializing fat
         bool init_ok = fatInitDefault();
+
         if (!init_ok) {
             // Handle error
             consoleDemoInit();
@@ -107,10 +107,6 @@ namespace core {
             while (1)
                 swiWaitForVBlank();
         }
-
-              check_debug_menu();
-      update();
-      draw();
 
         // Setup sub screen for the text console
         consoleDemoInit();
@@ -170,18 +166,59 @@ namespace core {
             printf("Save file not found\n");
         }
 
+        // Save Debug Menu Callbacks
+        static std::vector<DebugNode*> s_save_menu_nodes;
+
+        s_save_menu_nodes.push_back(new CallbackDebugNode("Save Game", [this]() -> std::string {
+            savedata.save_count++;
+            savedata.x = x;
+            savedata.y = y;
+            savedata.z = z;
+            savedata.angle_x = angle_x;
+            savedata.angle_z = angle_z;
+
+            if (save_write(&savedata)) {
+                return "Game Saved. Revision " + std::to_string(savedata.save_count);
+            }
+            return "Save Failed";
+        }));
+
+        s_save_menu_nodes.push_back(new CallbackDebugNode("Load Save", [this]() -> std::string {
+            if (save_load(&savedata)) {
+                x = savedata.x;
+                y = savedata.y;
+                z = savedata.z;
+                angle_x = savedata.angle_x;
+                angle_z = savedata.angle_z;
+
+                return "Save Loaded. Revision " + std::to_string(savedata.save_count);
+            }
+            return "Save file not found";
+        }));
+
+        s_save_menu_nodes.push_back(new CallbackDebugNode("Delete Save", [this]() -> std::string {
+            if (save_delete()) {
+                savedata.save_count = 0;
+                return "Save deleted";
+            }
+            else {
+                return "Failed to delete save";
+            }
+        }));
+
+        add_debug_node_to_root(new SubmenuDebugNode("Save Menu", s_save_menu_nodes));
+
         // Print some controls
         printf("PAD:     Move\n");
         printf("A,B,X,Y: Rotate\n");
         printf("\n");
         printf("START:   Exit to loader\n");
-        printf("Printing from Engine\n");
+        printf("SELECT:  Open Debug Menu\n");
+        printf("\nPrinting from Engine\n");
     }
 
     engine::~engine()
-    {
-
-    }
+    {}
 
     void engine::update()
     {
@@ -210,52 +247,8 @@ namespace core {
         if (keys & KEY_B)
             angle_z -= 3;
 
-        // Save data
-        if (down & KEY_START) {
-            savedata.save_count++;
-            savedata.x = x;
-            savedata.y = y;
-            savedata.z = z;
-            savedata.angle_x = angle_x;
-            savedata.angle_z = angle_z;
-
-            if (save_write(&savedata)) {
-                printf("Saved. Revision number: %i\n", savedata.save_count);
-            }
-            else {
-                printf("Save failed\n");
-            }
-        }
-
-        // Load data
-        if (down & KEY_SELECT) {
-            bool loaded = save_load(&savedata);
-
-            if (loaded) {
-                x = savedata.x;
-                y = savedata.y;
-                z = savedata.z;
-                angle_x = savedata.angle_x;
-                angle_z = savedata.angle_z;
-
-                printf("Save file loaded: Revision %i\n", savedata.save_count);
-            }
-            else {
-                printf("Save file not found\n");
-            }
-        }
-
-        // Delete data
-        if (down & KEY_LID) {
-            bool deleted = save_delete();
-
-            if (deleted) {
-                printf("Save file deleted\n");
-            }
-            else {
-                printf("Failed to delete save file\n");
-            }
-        }
+        if (down & KEY_START)
+            shouldQuit = true;
     }
 
     void engine::draw()
@@ -307,6 +300,7 @@ namespace core {
         {
             update();
             draw();
+            check_debug_menu();
 
             if (shouldQuit)
                 break;

@@ -1,9 +1,13 @@
-﻿#include "save.h"
+﻿// Sangbeom Kim
+// 01/14/2026
+
+#include "save.h"
 
 #include <fat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #define SAVE_PATH_MAX 512
 
@@ -13,8 +17,8 @@ static bool build_save_paths(char out_path[SAVE_PATH_MAX], char out_tmp[SAVE_PAT
         return false;
     }
 
-    snprintf(out_path, SAVE_PATH_MAX, "%sfactoryds.sav", cwd);
-    snprintf(out_tmp, SAVE_PATH_MAX, "%sfactoryds.tmp", cwd);
+    snprintf(out_path, SAVE_PATH_MAX, "%sFactania.sav", cwd);
+    snprintf(out_tmp, SAVE_PATH_MAX, "%sFactania.tmp", cwd);
 
     free(cwd);
     return true;
@@ -89,8 +93,15 @@ bool save_delete(void) {
         return false;
     }
 
-    remove(savePath);
-    remove(tmpPath);
+    bool ok = true;
 
-    return true;
+    if (remove(savePath) != 0) {
+        if (errno != ENOENT) ok = false;
+    }
+
+    if (remove(tmpPath) != 0) {
+        if (errno != ENOENT) ok = false;
+    }
+
+    return ok;
 }

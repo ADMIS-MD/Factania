@@ -17,6 +17,7 @@ set(SOURCE_FILES
   src/debug_menu/debug_menu.cpp
   src/debug_menu/memory_debug_info.cpp
   src/debug_menu/build_details_menu.cpp
+  src/debug_menu/save_debug_menu.cpp
   src/save.cpp
 )
 
@@ -36,7 +37,7 @@ target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
 target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
-    target_link_libraries(factoryds PRIVATE
+    target_link_libraries(Factania PRIVATE
         "-Wl,--start-group"
         nds9
         c
