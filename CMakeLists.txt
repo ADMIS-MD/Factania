@@ -33,7 +33,15 @@ set(HEADER_FILES
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
 
-target_include_directories(Factania PRIVATE sdk/libs/libnds/include src/)
+# Include all sdk header directories
+target_include_directories(Factania PRIVATE
+        src/
+        sdk/libs/libnds/include
+        sdk/libs/dswifi/include
+        sdk/libs/libteak/include
+        sdk/libs/libxm7/include
+        sdk/libs/maxmod/include)
+
 target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
