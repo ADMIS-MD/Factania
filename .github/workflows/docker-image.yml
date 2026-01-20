@@ -2,9 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
 
@@ -13,7 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build -q -t factory-ds ./scripts && docker run --rm -v "./":/work -t --entrypoint bash factory-ds:latest ./scripts/build-toolchained.sh
-
+      - uses: actions/checkout@v4
+      - name: Build nds
+        run: docker build -q -t factory-ds ./scripts && docker run --rm -v "./":/work -t --entrypoint bash factory-ds:latest ./scripts/build-toolchained.sh
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rom
+          path: build/Factania.nds

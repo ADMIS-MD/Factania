@@ -6,42 +6,60 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 
+configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
-add_executable(factoryds
-	src/main.c
-    src/test.cpp
-    src/chunk.cpp
-    src/chunk.hpp
-
-    extern/entt.hpp
-        src/entity.cpp
-        src/entity.h
-        src/transform.cpp
-        src/transform.hpp
-        src/test.h
+set(SOURCE_FILES
+  src/main.c
+  src/factania_main.cpp
+  src/engine.cpp
+  src/debug_menu/debug_menu.cpp
+  src/debug_menu/memory_debug_info.cpp
+  src/debug_menu/build_details_menu.cpp
+  src/debug_menu/save_debug_menu.cpp
+  src/save.cpp
 )
 
-#find_package(grit QUIET)
-#add_custom_command(
-#        TARGET factoryds
-#        PRE_LINK
-#        COMMAND ${GRIT_EXECUTABLE}
-#        ARGS ${GRIT_IMAGES} -ftc -W1 -o${CMAKE_CURRENT_BINARY_DIR}
-#)
+set(HEADER_FILES
+  src/engine.h
+  src/factania_main.h
+  src/debug_menu/debug_menu.h
+  src/debug_menu/memory_debug_info.h
+  src/debug_menu/build_details_menu.h
+  generated/generated_defines.h
+  src/save.h
+)
 
-target_include_directories(factoryds PRIVATE sdk/libs/libnds/include)
-target_include_directories(factoryds PRIVATE extern)
+add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
+
+# Include all sdk header directories
+target_include_directories(Factania PRIVATE
+        src/
+        sdk/libs/libnds/include
+        sdk/libs/dswifi/include
+        sdk/libs/libteak/include
+        sdk/libs/libxm7/include
+        sdk/libs/maxmod/include)
+
+target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
 if(NINTENDO_DS)
-    nds_create_rom(factoryds
+    target_link_libraries(Factania PRIVATE
+        "-Wl,--start-group"
+        nds9
+        c
+        "-Wl,--end-group"
+    )
+
+    nds_create_rom(Factania
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
         AUTHOR "ADMIS Manufacturing Division"
         NITROFS fs
     )
 else()
-    target_compile_definitions(factoryds PUBLIC ARM9)
+    target_compile_definitions(Factania PUBLIC ARM9)
 endif()
 
 find_program(MELONDS_PATH "melonDS")
@@ -65,7 +83,7 @@ add_custom_target(Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/scripts)
 
 add_custom_target(Melon_NDS
-    COMMAND scripts/melonds/${MELONDS_PATH} build/factoryds.nds
+    COMMAND scripts/melonds/${MELONDS_PATH} build/Factania.nds
     DEPENDS Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
