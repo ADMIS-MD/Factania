@@ -40,6 +40,10 @@ set(HEADER_FILES
     src/Transform.h
 )
 
+if(NINTENDO_DS)
+
+endif()
+
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
 
 # Include all sdk header directories
@@ -65,14 +69,21 @@ if(NINTENDO_DS)
         "-Wl,--end-group"
     )
 
+
+    set(GRIT_FILES)
+    add_custom_target(GritFind)
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
         message(STATUS "${filename_wle}")
         add_custom_command(
-            TARGET Factania PRE_BUILD
-            COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
+                TARGET GritFind PRE_BUILD
+                COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
         )
+        list(APPEND GRIT_FILES generated/${filename_wle}.c)
     endforeach()
+    add_library(Grit OBJECT ${GRIT_FILES})
+    add_dependencies(Grit GritFind)
+    target_link_libraries(Factania PRIVATE Grit)
 
     nds_create_rom(Factania
         NAME "FACTANIA"
