@@ -2,16 +2,16 @@
 
 namespace core {
 
-	class engine
+	class Engine
 	{
 	public:
-		engine();
-		~engine();
+		Engine();
+		~Engine();
 
-		void update();
-		void draw();
+		void Update();
+		void Draw();
 
-		void run();
+		void Run();
 	private:
 		// test variables
 		float x, y, z;
