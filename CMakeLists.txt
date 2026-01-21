@@ -70,18 +70,26 @@ if(NINTENDO_DS)
     )
 
 
-    set(GRIT_FILES)
+    set(GRIT_OUT_FILES)
     add_custom_target(GritFind)
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
-        message(STATUS "${filename_wle}")
         add_custom_command(
-                TARGET GritFind PRE_BUILD
-                COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
+            TARGET GritFind PRE_BUILD
+            COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
+            DEPENDS ${file_path}
         )
-        list(APPEND GRIT_FILES generated/${filename_wle}.c)
+        if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.h)
+            file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.h)
+        endif()
+        if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c)
+            file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c)
+        endif()
+        list(APPEND GRIT_OUT_FILES generated/${filename_wle}.c)
     endforeach()
-    add_library(Grit OBJECT ${GRIT_FILES})
+    add_library(Grit
+        OBJECT ${GRIT_OUT_FILES}
+    )
     add_dependencies(Grit GritFind)
     target_link_libraries(Factania PRIVATE Grit)
 
