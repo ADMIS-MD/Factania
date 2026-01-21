@@ -18,7 +18,6 @@
 
 #include <nds.h>
 #include <debug_menu/debug_menu.h>
-#include "test.h"
 #include "save.h"
 
 //-----------------------------------------------------------------------------
@@ -89,6 +88,72 @@ static void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, floa
     glVertex3v16(ex, by, ez);
 
     glEnd();
+}
+
+bool file_load(const char *path, void **buffer, size_t *size)
+{
+    // Open the file in read binary mode
+    FILE *f = fopen(path, "rb");
+    if (f == NULL)
+    {
+        perror("fopen");
+        return false;
+    }
+
+    // Move read cursor to the end of the file
+    int ret = fseek(f, 0, SEEK_END);
+    if (ret != 0)
+    {
+        perror("fseek");
+        return false;
+    }
+
+    // Check position of the cursor (we're at the end, so this is the size)
+    *size = ftell(f);
+    if (*size == 0)
+    {
+        printf("Size is 0!");
+        fclose(f);
+        return false;
+    }
+
+    // Move cursor to the start of the file again
+    rewind(f);
+
+    // Allocate buffer to hold data
+    *buffer = malloc(*size);
+    if (*buffer == NULL)
+    {
+        printf("Not enought memory to load %s!", path);
+        fclose(f);
+        return false;
+    }
+
+    // Read all data into the buffer
+    if (fread(*buffer, *size, 1, f) != 1)
+    {
+        perror("fread");
+        fclose(f);
+        free(*buffer);
+        return false;
+    }
+
+    // Close file
+    ret = fclose(f);
+    if (ret != 0)
+    {
+        perror("fclose");
+        free(*buffer);
+        return false;
+    }
+
+    return true;
+}
+
+static void load_image() {
+    char* buf;
+    size_t size;
+
 }
 
 namespace core {
@@ -208,6 +273,8 @@ namespace core {
 
         add_debug_node_to_root(new SubmenuDebugNode("Save Menu", s_save_menu_nodes));
 
+        load_image();
+
         // Print some controls
         printf("PAD:     Move\n");
         printf("A,B,X,Y: Rotate\n");
@@ -288,6 +355,8 @@ namespace core {
 
         draw_box(-0.75, -0.75, -0.75,
             0.75, 0.75, 0.75);
+
+        // Draw test image
 
         // Tell the hardware that we have sorted translucent polygons manually.
 
