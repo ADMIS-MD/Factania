@@ -5,5 +5,5 @@ visual_studio/
 scripts/melonds/melonDS.toml
 scripts/melonds/rtc.bin
 .clangd
-scripts/melonds/didi.bin
-scripts/melonds/didi.bin.idx
+scripts/melonds/dldi.bin
+scripts/melonds/dldi.bin.idx
