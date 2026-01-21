@@ -14,6 +14,7 @@ set(SOURCE_FILES
   src/main.c
   src/factania_main.cpp
   src/Engine.cpp
+  src/RenderSystem.cpp
   src/debug_menu/debug_menu.cpp
   src/debug_menu/memory_debug_info.cpp
   src/debug_menu/build_details_menu.cpp
@@ -26,6 +27,7 @@ set(HEADER_FILES
   src/Engine.h
   src/factania_main.h
   src/System.h
+  src/RenderSystem.h
   src/debug_menu/debug_menu.h
   src/debug_menu/memory_debug_info.h
   src/debug_menu/build_details_menu.h
