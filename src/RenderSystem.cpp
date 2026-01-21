@@ -13,47 +13,29 @@
 #include "RenderSystem.h"
 
 #include <gl2d.h>
-#include "tiny_16.h"
+#include "planet_tiles.h"
 #include <nds.h>
 
 //-----------------------------------------------------------------------------
 //	Defines
 //-----------------------------------------------------------------------------
 
-#define MAP_WIDTH   30
-#define MAP_HEIGHT  20
+#define MAP_WIDTH 8
+#define MAP_HEIGHT 4
+
+#define TILE_SIZE 32
+
+#define TILE_ROWS    1
+#define TILE_COLUMNS 2
 
 const int16_t map[MAP_WIDTH * MAP_HEIGHT] = {
-    94, 95, 84, 85, 94, 95, 84, 85, 94, 95, 1, 1, 1, 1, 1, 1, 1, 1, 94, 95, 84,
-    85, 84, 85, 94, 95, 84, 85, 84, 85, 84, 85, 94, 95, 84, 85, 94, 95, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 94, 95, 94, 95, 84, 85, 94, 95, 94, 95, 94, 95,
-    84, 85, 94, 95, 1, 0, 1, 1, 1, 1, 1, 1, 7, 7, 7, 1, 0, 1, 1, 1, 1, 1, 94,
-    95, 84, 85, 84, 85, 1, 1, 94, 95, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1,
-    1, 1, 1, 1, 1, 1, 7, 7, 94, 95, 94, 95, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 7,
-    1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 84, 85, 1, 1, 7, 0, 1, 1, 1,
-    1, 1, 1, 7, 2, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 94, 95, 1, 7,
-    7, 7, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 47, 48, 48, 48, 49, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 84, 0, 17, 18, 18, 18, 18, 18, 18, 19, 1, 1, 1, 1, 1, 1, 57, 58,
-    58, 58, 59, 1, 1, 1, 1, 0, 1, 1, 1, 1, 94, 0, 27, 1, 1, 1, 1, 1, 1, 29, 1,
-    1, 1, 1, 1, 7, 67, 68, 68, 68, 69, 1, 1, 7, 7, 2, 1, 7, 1, 84, 85, 7, 27, 1,
-    1, 1, 1, 1, 1, 29, 1, 1, 1, 1, 1, 1, 87, 97, 98, 99, 89, 1, 1, 0, 7, 7, 0,
-    0, 1, 94, 95, 7, 27, 1, 1, 1, 1, 1, 1, 29, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 0, 1, 1, 1, 84, 85, 84, 0, 27, 1, 1, 1, 1, 1, 1, 29, 7, 0, 1, 1, 1,
-    1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 94, 95, 94, 7, 27, 1, 1, 1, 1, 1, 1,
-    29, 2, 7, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 84, 85, 1, 37,
-    38, 38, 38, 38, 28, 38, 39, 7, 7, 1, 1, 1, 1, 20, 21, 21, 21, 21, 21, 21,
-    21, 22, 1, 1, 1, 1, 94, 95, 7, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 7, 1, 1, 1, 30,
-    31, 31, 31, 31, 31, 31, 31, 32, 1, 1, 1, 1, 84, 85, 0, 7, 1, 1, 1, 1, 0, 1,
-    1, 1, 1, 1, 1, 1, 20, 44, 31, 31, 31, 31, 31, 31, 31, 43, 22, 1, 2, 1, 94,
-    95, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 30, 31, 31, 31, 31, 31, 31,
-    31, 31, 31, 32, 1, 7, 1, 1, 84, 1, 1, 1, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 20,
-    44, 31, 31, 31, 31, 31, 31, 31, 31, 31, 32, 1, 1, 1, 1, 94, 1, 1, 1, 0, 1,
-    1, 1, 1, 1, 1, 0, 1, 1, 30, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 43, 22,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20, 44, 31, 31, 31, 31, 31,
-    31, 31, 31, 31, 31, 31, 32, 1, 1, 1, 1
+    0,1,0,0,0,0,0,0,
+    0,1,1,0,0,0,1,1,
+    0,1,0,0,0,1,1,1,
+    0,0,0,0,0,1,1,0
 };
 
-glImage tileset[10 * 10];
+glImage tileset[TILE_ROWS * TILE_COLUMNS];
 
 //-----------------------------------------------------------------------------
 //	Method Implementations
@@ -70,7 +52,7 @@ namespace core {
         videoSetMode(MODE_0_3D);
 
         // Setup some memory to be used for textures and for texture palettes
-        vramSetBankA(VRAM_A_TEXTURE);
+        vramSetBankA(VRAM_A_TEXTURE_SLOT0);
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
         // A tile set is formed by several images of the same size that start at the
@@ -88,19 +70,19 @@ namespace core {
         //
         // Note that if you leave enough space on the right of the texture for a new
         // image, even if there aren't graphics there, it will count.
-        tileset_texture_id =
-            glLoadTileSet(tileset,      // Pointer to glImage array
-                16,           // Sprite width
-                16,           // Sprite height
-                16 * 10,      // Bitmap width (the part that contains useful images)
-                16 * 10,      // Bitmap height (the part that contains useful images)
-                GL_RGB256,    // Texture type for glTexImage2D()
-                256,          // Full texture size X (image size)
-                256,          // Full texture size Y (image size)
-                TEXGEN_TEXCOORD, // Parameters for glTexImage2D()
-                256,            // Length of the palette to use (256 colors)
-                tiny_16Pal,     // Pointer to texture palette data
-                tiny_16Bitmap); // Pointer to texture data
+        tileset_texture_id = glLoadTileSet(
+            tileset,                                         // glImage array
+            TILE_SIZE, TILE_SIZE,                            // tile size
+            TILE_SIZE * TILE_COLUMNS, TILE_SIZE * TILE_ROWS, // bitmap area that contains tiles (2 rows only)
+            GL_RGB256,                                       // texture type
+            TILE_SIZE * TILE_COLUMNS, TILE_SIZE,             // full VRAM texture size
+            TEXGEN_TEXCOORD,                                 // texture params
+            256,                                             // palette entries
+            planet_tilesPal,                                 // palette
+            planet_tilesBitmap                               // bitmap data
+        );
+
+
 
         if (tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", tileset_texture_id);
@@ -113,19 +95,20 @@ namespace core {
 
     void RenderSystem::Update()
     {
+        const int scrollSpeed = 2;
         scanKeys();
 
         uint16_t keys = keysHeld();
 
         if (keys & KEY_UP)
-            scroll_y++;
+            scroll_y += scrollSpeed;
         if (keys & KEY_DOWN)
-            scroll_y--;
+            scroll_y -= scrollSpeed;
 
         if (keys & KEY_LEFT)
-            scroll_x++;
+            scroll_x += scrollSpeed;
         if (keys & KEY_RIGHT)
-            scroll_x--;
+            scroll_x -= scrollSpeed;
 
     }
 
@@ -144,9 +127,10 @@ namespace core {
         {
             for (int i = 0; i < MAP_WIDTH; i++)
             {
-                int x = scroll_x + i * 16;
-                int y = scroll_y + j * 16;
                 int tile_id = map[j * MAP_WIDTH + i];
+
+                int x = scroll_x + i * TILE_SIZE;
+                int y = scroll_y + j * TILE_SIZE;
 
                 glSprite(x, y, GL_FLIP_NONE, &tileset[tile_id]);
             }
