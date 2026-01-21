@@ -10,7 +10,7 @@
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "engine.h"
+#include "Engine.h"
 
 #include <errno.h>
 #include <dlfcn.h>
