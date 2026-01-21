@@ -12,6 +12,11 @@ namespace core {
 
         void Update() override;
         void Draw() override;
+    private:
+        int tileset_texture_id;
+        int scroll_x = 0;
+        int scroll_y = 0;
+
     };
 
     void BeginFrame();
