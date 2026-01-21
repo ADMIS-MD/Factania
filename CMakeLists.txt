@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 # Force the compiler to work no matter what
 set(CMAKE_CXX_COMPILER_WORKS 1)
 
+set(CMAKE_COLOR_DIAGNOSTICS 1)
+
 project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
@@ -11,31 +13,31 @@ string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
 set(SOURCE_FILES
-  src/main.c
-  src/factania_main.cpp
-  src/Engine.cpp
-  src/RenderSystem.cpp
-  src/debug_menu/debug_menu.cpp
-  src/debug_menu/memory_debug_info.cpp
-  src/debug_menu/build_details_menu.cpp
-  src/debug_menu/save_debug_menu.cpp
-  src/save.cpp
-  src/chunk.cpp
+    src/main.c
+    src/factania_main.cpp
+    src/Engine.cpp
+    src/RenderSystem.cpp
+    src/debug_menu/debug_menu.cpp
+    src/debug_menu/memory_debug_info.cpp
+    src/debug_menu/build_details_menu.cpp
+    src/debug_menu/save_debug_menu.cpp
+    src/save.cpp
+    src/chunk.cpp
 )
 
 set(HEADER_FILES
-  src/Engine.h
-  src/factania_main.h
-  src/System.h
-  src/RenderSystem.h
-  src/debug_menu/debug_menu.h
-  src/debug_menu/memory_debug_info.h
-  src/debug_menu/build_details_menu.h
-  generated/generated_defines.h
-  src/save.h
-  src/chunk.hpp
-        src/Transform.cpp
-        src/Transform.h
+    src/Engine.h
+    src/factania_main.h
+    src/System.h
+    src/RenderSystem.h
+    src/debug_menu/debug_menu.h
+    src/debug_menu/memory_debug_info.h
+    src/debug_menu/build_details_menu.h
+    generated/generated_defines.h
+    src/save.h
+    src/chunk.hpp
+    src/Transform.cpp
+    src/Transform.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
@@ -53,7 +55,7 @@ target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(Factania PRIVATE extern)
 
 # Get graphics files
-file(GLOB_RECURSE GRIT_SRCS graphics/*.png)
+file(GLOB_RECURSE GRIT_SRCS assets/*.png)
 
 if(NINTENDO_DS)
     target_link_libraries(Factania PRIVATE
