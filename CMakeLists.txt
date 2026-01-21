@@ -19,6 +19,7 @@ set(SOURCE_FILES
   src/debug_menu/build_details_menu.cpp
   src/debug_menu/save_debug_menu.cpp
   src/save.cpp
+  src/Player.cpp
 )
 
 set(HEADER_FILES
@@ -29,6 +30,7 @@ set(HEADER_FILES
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
   src/save.h
+  src/Player.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
