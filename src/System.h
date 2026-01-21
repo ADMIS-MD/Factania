@@ -4,6 +4,7 @@ namespace core {
 
     class System
     {
+    public:
         ~System() {}
 
         virtual void Update() {}

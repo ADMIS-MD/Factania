@@ -286,11 +286,19 @@ namespace core {
 
     Engine::~Engine()
     {
-    
+        for (auto system : m_systems)
+        {
+            delete system;
+        }
     }
 
     void Engine::Update()
     {
+        for (auto system : m_systems)
+        {
+            system->Update();
+        }
+
         scanKeys();
 
         uint16_t keys = keysHeld();
@@ -322,8 +330,10 @@ namespace core {
 
     void Engine::Draw()
     {
-        // Synchronize game loop to the screen refresh
-        swiWaitForVBlank();
+        for (auto system : m_systems)
+        {
+            system->Draw();
+        }
 
         // Render 3D scene
         // ---------------
@@ -369,6 +379,10 @@ namespace core {
     {
         while (1)
         {
+            // As far as I'm aware, this is our "tick", so it should run
+            // indepedent from any specific loop. Please correct me if wrong -Nick
+            swiWaitForVBlank();
+
             Update();
             Draw();
             check_debug_menu();
