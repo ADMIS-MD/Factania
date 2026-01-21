@@ -1,6 +1,5 @@
 #include "chunk.hpp"
 #include "entt.hpp"
-#include "transform.hpp"
 #include <gl2d.h>
 
 void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {
@@ -34,7 +33,7 @@ u32 reinterpret_array_as_u32(u16 arr[2]) {
     return *reinterpret_cast<u32*>(arr);
 }
 
-entt::entity make_chunk(u32 local_seed, FactoryTransform* chunk_position, OreContext& context, entt::registry& registry) {
+entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry) {
     //  8 bits for ore spawn chance
     u8 ore_chance = static_cast<u8>(local_seed);
     u16 ore_type = static_cast<u16>(local_seed >> 8);
@@ -65,16 +64,16 @@ entt::entity make_chunk(u32 local_seed, FactoryTransform* chunk_position, OreCon
             u32 ore_amount = scale_to(ore->amount_variance, ore_seed);
             ore_amount = ore->base_amount + ore_amount - ore_amount / 2;
 
-            FactoryTransform world_pos = *chunk_position;
-            world_pos.position[0] += pos % 8;
-            world_pos.position[1] += pos / 8;
+            GridTransform world_pos = *chunk_position;
+            world_pos.x += pos % 8;
+            world_pos.y += pos / 8;
 
             Sprite s = {
                 ORE_TEXTURE_INDEX, ore->color
             };
 
             entt::entity ore_entity = registry.create();
-            registry.emplace<FactoryTransform>(ore_entity, world_pos);
+            registry.emplace<GridTransform>(ore_entity, world_pos);
             registry.emplace<Sprite>(ore_entity, s);
             registry.emplace<FactoryLayer>(ore_entity, chunk_push_entity(
                 chunk, pos, s, ore_entity, registry
@@ -98,7 +97,7 @@ FactoryLayer chunk_push_entity(Chunk &storage, u8 position, Sprite sprite, entt:
     storage.cached_sprites[position] = sprite;
     storage.top_entity_ids[position] = e;
     return {
-        next_layer, {}, current_entity
+        {}, current_entity
     };
 }
 

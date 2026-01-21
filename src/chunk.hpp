@@ -5,17 +5,28 @@
 #include <entt.hpp>
 #include <nds/arm9/videoGL.h>
 
-#include "transform.hpp"
+#include "Transform.h"
 
 /* Ores are rendered as entities over the base tile-sheet
  *
  */
+
+struct Sprite {
+    u16 tile_pack; // (12 bytes tile_id, 4 bytes layer);
+    rgb color;
+};
 
 // Chunks in their most beefy state
 struct Chunk {
     Sprite cached_sprites[64];
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
     entt::entity surrounding_chunks[8];
+};
+
+struct FactoryLayer {
+    u8 layer;
+    entt::entity above {};
+    entt::entity below {};
 };
 
 class ChunkLookup {
@@ -65,7 +76,7 @@ T bsearch_T(T value, T const* list, ST size) {
 	}
 }
 
-entt::entity make_chunk(u32 local_seed, FactoryTransform* chunk_position, OreContext& context, entt::registry& registry);
+entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry);
 FactoryLayer chunk_push_entity(Chunk &storage, u8 position, Sprite sprite, entt::entity e, entt::registry& registry);
 void chunk_pop_entity(Chunk &storage, u8 position, FactoryLayer& layer, entt::registry &registry);
 void chunk_update_entity(Chunk &storage, u8 position, entt::registry &registry);
