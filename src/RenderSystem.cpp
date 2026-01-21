@@ -12,106 +12,32 @@
 
 #include "RenderSystem.h"
 
+#include <gl2d.h>
 #include <nds.h>
+
+//-----------------------------------------------------------------------------
+//	Defines
+//-----------------------------------------------------------------------------
+
+const uint32_t screen_width = 256;
+const uint32_t screen_height = 192;
+
+const uint32_t screen_half_width = screen_width / 2;
+const uint32_t screen_half_height = screen_height / 2;
+
 
 //-----------------------------------------------------------------------------
 //	Method Implementations
 //-----------------------------------------------------------------------------
 
-// !! TEMP !!
-static void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
-{
-    // Begin and end coordinates
-    int bx = floattov16(bx_);
-    int ex = floattov16(ex_);
-    int by = floattov16(by_);
-    int ey = floattov16(ey_);
-    int bz = floattov16(bz_);
-    int ez = floattov16(ez_);
-
-    glBegin(GL_QUADS);
-
-    glColor3f(1, 0, 0);
-
-    glVertex3v16(bx, by, bz);
-    glVertex3v16(bx, ey, bz);
-    glVertex3v16(ex, ey, bz);
-    glVertex3v16(ex, by, bz);
-
-    glColor3f(0, 1, 0);
-
-    glVertex3v16(bx, by, ez);
-    glVertex3v16(ex, by, ez);
-    glVertex3v16(ex, ey, ez);
-    glVertex3v16(bx, ey, ez);
-
-    glColor3f(0, 0, 1);
-
-    glVertex3v16(bx, by, bz);
-    glVertex3v16(ex, by, bz);
-    glVertex3v16(ex, by, ez);
-    glVertex3v16(bx, by, ez);
-
-    glColor3f(1, 0, 1);
-
-    glVertex3v16(bx, ey, bz);
-    glVertex3v16(bx, ey, ez);
-    glVertex3v16(ex, ey, ez);
-    glVertex3v16(ex, ey, bz);
-
-    glColor3f(0, 1, 1);
-
-    glVertex3v16(bx, by, bz);
-    glVertex3v16(bx, by, ez);
-    glVertex3v16(bx, ey, ez);
-    glVertex3v16(bx, ey, bz);
-
-    glColor3f(1, 1, 0);
-
-    glVertex3v16(ex, by, bz);
-    glVertex3v16(ex, ey, bz);
-    glVertex3v16(ex, ey, ez);
-    glVertex3v16(ex, by, ez);
-
-    glEnd();
-}
-
 namespace core {
 
+    // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/primitives/source/main.c
     RenderSystem::RenderSystem()
     {
-        // taken temporarily from the cube test
         videoSetMode(MODE_0_3D);
 
-        glInit();
-
-        glEnable(GL_ANTIALIAS);
-        glEnable(GL_BLEND);
-
-        // The background must be fully opaque and have a unique polygon ID
-        // (different from the polygons that are going to be drawn) so that
-        // alpha blending works.
-        glClearColor(0, 0, 0, 31);
-        glClearPolyID(63);
-
-        glClearDepth(0x7FFF);
-
-        glViewport(0, 0, 255, 191);
-
-        // Setup perspective
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(70, 256.0 / 192.0, 0.1, 40);
-
-        // Switch to model view matrix
-        glMatrixMode(GL_MODELVIEW);
-
-        angle_x = 45;
-        angle_z = 45;
-
-        x = 0.0;
-        y = 0.0;
-        z = 0.0;
+        glScreen2D();
     }
 
     RenderSystem::~RenderSystem()
@@ -122,82 +48,79 @@ namespace core {
     void RenderSystem::Update()
     {
 
-        scanKeys();
-
-        uint16_t keys = keysHeld();
-
-        if (keys & KEY_LEFT)
-            x -= 0.05;
-        if (keys & KEY_RIGHT)
-            x += 0.05;
-
-        if (keys & KEY_UP)
-            y += 0.05;
-        if (keys & KEY_DOWN)
-            y -= 0.05;
-
-        if (keys & KEY_A)
-            angle_x += 3;
-        if (keys & KEY_Y)
-            angle_x -= 3;
-
-        if (keys & KEY_X)
-            angle_z += 3;
-        if (keys & KEY_B)
-            angle_z -= 3;
     }
 
     void RenderSystem::Draw()
     {
+        /// TODO: DELETE THIS!!!!
 
-        // Render 3D scene
-        // ---------------
+        // Top left quadrant of the screen
 
-        // Setup camera
-        glLoadIdentity();
-        gluLookAt(0.0, 0.0, 4.0,  // Position
-            0.0, 0.0, 0.0,  // Look at
-            0.0, 1.0, 0.0); // Up
+        glBoxFilledGradient(0, 0,
+            screen_half_width - 1, screen_half_height - 1,
+            RGB15(31, 0, 0),
+            RGB15(31, 31, 0),
+            RGB15(31, 0, 31),
+            RGB15(0, 31, 31));
 
-        // Move and rotate the view before drawing a box
-        glTranslatef(x, y, z);
+        // Top right quadrant of the screen
 
-        glRotateY(angle_z);
-        glRotateX(angle_x);
+        glBoxFilled(screen_half_width, 0,
+            screen_width - 1, screen_half_height - 1,
+            RGB15(10, 10, 10));
 
-        // Use a different polygon ID for front-facing polygons and back-facing
-        // polygons. Draw the back-facing polygons first, then the front-facing
-        // ones.
-        //
-        // We don't know which polygons are front-facing or back-facing, so we
-        // use culling to select them for us (but we need to send the polygons
-        // to the GPU twice.
+        glBox(screen_half_width, 0,
+            screen_width - 1, screen_half_height - 1,
+            RGB15(20, 20, 20));
 
-        glPolyFmt(POLY_ALPHA(10) | POLY_ID(0) | POLY_CULL_FRONT);
+        // Bottom left quadrant of the screen
 
-        draw_box(-0.75, -0.75, -0.75,
-            0.75, 0.75, 0.75);
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(1));
 
-        glPolyFmt(POLY_ALPHA(10) | POLY_ID(1) | POLY_CULL_BACK);
+        glTriangleFilled(0, screen_height * 3 / 4,
+            screen_half_width - 1, screen_half_height,
+            screen_half_width - 1, screen_height - 1,
+            RGB15(31, 31, 31));
 
-        draw_box(-0.75, -0.75, -0.75,
-            0.75, 0.75, 0.75);
+        glPolyFmt(POLY_ALPHA(16) | POLY_CULL_NONE | POLY_ID(2));
 
-        // Draw test image
+        glTriangleFilledGradient(0, screen_half_height,
+            screen_half_width - 1, screen_height * 3 / 4,
+            0, screen_height - 1,
+            RGB15(0, 31, 0),
+            RGB15(31, 0, 0),
+            RGB15(0, 0, 31));
 
-        // Tell the hardware that we have sorted translucent polygons manually.
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(3));
 
-        glFlush(GL_TRANS_MANUALSORT);
+        // Bottom right quadrant of the screen
+
+        // Note that the pixels can't be seen in some emulators
+        glPutPixel(screen_width * 3 / 4 + 10, screen_height * 3 / 4,
+            RGB15(0, 31, 31));
+
+        glPutPixel(screen_width * 3 / 4 - 10, screen_height * 3 / 4,
+            RGB15(0, 31, 31));
+
+        glLine(screen_half_width, screen_half_height,
+            screen_width, screen_height,
+            RGB15(31, 0, 0));
+
+        glLine(screen_width, screen_half_height,
+            screen_half_width, screen_height,
+            RGB15(0, 31, 0));
+
     }
 
     void BeginFrame()
     {
-
+        glBegin2D();
     }
 
     void EndFrame()
     {
-
+        glEnd2D();
+        glFlush(0);
     }
 
 }

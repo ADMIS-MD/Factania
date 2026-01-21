@@ -193,10 +193,6 @@ namespace core {
 
         load_image();
 
-        // Print some controls
-        printf("PAD:     Move\n");
-        printf("A,B,X,Y: Rotate\n");
-        printf("\n");
         printf("START:   Exit to loader\n");
         printf("SELECT:  Open Debug Menu\n");
         printf("\nPrinting from Engine\n");
@@ -240,9 +236,13 @@ namespace core {
             // indepedent from any specific loop. Please correct me if wrong -Nick
             swiWaitForVBlank();
 
+            BeginFrame();
+
             Update();
             Draw();
             check_debug_menu();
+
+            EndFrame();
 
             if (shouldQuit)
                 break;

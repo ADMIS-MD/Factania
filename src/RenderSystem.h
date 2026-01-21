@@ -12,10 +12,6 @@ namespace core {
 
         void Update() override;
         void Draw() override;
-    private:
-        // TEMP!!
-        float x, y, z;
-        int angle_x, angle_z;
     };
 
     void BeginFrame();
