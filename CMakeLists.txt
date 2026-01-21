@@ -24,6 +24,7 @@ set(SOURCE_FILES
 set(HEADER_FILES
   src/engine.h
   src/factania_main.h
+  src/System.h
   src/debug_menu/debug_menu.h
   src/debug_menu/memory_debug_info.h
   src/debug_menu/build_details_menu.h
