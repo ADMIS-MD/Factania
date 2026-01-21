@@ -19,6 +19,7 @@ set(SOURCE_FILES
   src/debug_menu/build_details_menu.cpp
   src/debug_menu/save_debug_menu.cpp
   src/save.cpp
+  src/chunk.cpp
 )
 
 set(HEADER_FILES
@@ -30,6 +31,9 @@ set(HEADER_FILES
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
   src/save.h
+  src/chunk.hpp
+        src/Transform.cpp
+        src/Transform.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
@@ -44,6 +48,10 @@ target_include_directories(Factania PRIVATE
         sdk/libs/maxmod/include)
 
 target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
+target_include_directories(Factania PRIVATE extern)
+
+# Get graphics files
+file(GLOB_RECURSE GRIT_SRCS graphics/*.png)
 
 if(NINTENDO_DS)
     target_link_libraries(Factania PRIVATE
@@ -52,6 +60,15 @@ if(NINTENDO_DS)
         c
         "-Wl,--end-group"
     )
+
+    foreach(file_path ${GRIT_SRCS})
+        get_filename_component(filename_wle ${file_path} NAME_WLE)
+        message(STATUS "${filename_wle}")
+        add_custom_command(
+            TARGET Factania PRE_BUILD
+            COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
+        )
+    endforeach()
 
     nds_create_rom(Factania
         NAME "FACTANIA"
