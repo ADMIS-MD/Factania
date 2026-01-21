@@ -1,6 +1,7 @@
 #pragma once
 
 #include "System.h"
+#include <vector>
 
 namespace core {
 
