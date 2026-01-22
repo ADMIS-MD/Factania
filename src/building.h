@@ -4,7 +4,7 @@
 #include <vector>
 #include "Item.h"
 
-enum BuildingType {
+enum class BuildingType {
     None,
     Source,
     Transformer,
@@ -12,7 +12,7 @@ enum BuildingType {
     Sink
 };
 
-enum BuildingStatus {
+enum class BuildingStatus {
     None,
     Working,
     Idle,

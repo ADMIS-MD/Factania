@@ -20,6 +20,7 @@
 #include <nds.h>
 #include <debug_menu/debug_menu.h>
 #include "Save.h"
+#include "Conveyer.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -389,6 +390,7 @@ namespace core {
             Update();
             Draw();
             check_debug_menu();
+            confirm();
 
             if (shouldQuit)
                 break;

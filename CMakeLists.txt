@@ -23,6 +23,7 @@ set(SOURCE_FILES
   src/Player.cpp
   src/Transform.cpp
   src/Math.cpp
+  src/Conveyer.cpp
 )
 
 set(HEADER_FILES
@@ -38,6 +39,7 @@ set(HEADER_FILES
   src/Player.h
   src/Transform.h
   src/Math.h
+  src/Conveyer.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
