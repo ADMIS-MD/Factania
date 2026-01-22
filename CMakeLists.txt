@@ -24,7 +24,8 @@ set(SOURCE_FILES
     src/debug_menu/save_debug_menu.cpp
     src/save.cpp
     src/chunk.cpp
-        src/Math.cpp
+    src/Math.cpp
+    src/Player.cpp
 )
 
 set(HEADER_FILES
@@ -41,6 +42,7 @@ set(HEADER_FILES
     src/chunk.hpp
     src/Transform.cpp
     src/Transform.h
+    src/Player.h
 )
 
 if(NINTENDO_DS)
