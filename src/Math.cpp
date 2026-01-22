@@ -101,7 +101,7 @@ fixed& fixed::operator/=(const fixed& f)
     return *this;
 }
 
-fixed fixed::operator-()
+fixed fixed::operator-() const
 {
     return FromFixed(-m_value);
 }
@@ -185,7 +185,7 @@ Vec2& Vec2::operator/=(fixed other)
     return *this;
 }
 
-Vec2 Vec2::operator-()
+Vec2 Vec2::operator-() const
 {
     return {-X(), -Y()};
 }
@@ -285,7 +285,7 @@ Vec3& Vec3::operator/=(fixed other)
     return *this;
 }
 
-Vec3 Vec3::operator-()
+Vec3 Vec3::operator-() const
 {
     return {-X(), -Y(), -Z()};
 }
