@@ -116,6 +116,8 @@ struct Vec3
 
     fixed Dot(Vec3& other);
     Vec3 Cross(Vec3& other);
+    // Normalizes self
+    fixed& Normalize();
 
     fixed& operator[](int v);
     fixed const& operator[](int v) const;

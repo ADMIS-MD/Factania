@@ -386,6 +386,11 @@ Vec3 Vec3::Cross(Vec3& other)
     return out;
 }
 
+fixed& Vec3::Normalize()
+{
+    normalizef32(&arr->GetFixed());
+}
+
 fixed& Vec3::operator[](int v)
 {
     return arr[v];
