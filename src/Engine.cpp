@@ -16,6 +16,7 @@
 
 #include <errno.h>
 #include <dlfcn.h>
+#include <Math.h>
 #include <stdio.h>
 
 #include <nds.h>
@@ -196,6 +197,8 @@ namespace core {
         printf("START:   Exit to loader\n");
         printf("SELECT:  Open Debug Menu\n");
         printf("\nPrinting from Engine\n");
+        fixed result = fixed{1123.2115f} + fixed{1.963f};
+        printf("fixed 1123.2115 + 1.963 = %f", static_cast<float>(result));
     }
 
     Engine::~Engine()
