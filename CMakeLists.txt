@@ -6,19 +6,79 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 
-add_executable(Factania 
-	src/main.c
-    src/test.cpp
+configure_file(src/generated_defines.h.in generated/generated_defines.h)
+
+set(SOURCE_FILES
+  src/main.c
+  src/factania_main.cpp
+  src/Engine.cpp
+  src/debug_menu/debug_menu.cpp
+  src/debug_menu/memory_debug_info.cpp
+  src/debug_menu/build_details_menu.cpp
+  src/debug_menu/save_debug_menu.cpp
+  src/Save.cpp
+  src/chunk.cpp
+  src/Player.cpp
+  src/Transform.cpp
+  src/Math.cpp
 )
 
-target_include_directories(Factania PRIVATE sdk/libs/libnds/include)
+set(HEADER_FILES
+  src/Engine.h
+  src/factania_main.h
+  src/System.h
+  src/debug_menu/debug_menu.h
+  src/debug_menu/memory_debug_info.h
+  src/debug_menu/build_details_menu.h
+  generated/generated_defines.h
+  src/Save.h
+  src/chunk.hpp
+  src/Player.h
+  src/Transform.h
+  src/Math.h
+)
+
+add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
+
+# Include all sdk header directories
+target_include_directories(Factania PRIVATE
+        src/
+        sdk/libs/libnds/include
+        sdk/libs/dswifi/include
+        sdk/libs/libteak/include
+        sdk/libs/libxm7/include
+        sdk/libs/maxmod/include)
+
+target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
+target_include_directories(Factania PRIVATE extern)
+
+# Get graphics files
+file(GLOB_RECURSE GRIT_SRCS graphics/*.png)
 
 if(NINTENDO_DS)
+    target_link_libraries(Factania PRIVATE
+        "-Wl,--start-group"
+        nds9
+        c
+        "-Wl,--end-group"
+    )
+
+    foreach(file_path ${GRIT_SRCS})
+        get_filename_component(filename_wle ${file_path} NAME_WLE)
+        add_custom_command(
+            TARGET Factania PRE_BUILD
+            COMMENT GRIT
+            COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
+        )
+    endforeach()
+
     nds_create_rom(Factania
         NAME "FACTANIA"
         SUBTITLE "Build ${GIT_COMMIT_HASH_SHORT}"
         AUTHOR "ADMIS Manufacturing Division"
+        NITROFS fs
     )
 else()
     target_compile_definitions(Factania PUBLIC ARM9)
@@ -45,7 +105,7 @@ add_custom_target(Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/scripts)
 
 add_custom_target(Melon_NDS
-    COMMAND scripts/melonds/${MELONDS_PATH} build/factania.nds
+    COMMAND scripts/melonds/${MELONDS_PATH} build/Factania.nds
     DEPENDS Build_NDS
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
