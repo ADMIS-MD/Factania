@@ -1,6 +1,29 @@
 #include "chunk.hpp"
 #include "entt.hpp"
-#include <gl2d.h>
+#include "RenderSystem.h"
+
+void Chunk::Draw()
+{
+    glColor(RGB15(31, 31, 31));
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+
+    // This code could be made more intelligent by only drawing the
+    // tiles that are actually shown on the screen. That would reduce
+    // the number of polygons that are sent to the GPU and improve
+    // performance.
+    for (int j = 0; j < CHUNK_HEIGHT; j++)
+    {
+        for (int i = 0; i < CHUNK_WIDTH; i++)
+        {
+            int tile_id = cached_sprites[j * CHUNK_WIDTH + i].tile_pack;
+
+            int x = i * TILE_SIZE;
+            int y = j * TILE_SIZE;
+
+            glSprite(x, y, GL_FLIP_NONE, &core::g_tileset[tile_id]);
+        }
+    }
+}
 
 void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {
     u32 sum = 0;

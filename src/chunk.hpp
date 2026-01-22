@@ -7,6 +7,11 @@
 
 #include "Transform.h"
 
+#define CHUNK_SIZE 8
+
+#define CHUNK_WIDTH CHUNK_SIZE
+#define CHUNK_HEIGHT CHUNK_SIZE
+
 /* Ores are rendered as entities over the base tile-sheet
  *
  */
@@ -17,7 +22,11 @@ struct ChunkSprite {
 };
 
 // Chunks in their most beefy state
-struct Chunk {
+class Chunk
+{
+public:
+    void Draw();
+
     ChunkSprite cached_sprites[64];
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
     entt::entity surrounding_chunks[8];

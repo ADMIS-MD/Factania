@@ -20,23 +20,6 @@
 //	Defines
 //-----------------------------------------------------------------------------
 
-#define MAP_WIDTH 8
-#define MAP_HEIGHT 4
-
-#define TILE_SIZE 32
-
-#define TILE_ROWS    1
-#define TILE_COLUMNS 2
-
-const int16_t map[MAP_WIDTH * MAP_HEIGHT] = {
-    0,1,0,0,0,0,0,0,
-    0,1,1,0,0,0,1,1,
-    0,1,0,0,0,1,1,1,
-    0,0,0,0,0,1,1,0
-};
-
-glImage tileset[TILE_ROWS * TILE_COLUMNS];
-
 //-----------------------------------------------------------------------------
 //	Method Implementations
 //-----------------------------------------------------------------------------
@@ -71,7 +54,7 @@ namespace core {
         // Note that if you leave enough space on the right of the texture for a new
         // image, even if there aren't graphics there, it will count.
         tileset_texture_id = glLoadTileSet(
-            tileset,                                         // glImage array
+            g_tileset,                                         // glImage array
             TILE_SIZE, TILE_SIZE,                            // tile size
             TILE_SIZE * TILE_COLUMNS, TILE_SIZE * TILE_ROWS, // bitmap area that contains tiles (2 rows only)
             GL_RGB256,                                       // texture type
@@ -113,28 +96,7 @@ namespace core {
 
     void RenderSystem::Draw()
     {
-        /// TODO: DELETE THIS!!!!
 
-        glColor(RGB15(31, 31, 31));
-        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-
-        // This code could be made more intelligent by only drawing the
-        // tiles that are actually shown on the screen. That would reduce
-        // the number of polygons that are sent to the GPU and improve
-        // performance.
-        for (int j = 0; j < MAP_HEIGHT; j++)
-        {
-            for (int i = 0; i < MAP_WIDTH; i++)
-            {
-                int tile_id = map[j * MAP_WIDTH + i];
-
-                int x = scroll_x + i * TILE_SIZE;
-                int y = scroll_y + j * TILE_SIZE;
-
-                glSprite(x, y, GL_FLIP_NONE, &tileset[tile_id]);
-            }
-        }
-        printf("%d\n", sizeof(planet_tilesBitmap));
     }
 
     void BeginFrame()

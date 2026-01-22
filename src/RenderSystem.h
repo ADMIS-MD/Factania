@@ -1,8 +1,16 @@
 #pragma once
 
 #include "System.h"
+#include "gl2d.h"
+
+#define TILE_ROWS    1
+#define TILE_COLUMNS 2
+
+#define TILE_SIZE 32
 
 namespace core {
+
+    glImage g_tileset[TILE_ROWS * TILE_COLUMNS];
 
     class RenderSystem : public System
     {
