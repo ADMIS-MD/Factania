@@ -2,6 +2,7 @@
 
 #include <list>
 #include <vector>
+#include "Item.h"
 
 enum BuildingType {
     None,
@@ -18,18 +19,6 @@ enum BuildingStatus {
     Unpowered
 };
 
-class Item
-{
-public:
-    int itemID;
-};
-
-struct ItemQuantity
-{
-    Item item;
-    int quantity;
-};
-
 class Recipe
 {
 public:
@@ -42,20 +31,18 @@ class Building
 {
 public:
     BuildingType type;
-    std::vector<Building> inputs;
     std::vector<Building> outputs;
     virtual void UpdateBuilding(float dt) = 0;
     virtual void InputItems(ItemQuantity items) = 0;
 private:
-
+    std::vector<ItemQuantity> inputInventory;
+    std::vector<ItemQuantity> outputInventory;
 };
 
 class FactoryBuilding : Building
 {
 public:
     BuildingStatus status = BuildingStatus::Unpowered;
-    std::vector<ItemQuantity> inputInventory;
-    std::vector<ItemQuantity> outputInventory;
     std::vector<Recipe> recipes;
     void UpdateBuilding(float dt);
     void SelectRecipe(int recipeNum);
