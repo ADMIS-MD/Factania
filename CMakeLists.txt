@@ -75,7 +75,8 @@ if(NINTENDO_DS)
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
         add_custom_command(
-            TARGET GritFind PRE_BUILD
+            TARGET Factania PRE_BUILD
+            COMMENT GRIT
             COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
             DEPENDS ${file_path}
         )

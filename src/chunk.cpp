@@ -52,8 +52,35 @@ u32 scale_to(u32 max, u32 value) {
 
 #define ORE_TEXTURE_INDEX 1
 
-u32 reinterpret_array_as_u32(u16 arr[2]) {
-    return *reinterpret_cast<u32*>(arr);
+ChunkPosition ChunkPosition::FromGridTransform(const GridTransform& transform)
+{
+    return {
+        static_cast<int16>(transform.x >> 3),
+        static_cast<int16>(transform.y >> 3)
+    };
+}
+
+entt::entity ChunkLookup::GetChunk(GridTransform transform)
+{
+    auto pos = ChunkPosition::FromGridTransform(transform);
+    return GetChunk(pos);
+}
+
+entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
+{
+    auto it = m_chunks.find(transform);
+
+    return it->second;
+}
+
+std::size_t hash_value(const ChunkPosition& obj)
+{
+    return static_cast<uint32_t>(obj.x << 16) + obj.y;
+}
+
+bool operator==(ChunkPosition const& a, ChunkPosition const& b)
+{
+    return a.x == b.x && a.y == b.y;
 }
 
 entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry) {
