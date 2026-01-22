@@ -29,7 +29,7 @@ struct PlayerSprite
 
 struct PlayerMove 
 {
-	fixed speed = 10.f;
+	fixed speed = 0.2f;
 };
 
 entt::entity CreatePlayer(entt::registry& registry);
