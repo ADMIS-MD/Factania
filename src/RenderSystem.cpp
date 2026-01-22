@@ -12,6 +12,7 @@
 
 #include "RenderSystem.h"
 
+#include <chunk.hpp>
 #include <gl2d.h>
 #include "planet_tiles.h"
 #include <nds.h>
@@ -36,6 +37,7 @@ namespace core {
 
         // Setup some memory to be used for textures and for texture palettes
         vramSetBankA(VRAM_A_TEXTURE_SLOT0);
+        vramSetBankB(VRAM_B_TEXTURE_SLOT1);
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
         tileset_texture_id = glLoadTileSet(
@@ -82,7 +84,8 @@ namespace core {
 
     void RenderSystem::Draw()
     {
-
+        Chunk c;
+        c.Draw();
     }
 
     void BeginFrame()

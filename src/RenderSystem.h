@@ -12,7 +12,7 @@
 
 namespace core {
 
-    glImage g_tileset[TILE_ROWS * TILE_COLUMNS];
+    inline glImage g_tileset[TILE_ROWS * TILE_COLUMNS];
 
     class RenderSystem : public System
     {
