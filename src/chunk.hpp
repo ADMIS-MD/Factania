@@ -25,11 +25,11 @@ struct ChunkSprite {
 class Chunk
 {
 public:
-    void Draw();
+	void Draw();
 
-    ChunkSprite cached_sprites[64];
+	ChunkSprite cached_sprites[64] = { 0 };
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
-    entt::entity surrounding_chunks[8];
+    entt::entity surrounding_chunks[8]; // In clock order
 };
 
 struct FactoryLayer {
@@ -61,12 +61,11 @@ public:
 u32 reinterpret_array_as_u32(u16 arr[2]);
 
 struct OreType {
-	u16 weight;
+	u16 spawn_chance;
 	u16 item_id;
-	u32 base_amount;
-	u32 amount_variance;
+	u8 splotch_size;
+	u8 splotch_size_variance;
     rgb color;
-    u8 splotch_gen_chance;
 };
 
 // Sohuld be moved

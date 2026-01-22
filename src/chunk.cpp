@@ -28,13 +28,13 @@ void Chunk::Draw()
 void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {
     u32 sum = 0;
     for(int i = 0; i < count; ++i) {
-        sum += ores[i].weight;
+        sum += ores[i].spawn_chance;
     }
 
     u32 multiplier = UINT32_MAX / sum;
     u32 acc = 0;
     for(int i = 0; i < count - 1; ++i) {
-        acc += ores[i].weight;
+        acc += ores[i].spawn_chance;
         u32 outv = acc * multiplier;
         out[i] = static_cast<u16>(outv << 16);
     }
@@ -85,57 +85,57 @@ bool operator==(ChunkPosition const& a, ChunkPosition const& b)
     return a.x == b.x && a.y == b.y;
 }
 
-entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry) {
-    //  8 bits for ore spawn chance
-    u8 ore_chance = static_cast<u8>(local_seed);
-    u16 ore_type = static_cast<u16>(local_seed >> 8);
-    u8 ore_spawn_amount = static_cast<u8>(local_seed >> 24) / 4;
-
-    entt::entity chunk_entity = registry.create();
-    Chunk& chunk = registry.emplace<Chunk>(chunk_entity);
-
-    // Spawn ore?
-    // TODO: Wave function collapse ? Perlin noise
-    if(ore_chance > context.ore_chance) {
-        // TODO: don't think this works properly yet
-        u8 ore_idx = bsearch_T<u16, u8>(ore_type, context.generated_probabilities, context.ore_count - 1);
-        if (ore_idx != 255) {
-            u8 probability_v = context.generated_probabilities[ore_idx];
-            if (ore_type < probability_v)
-                ore_idx = 0;
-        } else
-            ore_idx = 0;
-
-        OreType* ore = context.ores + ore_idx;
-
-        u32 ore_seed = local_seed;
-        printf("osa%d\n", ore_spawn_amount);
-        for (int i = 0; i < ore_spawn_amount; ++i) {
-            ore_seed = next_seed_a(ore_seed);
-            u8 pos = static_cast<u8>(ore_seed) / 4;
-            u32 ore_amount = scale_to(ore->amount_variance, ore_seed);
-            ore_amount = ore->base_amount + ore_amount - ore_amount / 2;
-
-            GridTransform world_pos = *chunk_position;
-            world_pos.x += pos % 8;
-            world_pos.y += pos / 8;
-
-            ChunkSprite s = {
-                ORE_TEXTURE_INDEX, ore->color
-            };
-
-            entt::entity ore_entity = registry.create();
-            registry.emplace<GridTransform>(ore_entity, world_pos);
-            registry.emplace<ChunkSprite>(ore_entity, s);
-            registry.emplace<FactoryLayer>(ore_entity, chunk_push_entity(
-                chunk, pos, s, ore_entity, registry
-            ));
-        }
-        printf("done\n");
-    }
-
-    return chunk_entity;
-}
+// entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry) {
+//     //  8 bits for ore spawn chance
+//     u8 ore_chance = static_cast<u8>(local_seed);
+//     u16 ore_type = static_cast<u16>(local_seed >> 8);
+//     u8 ore_spawn_amount = static_cast<u8>(local_seed >> 24) / 4;
+//
+//     entt::entity chunk_entity = registry.create();
+//     Chunk& chunk = registry.emplace<Chunk>(chunk_entity);
+//
+//     // Spawn ore?
+//     // TODO: Wave function collapse ? Perlin noise
+//     if(ore_chance > context.ore_chance) {
+//         // TODO: don't think this works properly yet
+//         u8 ore_idx = bsearch_T<u16, u8>(ore_type, context.generated_probabilities, context.ore_count - 1);
+//         if (ore_idx != 255) {
+//             u8 probability_v = context.generated_probabilities[ore_idx];
+//             if (ore_type < probability_v)
+//                 ore_idx = 0;
+//         } else
+//             ore_idx = 0;
+//
+//         OreType* ore = context.ores + ore_idx;
+//
+//         u32 ore_seed = local_seed;
+//         printf("osa%d\n", ore_spawn_amount);
+//         for (int i = 0; i < ore_spawn_amount; ++i) {
+//             ore_seed = next_seed_a(ore_seed);
+//             u8 pos = static_cast<u8>(ore_seed) / 4;
+//             u32 ore_amount = scale_to(ore->amount_variance, ore_seed);
+//             ore_amount = ore->base_amount + ore_amount - ore_amount / 2;
+//
+//             GridTransform world_pos = *chunk_position;
+//             world_pos.x += pos % 8;
+//             world_pos.y += pos / 8;
+//
+//             ChunkSprite s = {
+//                 ORE_TEXTURE_INDEX, ore->color
+//             };
+//
+//             entt::entity ore_entity = registry.create();
+//             registry.emplace<GridTransform>(ore_entity, world_pos);
+//             registry.emplace<ChunkSprite>(ore_entity, s);
+//             registry.emplace<FactoryLayer>(ore_entity, chunk_push_entity(
+//                 chunk, pos, s, ore_entity, registry
+//             ));
+//         }
+//         printf("done\n");
+//     }
+//
+//     return chunk_entity;
+// }
 
 FactoryLayer chunk_push_entity(Chunk &storage, u8 position, ChunkSprite sprite, entt::entity e, entt::registry& registry) {
     auto current_entity = storage.top_entity_ids[position];
