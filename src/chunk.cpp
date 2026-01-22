@@ -69,6 +69,8 @@ entt::entity ChunkLookup::GetChunk(GridTransform transform)
 entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
 {
     auto it = m_chunks.find(transform);
+    if (it == m_chunks.end()) // TODO: Make chunk
+        return {};
 
     return it->second;
 }
@@ -95,7 +97,7 @@ entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContex
     // Spawn ore?
     // TODO: Wave function collapse ? Perlin noise
     if(ore_chance > context.ore_chance) {
-        // TODO: don't think this owrks properly yet
+        // TODO: don't think this works properly yet
         u8 ore_idx = bsearch_T<u16, u8>(ore_type, context.generated_probabilities, context.ore_count - 1);
         if (ore_idx != 255) {
             u8 probability_v = context.generated_probabilities[ore_idx];

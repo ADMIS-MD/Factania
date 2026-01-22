@@ -23,6 +23,7 @@ set(SOURCE_FILES
     src/debug_menu/save_debug_menu.cpp
     src/save.cpp
     src/chunk.cpp
+        src/Math.cpp
 )
 
 set(HEADER_FILES
