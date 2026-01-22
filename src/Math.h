@@ -33,6 +33,7 @@ public:
     fixed& operator-=(const fixed& f);
     fixed& operator*=(const fixed& f);
     fixed& operator/=(const fixed& f);
+    fixed operator-();
     friend fixed operator+(fixed a, fixed b);
     friend fixed operator-(fixed a, fixed b);
     friend fixed operator*(fixed a, fixed b);
@@ -67,6 +68,7 @@ struct Vec2
     Vec2& operator*=(fixed other);
     // Avoid this function!
     Vec2& operator/=(fixed other);
+    Vec2 operator-();
     friend Vec2 operator+(const Vec2& a, const Vec2& b);
     friend Vec2 operator-(const Vec2& a, const Vec2& b);
     friend Vec2 operator*(const Vec2& a, const Vec2& b);
@@ -103,6 +105,7 @@ struct Vec3
     Vec3& operator*=(fixed other);
     // Avoid this function!
     Vec3& operator/=(fixed other);
+    Vec3 operator-();
     friend Vec3 operator+(const Vec3& a, const Vec3& b);
     friend Vec3 operator-(const Vec3& a, const Vec3& b);
     friend Vec3 operator*(const Vec3& a, const Vec3& b);

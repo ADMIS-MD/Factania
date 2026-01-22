@@ -89,8 +89,6 @@ T bsearch_T(T value, T const* list, ST size) {
 	T const* mid = list + size/2;
 	T vmid = *mid;
 
-
-
 	if(value > vmid) {
 		return half + bsearch_T<T, ST>(value, mid, size - half);
 	} else if (value < vmid) {
