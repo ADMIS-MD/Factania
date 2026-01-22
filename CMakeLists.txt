@@ -22,7 +22,7 @@ set(SOURCE_FILES
     src/debug_menu/memory_debug_info.cpp
     src/debug_menu/build_details_menu.cpp
     src/debug_menu/save_debug_menu.cpp
-    src/save.cpp
+    src/Save.cpp
     src/chunk.cpp
     src/Math.cpp
     src/Player.cpp
@@ -38,7 +38,7 @@ set(HEADER_FILES
     src/debug_menu/memory_debug_info.h
     src/debug_menu/build_details_menu.h
     generated/generated_defines.h
-    src/save.h
+    src/Save.h
     src/chunk.hpp
     src/Transform.cpp
     src/Transform.h
