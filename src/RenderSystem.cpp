@@ -38,21 +38,6 @@ namespace core {
         vramSetBankA(VRAM_A_TEXTURE_SLOT0);
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
-        // A tile set is formed by several images of the same size that start at the
-        // top left corner. It increses to the right in the top row until the end of
-        // the texture is reached, then it continues to the second row.
-        //
-        // When all the images are put together they form a bitmap with some
-        // dimensions. The dimensions can be whatever is required for that specific
-        // sprite, with no restrictions.
-        //
-        // However, the GPU of the DS requires textures to have sizes that are power
-        // of two. When you have a bitmap with dimensions that aren't a power of
-        // two, padding needs to be added to the bottom and to the right to fill the
-        // image up to a valid size.
-        //
-        // Note that if you leave enough space on the right of the texture for a new
-        // image, even if there aren't graphics there, it will count.
         tileset_texture_id = glLoadTileSet(
             g_tileset,                                         // glImage array
             TILE_SIZE, TILE_SIZE,                            // tile size
