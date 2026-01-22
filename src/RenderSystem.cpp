@@ -82,15 +82,14 @@ namespace core {
             planet_tilesBitmap                               // bitmap data
         );
 
-
-
         if (tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", tileset_texture_id);
+
     }
 
     RenderSystem::~RenderSystem()
     {
-
+        glDeleteTextures(1, &tileset_texture_id);
     }
 
     void RenderSystem::Update()
@@ -135,6 +134,7 @@ namespace core {
                 glSprite(x, y, GL_FLIP_NONE, &tileset[tile_id]);
             }
         }
+        printf("%d\n", sizeof(planet_tilesBitmap));
     }
 
     void BeginFrame()
