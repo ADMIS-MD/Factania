@@ -15,8 +15,7 @@ struct GridTransform {
 
 // Positions for anything else
 struct Transform {
-    fixed x;
-    fixed y;
+    Vec2 pos;
     u8 layer;
 };
 

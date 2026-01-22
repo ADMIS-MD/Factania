@@ -217,7 +217,7 @@ namespace core {
         // Loading save data
         memset(&savedata, 0, sizeof(savedata));
 
-        bool loaded = save_load(&savedata);
+        bool loaded = LoadSave(&savedata);
 
         if (loaded) {
             x = savedata.x;
@@ -233,46 +233,46 @@ namespace core {
         }
 
         // Save Debug Menu Callbacks
-        static std::vector<DebugNode*> s_save_menu_nodes;
+        //static std::vector<DebugNode*> s_save_menu_nodes;
 
-        s_save_menu_nodes.push_back(new CallbackDebugNode("Save Game", [this]() -> std::string {
-            savedata.save_count++;
-            savedata.x = x;
-            savedata.y = y;
-            savedata.z = z;
-            savedata.angle_x = angle_x;
-            savedata.angle_z = angle_z;
+        //s_save_menu_nodes.push_back(new CallbackDebugNode("Save Game", [this]() -> std::string {
+        //    /*savedata.save_count++;
+        //    savedata.x = x;
+        //    savedata.y = y;
+        //    savedata.z = z;
+        //    savedata.angle_x = angle_x;
+        //    savedata.angle_z = angle_z;
 
-            if (save_write(&savedata)) {
-                return "Game Saved. Revision " + std::to_string(savedata.save_count);
-            }
-            return "Save Failed";
-        }));
+        //    if (save_write(&savedata)) {
+        //        return "Game Saved. Revision " + std::to_string(savedata.save_count);
+        //    }
+        //    return "Save Failed";*/
+        //}));
 
-        s_save_menu_nodes.push_back(new CallbackDebugNode("Load Save", [this]() -> std::string {
-            if (save_load(&savedata)) {
-                x = savedata.x;
-                y = savedata.y;
-                z = savedata.z;
-                angle_x = savedata.angle_x;
-                angle_z = savedata.angle_z;
+        //s_save_menu_nodes.push_back(new CallbackDebugNode("Load Save", [this]() -> std::string {
+        //    /*if (save_load(&savedata)) {
+        //        x = savedata.x;
+        //        y = savedata.y;
+        //        z = savedata.z;
+        //        angle_x = savedata.angle_x;
+        //        angle_z = savedata.angle_z;
 
-                return "Save Loaded. Revision " + std::to_string(savedata.save_count);
-            }
-            return "Save file not found";
-        }));
+        //        return "Save Loaded. Revision " + std::to_string(savedata.save_count);
+        //    }
+        //    return "Save file not found";*/
+        //}));
 
-        s_save_menu_nodes.push_back(new CallbackDebugNode("Delete Save", [this]() -> std::string {
-            if (save_delete()) {
-                savedata.save_count = 0;
-                return "Save deleted";
-            }
-            else {
-                return "Failed to delete save";
-            }
-        }));
+        //s_save_menu_nodes.push_back(new CallbackDebugNode("Delete Save", [this]() -> std::string {
+        //    /*if (save_delete()) {
+        //        savedata.save_count = 0;
+        //        return "Save deleted";
+        //    }
+        //    else {
+        //        return "Failed to delete save";
+        //    }*/
+        //}));
 
-        add_debug_node_to_root(new SubmenuDebugNode("Save Menu", s_save_menu_nodes));
+        //add_debug_node_to_root(new SubmenuDebugNode("Save Menu", s_save_menu_nodes));
 
         load_image();
 

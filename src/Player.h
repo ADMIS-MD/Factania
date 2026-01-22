@@ -1,9 +1,10 @@
 ﻿// Sangbeom Kim
 // 01/20/2026
+
 #pragma once
 
 #include <entt.hpp>
-#include "Transform.h"
+#include "Math.h"
 
 enum class PlayerMode 
 {
@@ -28,9 +29,9 @@ struct PlayerSprite
 
 struct PlayerMove 
 {
-	fixed speed = 0;
+	fixed speed = 10.f;
 };
 
-entt::entity CreatePlayer(entt::registry registry);
+entt::entity CreatePlayer(entt::registry& registry);
 
-void UpdatePlayer(entt::registry registry);
+void UpdatePlayer(entt::registry& registry);

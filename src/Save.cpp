@@ -11,7 +11,8 @@
 
 #define SAVE_PATH_MAX 512
 
-static bool build_save_paths(char out_path[SAVE_PATH_MAX], char out_tmp[SAVE_PATH_MAX]) {
+static bool BuildSavePaths(char out_path[SAVE_PATH_MAX], char out_tmp[SAVE_PATH_MAX]) 
+{
     char* cwd = fatGetDefaultCwd();
     if (!cwd) {
         return false;
@@ -24,11 +25,12 @@ static bool build_save_paths(char out_path[SAVE_PATH_MAX], char out_tmp[SAVE_PAT
     return true;
 }
 
-bool save_load(SaveData* sLoad) {
+bool LoadSave(SaveData* sLoad) 
+{
     char savePath[SAVE_PATH_MAX];
     char tmpPath[SAVE_PATH_MAX];
 
-    if (!build_save_paths(savePath, tmpPath)) {
+    if (!BuildSavePaths(savePath, tmpPath)) {
         return false;
     }
 
@@ -51,11 +53,12 @@ bool save_load(SaveData* sLoad) {
     return true;
 }
 
-bool save_write(const SaveData* sWrite) {
+bool WriteSave(const SaveData* sWrite) 
+{
     char savePath[SAVE_PATH_MAX];
     char tmpPath[SAVE_PATH_MAX];
 
-    if (!build_save_paths(savePath, tmpPath)) {
+    if (!BuildSavePaths(savePath, tmpPath)) {
         return false;
     }
 
@@ -85,11 +88,12 @@ bool save_write(const SaveData* sWrite) {
     return false;
 }
 
-bool save_delete(void) {
+bool DeleteSave(void) 
+{
     char savePath[SAVE_PATH_MAX];
     char tmpPath[SAVE_PATH_MAX];
 
-    if (!build_save_paths(savePath, tmpPath)) {
+    if (!BuildSavePaths(savePath, tmpPath)) {
         return false;
     }
 
