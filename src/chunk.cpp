@@ -1,8 +1,7 @@
 #include "chunk.hpp"
 #include "entt.hpp"
-#include "RenderSystem.h"
 
-void Chunk::Draw()
+void Chunk::Draw(Camera cam)
 {
     glColor(RGB15(31, 31, 31));
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
@@ -17,8 +16,8 @@ void Chunk::Draw()
         {
             int tile_id = cached_sprites[j * CHUNK_WIDTH + i].tile_pack;
 
-            int x = i * TILE_SIZE;
-            int y = j * TILE_SIZE;
+            int x = cam.WorldToCamera().X().GetInt() + i * TILE_SIZE;
+            int y = cam.WorldToCamera().Y().GetInt() + j * TILE_SIZE;
 
             glSprite(x, y, GL_FLIP_NONE, &core::g_tileset[tile_id]);
         }

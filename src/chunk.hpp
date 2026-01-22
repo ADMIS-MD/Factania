@@ -6,6 +6,7 @@
 #include <nds/arm9/videoGL.h>
 
 #include "Transform.h"
+#include "RenderSystem.h"
 
 #define CHUNK_SIZE 8
 
@@ -25,7 +26,7 @@ struct ChunkSprite {
 class Chunk
 {
 public:
-	void Draw();
+	void Draw(Camera cam);
 
 	ChunkSprite cached_sprites[64] = { 0 };
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it

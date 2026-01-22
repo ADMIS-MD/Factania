@@ -29,7 +29,7 @@ namespace core {
 
     // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/tileset_background/source/main.c
 
-    RenderSystem::RenderSystem()
+    RenderSystem::RenderSystem() : m_activeCam(Camera())
     {
         glScreen2D();
 
@@ -65,27 +65,27 @@ namespace core {
 
     void RenderSystem::Update()
     {
-        const int scrollSpeed = 2;
+        const fixed scrollSpeed = 2.0f;
         scanKeys();
 
         uint16_t keys = keysHeld();
 
         if (keys & KEY_UP)
-            scroll_y += scrollSpeed;
+            m_activeCam.MoveUp(scrollSpeed);
         if (keys & KEY_DOWN)
-            scroll_y -= scrollSpeed;
+            m_activeCam.MoveDown(scrollSpeed);
 
         if (keys & KEY_LEFT)
-            scroll_x += scrollSpeed;
+            m_activeCam.MoveLeft(scrollSpeed);
         if (keys & KEY_RIGHT)
-            scroll_x -= scrollSpeed;
+            m_activeCam.MoveRight(scrollSpeed);
 
     }
 
     void RenderSystem::Draw()
     {
         Chunk c;
-        c.Draw();
+        c.Draw(m_activeCam);
     }
 
     void BeginFrame()

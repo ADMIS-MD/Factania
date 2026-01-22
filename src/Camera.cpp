@@ -31,6 +31,11 @@ Vec2 Camera::GetPos() const
 	return m_eye;
 }
 
+Vec2 Camera::WorldToCamera() const
+{
+    return -m_eye;
+}
+
 void Camera::SetPos(Vec2 pos)
 {
     m_eye = pos;
@@ -38,7 +43,7 @@ void Camera::SetPos(Vec2 pos)
 
 void Camera::MoveRight(fixed x)
 {
-    m_eye.X()  += x;
+    m_eye.X() += x;
 }
 
 void Camera::MoveLeft(fixed x)
@@ -48,10 +53,10 @@ void Camera::MoveLeft(fixed x)
 
 void Camera::MoveUp(fixed y)
 {
-    m_eye.Y() += y;
+    m_eye.Y() -= y;
 }
 
 void Camera::MoveDown(fixed y)
 {
-    m_eye.Y() -= y;
+    m_eye.Y() += y;
 }

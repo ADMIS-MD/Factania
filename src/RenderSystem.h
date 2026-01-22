@@ -23,7 +23,7 @@ namespace core {
         void Update() override;
         void Draw() override;
     private:
-        Camera& m_activeCam;
+        Camera m_activeCam;
         
         int tileset_texture_id;
         int scroll_x = 0;
