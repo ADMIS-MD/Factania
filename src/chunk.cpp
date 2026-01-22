@@ -29,8 +29,35 @@ u32 scale_to(u32 max, u32 value) {
 
 #define ORE_TEXTURE_INDEX 1
 
-u32 reinterpret_array_as_u32(u16 arr[2]) {
-    return *reinterpret_cast<u32*>(arr);
+ChunkPosition ChunkPosition::FromGridTransform(const GridTransform& transform)
+{
+    return {
+        static_cast<int16>(transform.x >> 3),
+        static_cast<int16>(transform.y >> 3)
+    };
+}
+
+entt::entity ChunkLookup::GetChunk(GridTransform transform)
+{
+    auto pos = ChunkPosition::FromGridTransform(transform);
+    return GetChunk(pos);
+}
+
+entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
+{
+    auto it = m_chunks.find(transform);
+
+    return it->second;
+}
+
+std::size_t hash_value(const ChunkPosition& obj)
+{
+    return static_cast<uint32_t>(obj.x << 16) + obj.y;
+}
+
+bool operator==(ChunkPosition const& a, ChunkPosition const& b)
+{
+    return a.x == b.x && a.y == b.y;
 }
 
 entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry) {
@@ -68,13 +95,13 @@ entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContex
             world_pos.x += pos % 8;
             world_pos.y += pos / 8;
 
-            Sprite s = {
+            ChunkSprite s = {
                 ORE_TEXTURE_INDEX, ore->color
             };
 
             entt::entity ore_entity = registry.create();
             registry.emplace<GridTransform>(ore_entity, world_pos);
-            registry.emplace<Sprite>(ore_entity, s);
+            registry.emplace<ChunkSprite>(ore_entity, s);
             registry.emplace<FactoryLayer>(ore_entity, chunk_push_entity(
                 chunk, pos, s, ore_entity, registry
             ));
@@ -85,7 +112,7 @@ entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContex
     return chunk_entity;
 }
 
-FactoryLayer chunk_push_entity(Chunk &storage, u8 position, Sprite sprite, entt::entity e, entt::registry& registry) {
+FactoryLayer chunk_push_entity(Chunk &storage, u8 position, ChunkSprite sprite, entt::entity e, entt::registry& registry) {
     auto current_entity = storage.top_entity_ids[position];
     u8 next_layer = 0;
     if (static_cast<u32>(current_entity) != 0) {
@@ -105,14 +132,14 @@ void chunk_pop_entity(Chunk &storage, u8 position, FactoryLayer& layer, entt::re
     auto underneath = layer.below;
     if (static_cast<u32>(underneath) != 0) {
         registry.get<FactoryLayer>(underneath).above = {};
-        storage.cached_sprites[position] = registry.get<Sprite>(underneath);
+        storage.cached_sprites[position] = registry.get<ChunkSprite>(underneath);
         storage.top_entity_ids[position] = underneath;
     } else {
-        storage.cached_sprites[position] = Sprite {0, RGB15(31,31,31)};
+        storage.cached_sprites[position] = ChunkSprite {0, RGB15(31,31,31)};
         storage.top_entity_ids[position] = {};
     }
 }
 
 void chunk_update_entity(Chunk &storage, u8 position, entt::registry &registry) {
-    storage.cached_sprites[position] = registry.get<Sprite>(storage.top_entity_ids[position]);
+    storage.cached_sprites[position] = registry.get<ChunkSprite>(storage.top_entity_ids[position]);
 }

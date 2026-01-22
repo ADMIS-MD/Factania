@@ -11,14 +11,14 @@
  *
  */
 
-struct Sprite {
-    u16 tile_pack; // (12 bytes tile_id, 4 bytes layer);
+struct ChunkSprite {
+    u16 tile_pack;
     rgb color;
 };
 
 // Chunks in their most beefy state
 struct Chunk {
-    Sprite cached_sprites[64];
+    ChunkSprite cached_sprites[64];
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
     entt::entity surrounding_chunks[8];
 };
@@ -29,8 +29,24 @@ struct FactoryLayer {
     entt::entity below {};
 };
 
+struct ChunkPosition
+{
+	int16 x;
+	int16 y;
+
+	// Fake hashing function that just packs into a u32
+	friend std::size_t hash_value(const ChunkPosition& obj);
+	friend bool operator==(ChunkPosition const& a, ChunkPosition const& b);
+	static ChunkPosition FromGridTransform(const GridTransform& transform);
+};
+
 class ChunkLookup {
-    std::unordered_map<u32, entt::entity> chunks;
+	// The u32 is composed of 2 positions
+    std::unordered_map<ChunkPosition, entt::entity, HashForHelper<ChunkPosition>> m_chunks;
+
+public:
+	entt::entity GetChunk(GridTransform transform);
+	entt::entity GetChunk(ChunkPosition transform);
 };
 
 u32 reinterpret_array_as_u32(u16 arr[2]);
@@ -77,6 +93,8 @@ T bsearch_T(T value, T const* list, ST size) {
 }
 
 entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry);
-FactoryLayer chunk_push_entity(Chunk &storage, u8 position, Sprite sprite, entt::entity e, entt::registry& registry);
+FactoryLayer chunk_push_entity(Chunk &storage, u8 position, ChunkSprite sprite, entt::entity e, entt::registry& registry);
 void chunk_pop_entity(Chunk &storage, u8 position, FactoryLayer& layer, entt::registry &registry);
 void chunk_update_entity(Chunk &storage, u8 position, entt::registry &registry);
+
+Chunk get_chunk_from_position(GridTransform transform, ChunkLookup const& lookup, entt::registry const& registry);

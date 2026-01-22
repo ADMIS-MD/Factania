@@ -7,6 +7,15 @@
 #include "Math.h"
 #include "nds/ndstypes.h"
 
+template<typename T>
+struct HashForHelper
+{
+    size_t operator()(const T& v) const
+    {
+        return hash_value(v);
+    }
+};
+
 // Grid positions
 struct GridTransform {
     int32 x;
