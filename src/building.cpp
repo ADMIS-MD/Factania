@@ -14,18 +14,21 @@ void FactoryBuilding::UpdateBuilding(float dt)
 			if (recipes[selectedRecipe].inputItems[0].quantity > inputInventory[i].quantity || recipes[selectedRecipe].inputItems[0].item.itemID != inputInventory[i].item.itemID) //see if we have enough items to craft
 			{
 				status = BuildingStatus::Idle;
+				invChanged = false;
 				return;
 			}
 		}
 		invChanged = false;
 	}
-
-	craftTimer += dt;
-	status = BuildingStatus::Working;
-	if (craftTimer >= recipes[selectedRecipe].recipeDuration)
+	if (status == BuildingStatus::Idle)
 	{
-		craftTimer = 0;
-		ResolveRecipe(&recipes[selectedRecipe]);
+		craftTimer += dt;
+		status = BuildingStatus::Working;
+		if (craftTimer >= recipes[selectedRecipe].recipeDuration)
+		{
+			craftTimer = 0;
+			ResolveRecipe(&recipes[selectedRecipe]);
+		}
 	}
 }
 

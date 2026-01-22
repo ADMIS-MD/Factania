@@ -19,24 +19,16 @@ enum BuildingStatus {
     Unpowered
 };
 
-class Recipe
-{
-public:
-    std::vector<ItemQuantity> inputItems;
-    std::vector<ItemQuantity> outputItems;
-    float recipeDuration;
-};
-
 class Building
 {
 public:
     BuildingType type;
     std::vector<Building> outputs;
+    std::vector<ItemQuantity> inputInventory;
+    std::vector<ItemQuantity> outputInventory;
     virtual void UpdateBuilding(float dt) = 0;
     virtual void InputItems(ItemQuantity items) = 0;
 private:
-    std::vector<ItemQuantity> inputInventory;
-    std::vector<ItemQuantity> outputInventory;
 };
 
 class FactoryBuilding : Building
