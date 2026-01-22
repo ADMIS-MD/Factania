@@ -17,8 +17,9 @@ struct Sprite {
 };
 
 // Chunks in their most beefy state
-struct Chunk {
-    Sprite cached_sprites[64];
+struct Chunk
+{
+	Sprite cached_sprites[64] {0};
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
     entt::entity surrounding_chunks[8];
 };
