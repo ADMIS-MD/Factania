@@ -101,6 +101,11 @@ fixed& fixed::operator/=(const fixed& f)
     return *this;
 }
 
+fixed fixed::operator-() const
+{
+    return FromFixed(-m_value);
+}
+
 Vec2::Vec2()
 {
 }
@@ -178,6 +183,11 @@ Vec2& Vec2::operator/=(fixed other)
     X() /= other;
     Y() /= other;
     return *this;
+}
+
+Vec2 Vec2::operator-() const
+{
+    return {-X(), -Y()};
 }
 
 Vec2 operator+(const Vec2& a, const Vec2& b)
@@ -275,6 +285,11 @@ Vec3& Vec3::operator/=(fixed other)
     return *this;
 }
 
+Vec3 Vec3::operator-() const
+{
+    return {-X(), -Y(), -Z()};
+}
+
 fixed& Vec3::X()
 {
     return arr[0];
@@ -369,6 +384,12 @@ Vec3 Vec3::Cross(Vec3& other)
     Vec3 out;
     crossf32(&arr->GetFixed(), &other.arr->GetFixed(), &out.arr->GetFixed());
     return out;
+}
+
+Vec3& Vec3::Normalize()
+{
+    normalizef32(&arr->GetFixed());
+    return *this;
 }
 
 fixed& Vec3::operator[](int v)
