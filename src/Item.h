@@ -4,7 +4,12 @@
 class Item
 {
 public:
-    int itemID;
+    int itemID = 0;
+
+    Item(int itemID_ = -1)
+    {
+        itemID = itemID_;
+    }
 
     bool operator==(const Item& other) const 
     {
@@ -63,11 +68,14 @@ public:
     std::vector<ItemQuantity> inputItems;
     std::vector<ItemQuantity> outputItems;
     float recipeDuration;
+    float powerDraw;
 
     Recipe operator=(const Recipe& other) 
     {
         inputItems = other.inputItems;
         outputItems = other.outputItems;
+        recipeDuration = other.recipeDuration;
+        powerDraw = other.powerDraw;
         return *this;
     }
 };

@@ -2,7 +2,7 @@
 
 void FactoryBuilding::UpdateBuilding(float dt)
 {
-	if (status == BuildingStatus::Unpowered && selectedRecipe != -1)
+	if (status == BuildingStatus::Unpowered || selectedRecipe == -1)
 	{
 		return;
 	}
@@ -16,13 +16,15 @@ void FactoryBuilding::UpdateBuilding(float dt)
 			{
 				status = BuildingStatus::Idle;
 				inputInventoryChanged = false;
+				craftTimer = 0;
 				return;
 			}
 		}
+		status = BuildingStatus::Working;
 		inputInventoryChanged = false;
 	}
 
-	if (status == BuildingStatus::Idle)
+	if (status != BuildingStatus::Idle)
 	{
 		craftTimer += dt;
 		status = BuildingStatus::Working;
@@ -81,5 +83,60 @@ void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 	for (int i = 0; i < recipe->outputItems.size(); i++)
 	{
 		outputInventory[i].quantity += recipe->outputItems[i].quantity;
+	}
+}
+
+FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1)
+{
+	recipes = recipes_;
+	selectedRecipe = selectedRecipe_;
+}
+
+FactoryBuilding::FactoryBuilding()
+{
+
+}
+
+void PowerGrid::UpdateBuilding(float dt)
+{
+	for (int i = 0; i < connectedSources.size(); i++)
+	{
+		if (connectedSources[i].status == BuildingStatus::Working)
+		{
+			Recipe curRecipe = connectedSources[i].recipes[connectedSources[i].selectedRecipe];
+			totalGenerated += curRecipe.powerDraw;
+		}
+	}
+	for (int i = 0; i < connectedSinks.size(); i++)
+	{
+		if (connectedSinks[i].status == BuildingStatus::Working)
+		{
+			Recipe curRecipe = connectedSinks[i].recipes[connectedSinks[i].selectedRecipe];
+			totalUseage += curRecipe.powerDraw;
+		}
+	}
+	
+	if (totalUseage > totalGenerated) //not enough power, crash grid
+	{
+		for (int i = 0; i < connectedSources.size(); i++)
+		{
+			connectedSources[i].status = BuildingStatus::Unpowered;
+		}
+		for (int i = 0; i < connectedSinks.size(); i++)
+		{
+			connectedSinks[i].status = BuildingStatus::Unpowered;
+		}
+	}
+}
+
+void PowerGrid::StartGrid()
+{
+	for (int i = 0; i < connectedSources.size(); i++)
+	{
+		connectedSources[i].status == BuildingStatus::Idle;
+	}
+	for (int i = 0; i < connectedSinks.size(); i++)
+	{
+		connectedSinks[i].status == BuildingStatus::Idle;
 	}
 }
