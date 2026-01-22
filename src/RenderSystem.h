@@ -3,6 +3,8 @@
 #include "System.h"
 #include "gl2d.h"
 
+#include "Camera.h"
+
 #define TILE_ROWS    1
 #define TILE_COLUMNS 2
 
@@ -21,6 +23,8 @@ namespace core {
         void Update() override;
         void Draw() override;
     private:
+        Camera& m_activeCam;
+        
         int tileset_texture_id;
         int scroll_x = 0;
         int scroll_y = 0;

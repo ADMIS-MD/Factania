@@ -55,6 +55,7 @@ namespace core {
         if (tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", tileset_texture_id);
 
+
     }
 
     RenderSystem::~RenderSystem()
