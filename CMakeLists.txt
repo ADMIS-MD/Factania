@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 # Force the compiler to work no matter what
 set(CMAKE_CXX_COMPILER_WORKS 1)
 
+set(CMAKE_COLOR_DIAGNOSTICS 1)
+
 project(Factania LANGUAGES C CXX)
 
 include(scripts/cmake/git.cmake)
@@ -11,32 +13,41 @@ string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 configure_file(src/generated_defines.h.in generated/generated_defines.h)
 
 set(SOURCE_FILES
-  src/main.c
-  src/factania_main.cpp
-  src/Engine.cpp
-  src/debug_menu/debug_menu.cpp
-  src/debug_menu/memory_debug_info.cpp
-  src/debug_menu/build_details_menu.cpp
-  src/debug_menu/save_debug_menu.cpp
-  src/save.cpp
-  src/chunk.cpp
-  src/Math.cpp
+    src/main.c
+    src/factania_main.cpp
+    src/Engine.cpp
+    src/RenderSystem.cpp
+    src/Camera.cpp
+    src/debug_menu/debug_menu.cpp
+    src/debug_menu/memory_debug_info.cpp
+    src/debug_menu/build_details_menu.cpp
+    src/debug_menu/save_debug_menu.cpp
+    src/Save.cpp
+    src/chunk.cpp
+    src/Math.cpp
+    src/Player.cpp
 )
 
 set(HEADER_FILES
-  src/Engine.h
-  src/factania_main.h
-  src/System.h
-  src/debug_menu/debug_menu.h
-  src/debug_menu/memory_debug_info.h
-  src/debug_menu/build_details_menu.h
-  generated/generated_defines.h
-  src/save.h
-  src/chunk.hpp
-  src/Transform.cpp
-  src/Transform.h
-  src/Math.h
+    src/Engine.h
+    src/factania_main.h
+    src/System.h
+    src/RenderSystem.h
+    src/Camera.h
+    src/debug_menu/debug_menu.h
+    src/debug_menu/memory_debug_info.h
+    src/debug_menu/build_details_menu.h
+    generated/generated_defines.h
+    src/Save.h
+    src/chunk.hpp
+    src/Transform.cpp
+    src/Transform.h
+    src/Player.h
 )
+
+if(NINTENDO_DS)
+
+endif()
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
 
@@ -53,7 +64,7 @@ target_include_directories(Factania PRIVATE ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(Factania PRIVATE extern)
 
 # Get graphics files
-file(GLOB_RECURSE GRIT_SRCS graphics/*.png)
+file(GLOB_RECURSE GRIT_SRCS assets/*.png)
 
 if(NINTENDO_DS)
     target_link_libraries(Factania PRIVATE
@@ -63,14 +74,20 @@ if(NINTENDO_DS)
         "-Wl,--end-group"
     )
 
+
+    set(GRIT_OUT_FILES)
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
-        add_custom_command(
-            TARGET Factania PRE_BUILD
-            COMMENT GRIT
-            COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
+        execute_process(
+            COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -o${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}
         )
+        list(APPEND GRIT_OUT_FILES generated/${filename_wle}.c)
     endforeach()
+    add_library(Grit
+        OBJECT ${GRIT_OUT_FILES}
+    )
+    add_dependencies(Factania Grit)
+    target_link_libraries(Factania PRIVATE Grit)
 
     nds_create_rom(Factania
         NAME "FACTANIA"

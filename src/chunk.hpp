@@ -6,6 +6,12 @@
 #include <nds/arm9/videoGL.h>
 
 #include "Transform.h"
+#include "RenderSystem.h"
+
+#define CHUNK_SIZE 8
+
+#define CHUNK_WIDTH CHUNK_SIZE
+#define CHUNK_HEIGHT CHUNK_SIZE
 
 /* Ores are rendered as entities over the base tile-sheet
  *
@@ -17,10 +23,14 @@ struct ChunkSprite {
 };
 
 // Chunks in their most beefy state
-struct Chunk {
-    ChunkSprite cached_sprites[64];
+class Chunk
+{
+public:
+	void Draw(Camera cam);
+
+	ChunkSprite cached_sprites[64] = { 0 };
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
-    entt::entity surrounding_chunks[8];
+    entt::entity surrounding_chunks[8]; // In clock order
 };
 
 struct FactoryLayer {
@@ -52,12 +62,11 @@ public:
 u32 reinterpret_array_as_u32(u16 arr[2]);
 
 struct OreType {
-	u16 weight;
+	u16 spawn_chance;
 	u16 item_id;
-	u32 base_amount;
-	u32 amount_variance;
+	u8 splotch_size;
+	u8 splotch_size_variance;
     rgb color;
-    u8 splotch_gen_chance;
 };
 
 // Sohuld be moved
@@ -80,8 +89,6 @@ T bsearch_T(T value, T const* list, ST size) {
 	ST half = size/2;
 	T const* mid = list + size/2;
 	T vmid = *mid;
-
-
 
 	if(value > vmid) {
 		return half + bsearch_T<T, ST>(value, mid, size - half);
