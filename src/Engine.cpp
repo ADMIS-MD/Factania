@@ -19,7 +19,7 @@
 
 #include <nds.h>
 #include <debug_menu/debug_menu.h>
-#include "save.h"
+#include "Save.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
