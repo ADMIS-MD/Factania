@@ -13,7 +13,7 @@ configure_file(src/generated_defines.h.in generated/generated_defines.h)
 set(SOURCE_FILES
   src/main.c
   src/factania_main.cpp
-  src/engine.cpp
+  src/Engine.cpp
   src/debug_menu/debug_menu.cpp
   src/debug_menu/memory_debug_info.cpp
   src/debug_menu/build_details_menu.cpp
@@ -21,20 +21,23 @@ set(SOURCE_FILES
   src/save.cpp
   src/chunk.cpp
   src/Player.cpp
+  src/Math.cpp
 )
 
 set(HEADER_FILES
-  src/engine.h
+  src/Engine.h
   src/factania_main.h
+  src/System.h
   src/debug_menu/debug_menu.h
   src/debug_menu/memory_debug_info.h
   src/debug_menu/build_details_menu.h
   generated/generated_defines.h
   src/save.h
   src/chunk.hpp
-        src/Transform.cpp
-        src/Transform.h
   src/Player.h
+  src/Transform.cpp
+  src/Transform.h
+  src/Math.h
 )
 
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
@@ -64,9 +67,9 @@ if(NINTENDO_DS)
 
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
-        message(STATUS "${filename_wle}")
         add_custom_command(
             TARGET Factania PRE_BUILD
+            COMMENT GRIT
             COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -ogenerated/${filename_wle}
         )
     endforeach()

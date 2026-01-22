@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include "Math.h"
 #include "nds/ndstypes.h"
-
-using fixed = float;
 
 // Grid positions
 struct GridTransform {

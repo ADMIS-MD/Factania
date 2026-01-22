@@ -11,7 +11,7 @@
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "engine.h"
+#include "Engine.h"
 
 //-----------------------------------------------------------------------------
 //	Functions
@@ -19,8 +19,8 @@
 extern "C" {
 	int factania_main(void)
 	{
-		core::engine engine;
-		engine.run();
+		core::Engine engine;
+		engine.Run();
 
 		return 0;
 	}
