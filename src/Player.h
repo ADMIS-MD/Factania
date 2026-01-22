@@ -2,20 +2,35 @@
 // 01/20/2026
 #pragma once
 
-typedef float fixed;
+#include <entt.hpp>
+#include "Transform.h"
 
-class Player 
+enum class PlayerMode 
 {
-	Player(fixed position[]) : position(position) {}
-
-	enum State {
-		MOVING, MINING, BUILDING, NUM_STATE
-	};
-
-	void Update();
-
-private:
-	fixed* position = new fixed[3];
-
-	State state;
+	IDLE,
+	MOVING,
+	MINING,
+	BUILDING,
 };
+
+struct PlayerState 
+{
+	PlayerMode mode = PlayerMode::IDLE;
+	bool inputEnabled = true;
+};
+
+struct PlayerSprite 
+{
+	int spriteID = 0;
+	int anim = 0;
+	bool xFlip = false;
+};
+
+struct PlayerMove 
+{
+	fixed speed = 0;
+};
+
+entt::entity CreatePlayer(entt::registry registry);
+
+void UpdatePlayer(entt::registry registry);
