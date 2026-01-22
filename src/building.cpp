@@ -7,19 +7,21 @@ void FactoryBuilding::UpdateBuilding(float dt)
 		return;
 	}
 
-	if (invChanged == true)
+	if (inputInventoryChanged == true)
 	{
 		for (int i = 0; i < inputInventory.size(); i++) //loop through inventory
 		{
-			if (recipes[selectedRecipe].inputItems[0].quantity > inputInventory[i].quantity || recipes[selectedRecipe].inputItems[0].item.itemID != inputInventory[i].item.itemID) //see if we have enough items to craft
+			if (recipes[selectedRecipe].inputItems[0].quantity > inputInventory[i].quantity ||
+				recipes[selectedRecipe].inputItems[0].item.itemID != inputInventory[i].item.itemID) //see if we have enough items to craft
 			{
 				status = BuildingStatus::Idle;
-				invChanged = false;
+				inputInventoryChanged = false;
 				return;
 			}
 		}
-		invChanged = false;
+		inputInventoryChanged = false;
 	}
+
 	if (status == BuildingStatus::Idle)
 	{
 		craftTimer += dt;
@@ -41,7 +43,7 @@ void FactoryBuilding::SelectRecipe(int recipeNum)
 
 	//output items inside into player inv if any inside
 
-	invChanged = true;
+	inputInventoryChanged = true;
 	selectedRecipe = recipeNum;
 
 	for (int i = 0; i < recipes[selectedRecipe].inputItems.size(); i++)
@@ -56,9 +58,9 @@ void FactoryBuilding::SelectRecipe(int recipeNum)
 	}
 }
 
-void FactoryBuilding::InputItems(ItemQuantity inputs)
+bool FactoryBuilding::InputItems(ItemQuantity inputs)
 {
-	invChanged = true;
+	inputInventoryChanged = true;
 	for (int i = 0; i < inputInventory.size(); i++)
 	{
 		if (inputInventory[i].item.itemID == inputs.item.itemID)
@@ -71,7 +73,7 @@ void FactoryBuilding::InputItems(ItemQuantity inputs)
 
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 {
-	invChanged = true;
+	inputInventoryChanged = true;
 	for (int i = 0; i < inputInventory.size(); i++)
 	{
 		inputInventory[i].quantity -= recipe->inputItems[i].quantity;
