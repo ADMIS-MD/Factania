@@ -8,7 +8,8 @@
 #include <fat.h> 
 #include <unistd.h>
 
-struct SaveData {
+struct SaveData 
+{
     float x, y, z;
     int angle_x;
     int angle_z;
@@ -18,8 +19,8 @@ struct SaveData {
 
 inline SaveData savedata;
 
-bool save_write(const SaveData* sWrite);
+bool WriteSave(const SaveData* sWrite);
 
-bool save_load(SaveData* sLoad);
+bool LoadSave(SaveData* sLoad);
 
-bool save_delete(void);
+bool DeleteSave(void);
