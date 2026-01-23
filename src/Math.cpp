@@ -101,9 +101,29 @@ fixed& fixed::operator/=(const fixed& f)
     return *this;
 }
 
+fixed operator+(fixed a, fixed b)
+{
+    return a += b;
+}
+
+fixed operator-(fixed a, fixed b)
+{
+    return a -= b;
+}
+
 fixed fixed::operator-() const
 {
     return FromFixed(-m_value);
+}
+
+fixed operator*(fixed a, fixed b)
+{
+    return a *= b;
+}
+
+fixed operator/(fixed a, fixed b)
+{
+    return a /= b;
 }
 
 Vec2::Vec2()
@@ -278,9 +298,9 @@ Vec3& Vec3::operator*=(fixed other)
 
 Vec3& Vec3::operator/=(fixed other)
 {
-    arr[0] / other;
-    arr[1] / other;
-    arr[2] / other;
+    arr[0] /= other;
+    arr[1] /= other;
+    arr[2] /= other;
 
     return *this;
 }
@@ -400,12 +420,6 @@ fixed& Vec3::operator[](int v)
 fixed const& Vec3::operator[](int v) const
 {
     return arr[v];
-}
-
-
-fixed operator+(fixed a, fixed b)
-{
-    return a += b;
 }
 
 bool operator==(fixed a, fixed b)

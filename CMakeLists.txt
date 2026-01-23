@@ -43,6 +43,7 @@ set(HEADER_FILES
     src/Transform.cpp
     src/Transform.h
     src/Player.h
+    src/Sprite.h
 )
 
 if(NINTENDO_DS)

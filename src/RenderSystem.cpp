@@ -16,6 +16,10 @@
 #include <gl2d.h>
 #include "planet_tiles.h"
 #include <nds.h>
+#include "entt.hpp"
+#include "Sprite.h"
+#include "Player.h"
+
 
 //-----------------------------------------------------------------------------
 //	Defines
@@ -54,8 +58,6 @@ namespace core {
 
         if (tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", tileset_texture_id);
-
-
     }
 
     RenderSystem::~RenderSystem()
@@ -63,29 +65,59 @@ namespace core {
         glDeleteTextures(1, &tileset_texture_id);
     }
 
-    void RenderSystem::Update()
+    void RenderSystem::Update(entt::registry& registry)
     {
-        const fixed scrollSpeed = 2.0f;
-        scanKeys();
+        const int boxW = SCREENW / 2;
+        const int boxH = SCREENH / 2;
 
-        uint16_t keys = keysHeld();
+        const int left = (SCREENW - boxW) / 2;
+        const int right = left + boxW;
+        const int top = (SCREENH - boxH) / 2;
+        const int bottom = top + boxH;
 
-        if (keys & KEY_UP)
-            m_activeCam.MoveUp(scrollSpeed);
-        if (keys & KEY_DOWN)
-            m_activeCam.MoveDown(scrollSpeed);
+        auto view = registry.view<PlayerState, Transform>();
+        for (auto e : view) {
+            auto& tr = view.get<Transform>(e);
 
-        if (keys & KEY_LEFT)
-            m_activeCam.MoveLeft(scrollSpeed);
-        if (keys & KEY_RIGHT)
-            m_activeCam.MoveRight(scrollSpeed);
+            Vec2 camPos = m_activeCam.GetPos();
+            Vec2 screenPos = tr.pos - camPos;
 
+            if (screenPos.X().GetInt() < left) {
+                camPos.X() = tr.pos.X() - fixed(static_cast<int32>(left));
+            }
+            else if (screenPos.X().GetInt() > right) {
+                camPos.X() = tr.pos.X() - fixed(static_cast<int32>(right));
+            }
+
+            if (screenPos.Y().GetInt() < top) {
+                camPos.Y() = tr.pos.Y() - fixed(static_cast<int32>(top));
+            }
+            else if (screenPos.Y().GetInt() > bottom) {
+                camPos.Y() = tr.pos.Y() - fixed(static_cast<int32>(bottom));
+            }
+
+            m_activeCam.SetPos(camPos);
+            break;
+        }
     }
 
-    void RenderSystem::Draw()
+    void RenderSystem::Draw(entt::registry& registry)
     {
         Chunk c;
         c.Draw(m_activeCam);
+
+        auto view = registry.view<Sprite, Transform>();
+        for (auto spriteEntts : view) {
+            auto& sp = view.get<Sprite>(spriteEntts);
+            auto& tr = view.get<Transform>(spriteEntts);
+            fixed x = m_activeCam.WorldToCamera().X();
+            fixed y = m_activeCam.WorldToCamera().Y();
+            int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
+            int drawX = (tr.pos.X() + x).GetInt() - PLAYER_SPR / 2;
+            int drawY = (tr.pos.Y() + y).GetInt() - PLAYER_SPR;
+
+            glSprite(drawX, drawY, flip, &sp.sprite[sp.spriteID]);
+        }
     }
 
     void BeginFrame()
