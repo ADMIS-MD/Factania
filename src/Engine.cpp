@@ -13,6 +13,7 @@
 #include "Engine.h"
 
 #include "RenderSystem.h"
+#include "Player.h"
 
 #include <errno.h>
 #include <dlfcn.h>
@@ -22,6 +23,7 @@
 #include <nds.h>
 #include <debug_menu/debug_menu.h>
 #include "Save.h"
+#include "Player.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -132,23 +134,23 @@ namespace core {
         // Print some text in the demo console
         consoleClear();
 
-        // Loading save data
-        memset(&savedata, 0, sizeof(savedata));
+        //// Loading save data
+        //memset(&savedata, 0, sizeof(savedata));
 
-        bool loaded = LoadSave(&savedata);
+        //bool loaded = LoadSave(&savedata);
 
-        if (loaded) {
-            //x = savedata.x;
-            //y = savedata.y;
-            //z = savedata.z;
-            //angle_x = savedata.angle_x;
-            //angle_z = savedata.angle_z;
+        //if (loaded) {
+        //    //x = savedata.x;
+        //    //y = savedata.y;
+        //    //z = savedata.z;
+        //    //angle_x = savedata.angle_x;
+        //    //angle_z = savedata.angle_z;
 
-            printf("Save file loaded: Revision %i\n", savedata.save_count);
-        }
-        else {
-            printf("Save file not found\n");
-        }
+        //    printf("Save file loaded: Revision %i\n", savedata.save_count);
+        //}
+        //else {
+        //    printf("Save file not found\n");
+        //}
 
         // Save Debug Menu Callbacks
         //static std::vector<DebugNode*> s_save_menu_nodes;
@@ -194,6 +196,8 @@ namespace core {
 
         load_image();
 
+        CreatePlayer(registry);
+
         printf("START:   Exit to loader\n");
         printf("SELECT:  Open Debug Menu\n");
         printf("\nPrinting from Engine\n");
@@ -213,8 +217,10 @@ namespace core {
     {
         for (auto system : m_systems)
         {
-            system->Update();
+            system->Update(registry);
         }
+
+        UpdatePlayer(registry);
 
         // because i dont have a better place to put it for testing :)
         uint16_t down = keysDown();
@@ -227,7 +233,7 @@ namespace core {
     {
         for (auto system : m_systems)
         {
-            system->Draw();
+            system->Draw(registry);
         }
     }
 

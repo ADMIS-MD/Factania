@@ -20,8 +20,8 @@ namespace core {
         RenderSystem();
         ~RenderSystem();
 
-        void Update() override;
-        void Draw() override;
+        void Update(entt::registry& registry) override;
+        void Draw(entt::registry& registry) override;
     private:
         Camera m_activeCam;
         

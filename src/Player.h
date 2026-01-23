@@ -6,6 +6,8 @@
 #include <entt.hpp>
 #include "Math.h"
 
+const int PLAYER_SPR = 32;
+
 enum class PlayerMode 
 {
 	IDLE,
@@ -20,16 +22,9 @@ struct PlayerState
 	bool inputEnabled = true;
 };
 
-struct PlayerSprite 
-{
-	int spriteID = 0;
-	int anim = 0;
-	bool xFlip = false;
-};
-
 struct PlayerMove 
 {
-	fixed speed = 10.f;
+	fixed speed = 2.f;
 };
 
 entt::entity CreatePlayer(entt::registry& registry);

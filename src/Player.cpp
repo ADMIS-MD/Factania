@@ -4,18 +4,51 @@
 #include "nds.h"
 #include "Player.h"
 #include "Transform.h"
+#include "Sprite.h"
+#include "player_sprite.h"
 
-entt::entity CreatePlayer(entt::registry& registry)
-{
-    const entt::entity entity = registry.create();
+static glImage g_playerImages[14];
+static int g_playerTexId = -1;
+const uint16_t Player_texcoords[] = {
+      0,   0, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR,   0, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 2,   0, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 3,   0, PLAYER_SPR, PLAYER_SPR,
 
-    registry.emplace<Transform>(entity);
-    registry.emplace<GridTransform>(entity);
-    registry.emplace<PlayerState>(entity);
-    registry.emplace<PlayerSprite>(entity);
-    registry.emplace<PlayerMove>(entity);
+      0,  PLAYER_SPR, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR,  PLAYER_SPR, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 2,  PLAYER_SPR, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 3,  PLAYER_SPR, PLAYER_SPR, PLAYER_SPR,
 
-    return entity;
+      0,  PLAYER_SPR * 2, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR,  PLAYER_SPR * 2, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 2,  PLAYER_SPR * 2, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 3,  PLAYER_SPR * 2, PLAYER_SPR, PLAYER_SPR,
+
+     0,   PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR,  PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 2,  PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
+     PLAYER_SPR * 3,  PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
+};
+
+static void LoadPlayerSpriteOnce() {
+    if (g_playerTexId >= 0) return;
+
+    g_playerTexId = glLoadSpriteSet(
+        g_playerImages,
+        16,
+        Player_texcoords,
+        GL_RGB256,
+        128, 128,
+        TEXGEN_TEXCOORD | GL_TEXTURE_COLOR0_TRANSPARENT,
+        128,
+        player_spritePal,
+        player_spriteBitmap
+    );
+
+    if (g_playerTexId < 0) {
+        printf("Failed to load texture: %d\n", g_playerTexId);
+    }
 }
 
 static inline int32 WorldToTile(const fixed& p)
@@ -30,6 +63,7 @@ static inline bool CheckCollision(const Vec2& pos)
     int32 playerTileY = WorldToTile(pos.Y());
 
     // TODO: get tilemap array?
+    return false;
 
     for (int indexX = -1; indexX <= 1; ++indexX) {
         for (int indexY = -1; indexY <= 1; ++indexY) {
@@ -52,15 +86,53 @@ static inline bool CheckCollision(const Vec2& pos)
     return false;
 }
 
-static inline void SetMode(PlayerState& st, PlayerSprite& sp, PlayerMode newMode)
+static inline void SetAnim(Sprite& sp, int start, int end)
 {
-    if (st.mode == newMode) {
-        return;
-    }
+    sp.start = start;
+    sp.end = end;
+    sp.spriteID = start;
+    sp.frame = 0;
+}
 
+static inline void SetMode(PlayerState& st, Sprite& sp, PlayerMode newMode)
+{
+    if (st.mode == newMode) return;
     st.mode = newMode;
 
-    // TODO: set animation
+    if (newMode == PlayerMode::IDLE) {
+        SetAnim(sp, 0, 5);
+    }
+    else if (newMode == PlayerMode::MOVING) {
+        SetAnim(sp, 6, 15);
+    }
+}
+
+static inline void AdvanceAnim(Sprite& sp)
+{
+    sp.frame++;
+    if (sp.frame >= sp.ticksPerFrame) {
+        sp.frame = 0;
+        sp.spriteID++;
+        if (sp.spriteID > sp.end) sp.spriteID = sp.start;
+    }
+}
+
+entt::entity CreatePlayer(entt::registry& registry)
+{
+    LoadPlayerSpriteOnce();
+
+    const entt::entity entity = registry.create();
+
+    registry.emplace<Transform>(entity, Vec2(fixed(static_cast<int32>(SCREENW / 2)), fixed(static_cast<int32>(SCREENH / 2))), 1);
+    registry.emplace<GridTransform>(entity);
+    auto& st = registry.emplace<PlayerState>(entity);
+    auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, 0, false);
+    registry.emplace<PlayerMove>(entity);
+
+    st.mode = PlayerMode::IDLE;
+    SetAnim(sp, 0, 5);
+
+    return entity;
 }
 
 void UpdatePlayer(entt::registry& registry)
@@ -79,14 +151,14 @@ void UpdatePlayer(entt::registry& registry)
         dir *= fixed(0.707f);
     }
 
-    auto player = registry.view<Transform, GridTransform, PlayerState, PlayerSprite, PlayerMove>();
+    auto view = registry.view<Transform, GridTransform, PlayerState, Sprite, PlayerMove>();
 
-    for (auto entity : player) {
-        auto& tr = player.get<Transform>(entity);
-        auto& gtr = player.get<GridTransform>(entity);
-        auto& st = player.get<PlayerState>(entity);
-        auto& sp = player.get<PlayerSprite>(entity);
-        const auto& mv = player.get<PlayerMove>(entity);
+    for (auto player : view) {
+        auto& tr = view.get<Transform>(player);
+        auto& gtr = view.get<GridTransform>(player);
+        auto& st = view.get<PlayerState>(player);
+        auto& sp = view.get<Sprite>(player);
+        const auto& mv = view.get<PlayerMove>(player);
 
         if (!st.inputEnabled) {
             // skip update
@@ -97,6 +169,8 @@ void UpdatePlayer(entt::registry& registry)
         case PlayerMode::IDLE:
         {
             // TODO: change to mine or build if key press or something
+
+            AdvanceAnim(sp);
 
             if (dir.X() != 0.f || dir.Y() != 0.f) {
                 SetMode(st, sp, PlayerMode::MOVING);
@@ -118,6 +192,8 @@ void UpdatePlayer(entt::registry& registry)
             else if (dir.X() > 0.f) {
                 sp.xFlip = false;
             }
+
+            AdvanceAnim(sp);
 
             Vec2 delta = dir;
             delta *= mv.speed;

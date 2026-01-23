@@ -1,6 +1,7 @@
 #pragma once
 
 #include "System.h"
+#include "entt.hpp"
 #include <vector>
 
 namespace core {
@@ -15,10 +16,14 @@ namespace core {
 		void Draw();
 
 		void Run();
+
+
 	private:
 		std::vector<System*> m_systems;
 
 		bool shouldQuit;
+
+		entt::registry registry;
 	};
 
 }
