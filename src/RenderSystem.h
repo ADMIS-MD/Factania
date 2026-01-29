@@ -1,9 +1,12 @@
 #pragma once
 
+#include <chunk.hpp>
+
 #include "System.h"
 #include "gl2d.h"
 
 #include "Camera.h"
+#include "chunk.hpp"
 
 #define TILE_ROWS    1
 #define TILE_COLUMNS 2
@@ -29,6 +32,7 @@ namespace core {
         int scroll_x = 0;
         int scroll_y = 0;
 
+        ChunkLookup cl;
     };
 
     void BeginFrame();

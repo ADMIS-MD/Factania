@@ -75,14 +75,18 @@ if(NINTENDO_DS)
         "-Wl,--end-group"
     )
 
-
     set(GRIT_OUT_FILES)
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
+        list(APPEND GRIT_OUT_FILES generated/${filename_wle}.c)
+        if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c")
+            if("${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c" IS_NEWER_THAN ${file_path})
+                continue()
+            endif()
+        endif()
         execute_process(
             COMMAND ${BLOCKSDS}/tools/grit/grit ${file_path} -ftc -W1 -o${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}
         )
-        list(APPEND GRIT_OUT_FILES generated/${filename_wle}.c)
     endforeach()
     add_library(Grit
         OBJECT ${GRIT_OUT_FILES}

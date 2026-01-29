@@ -21,7 +21,8 @@ struct Transform;
 
 struct GridTransform {
     GridTransform(int32 x, int32 y);
-    GridTransform();;
+    GridTransform();
+    explicit GridTransform(Vec2& vec);
     GridTransform(const GridTransform& other);
     GridTransform(GridTransform&& other) noexcept;
     GridTransform& operator=(const GridTransform& other);

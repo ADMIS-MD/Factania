@@ -103,15 +103,43 @@ namespace core {
 
     void RenderSystem::Draw(entt::registry& registry)
     {
-        Chunk c;
-        c.Draw(m_activeCam);
+        Vec2 world = m_activeCam.WorldToCamera();
+        fixed x = m_activeCam.WorldToCamera().X();
+        fixed y = m_activeCam.WorldToCamera().Y();
+
+        GridTransform grid {world};
+        ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
+        consoleClear();
+        entt::entity center = cl.GetChunk(pos);
+        if (!registry.valid(center))
+        {
+            center = Chunk::MakeChunk(cl, registry, pos);
+        }
+        Chunk& center_chunk = registry.get<Chunk>(center);
+        center_chunk.FillSurrounding(cl, registry, pos);
+        center_chunk.Draw(m_activeCam, pos);
+        int xc = pos.x;
+        int yc = pos.y;
+        const ChunkPosition transforms[8] = {
+            {static_cast<int16>(xc + 0), static_cast<int16>(yc + 1)},
+            {static_cast<int16>(xc + 1), static_cast<int16>(yc + 1)},
+            {static_cast<int16>(xc + 1), static_cast<int16>(yc + 0)},
+            {static_cast<int16>(xc + 1), static_cast<int16>(yc - 1)},
+            {static_cast<int16>(xc + 0), static_cast<int16>(yc - 1)},
+            {static_cast<int16>(xc - 1), static_cast<int16>(yc - 1)},
+            {static_cast<int16>(xc - 1), static_cast<int16>(yc + 0)},
+            {static_cast<int16>(xc - 1), static_cast<int16>(yc + 1)},
+        };
+        for (int i = 0; i < 8; ++i)
+        {
+            registry.get<Chunk>(center_chunk.surrounding_chunks[i]).Draw(m_activeCam, transforms[i]);
+        }
 
         auto view = registry.view<Sprite, Transform>();
         for (auto spriteEntts : view) {
             auto& sp = view.get<Sprite>(spriteEntts);
             auto& tr = view.get<Transform>(spriteEntts);
-            fixed x = m_activeCam.WorldToCamera().X();
-            fixed y = m_activeCam.WorldToCamera().Y();
+
             int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
             int drawX = (tr.pos.X() + x).GetInt() - PLAYER_SPR / 2;
             int drawY = (tr.pos.Y() + y).GetInt() - PLAYER_SPR;

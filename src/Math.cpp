@@ -32,7 +32,18 @@ fixed::operator float() const
 
 int32 fixed::GetInt() const
 {
+    fixed adj = *this + FromFixed(floatToFixed(.5f, FIXED_POINT_LOC));
+    return int32{adj};
+}
+
+int32 fixed::Floor() const
+{
     return int32{*this};
+}
+
+float fixed::GetFloat() const
+{
+    return float{*this};
 }
 
 int32 const& fixed::GetFixed() const
