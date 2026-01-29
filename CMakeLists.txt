@@ -50,7 +50,7 @@ set(HEADER_FILES
     src/Player.h
     src/Sprite.h
     src/building.h
-    src/item.h
+    src/Item.h
 )
 
 # Create fake executable target
