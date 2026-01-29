@@ -13,7 +13,7 @@
 #include "Engine.h"
 
 #include "RenderSystem.h"
-#include "Player.h"
+#include "EntitySystemManager.h"
 
 #include <errno.h>
 #include <dlfcn.h>
@@ -31,90 +31,10 @@
 //	Method Declarations
 //-----------------------------------------------------------------------------
 
-// SPDX-License-Identifier: CC0-1.0
-//
-// SPDX-FileContributor: Antonio Ni�o D�az, 2024-2025
-
-// This example shows how to draw a translucent 3D box in which you can see all
-// faces. This is how you would see 3D objects that are translucent, but not
-// fully solid. For example, you could have an empty cube where all the faces
-// are translucent pieces of plastic.
-
-
-
-bool file_load(const char *path, void **buffer, size_t *size)
-{
-    // Open the file in read binary mode
-    FILE *f = fopen(path, "rb");
-    if (f == NULL)
-    {
-        perror("fopen");
-        return false;
-    }
-
-    // Move read cursor to the end of the file
-    int ret = fseek(f, 0, SEEK_END);
-    if (ret != 0)
-    {
-        perror("fseek");
-        return false;
-    }
-
-    // Check position of the cursor (we're at the end, so this is the size)
-    *size = ftell(f);
-    if (*size == 0)
-    {
-        printf("Size is 0!");
-        fclose(f);
-        return false;
-    }
-
-    // Move cursor to the start of the file again
-    rewind(f);
-
-    // Allocate buffer to hold data
-    *buffer = malloc(*size);
-    if (*buffer == NULL)
-    {
-        printf("Not enought memory to load %s!", path);
-        fclose(f);
-        return false;
-    }
-
-    // Read all data into the buffer
-    if (fread(*buffer, *size, 1, f) != 1)
-    {
-        perror("fread");
-        fclose(f);
-        free(*buffer);
-        return false;
-    }
-
-    // Close file
-    ret = fclose(f);
-    if (ret != 0)
-    {
-        perror("fclose");
-        free(*buffer);
-        return false;
-    }
-
-    return true;
-}
-
-static void load_image() {
-    char* buf;
-    size_t size;
-
-}
-
 namespace core {
 
     Engine::Engine()
     {
-        // Add Systems Here
-        m_systems.push_back(new RenderSystem());
-
         // Initializing fat
         bool init_ok = fatInitDefault();
 
@@ -127,6 +47,11 @@ namespace core {
             while (1)
                 swiWaitForVBlank();
         }
+
+        // Add Systems Here
+        m_systems.push_back(new RenderSystem());
+        m_systems.push_back(new EntitySystemManager(m_registry));
+
 
         // Setup sub screen for the text console
         consoleDemoInit();
@@ -240,7 +165,7 @@ namespace core {
     {
         for (auto system : m_systems)
         {
-            system->Update(registry);
+            system->Update(m_registry);
         }
 
         UpdatePlayer(registry);
@@ -258,7 +183,7 @@ namespace core {
     {
         for (auto system : m_systems)
         {
-            system->Draw(registry);
+            system->Draw(m_registry);
         }
     }
 
@@ -269,12 +194,14 @@ namespace core {
             // As far as I'm aware, this is our "tick", so it should run
             // indepedent from any specific loop. Please correct me if wrong -Nick
             swiWaitForVBlank();
+            check_debug_menu();
+
+            scanKeys();
+            Update();
 
             BeginFrame();
-
-            Update();
+            
             Draw();
-            check_debug_menu();
 
             EndFrame();
 
