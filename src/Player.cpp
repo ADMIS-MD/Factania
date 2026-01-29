@@ -106,7 +106,7 @@ static inline void SetMode(PlayerState& st, Sprite& sp, Animation& an, PlayerMod
     }
 }
 
-entt::entity CreatePlayer(entt::registry& registry)
+void CreatePlayerComponent(entt::registry& registry)
 {
     LoadPlayerSprite();
 
@@ -121,8 +121,6 @@ entt::entity CreatePlayer(entt::registry& registry)
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);
-
-    return entity;
 }
 
 void UpdatePlayerComponent(entt::registry& registry)
