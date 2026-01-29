@@ -19,6 +19,7 @@ set(SOURCE_FILES
     src/factania_main.cpp
     src/Engine.cpp
     src/RenderSystem.cpp
+    src/EntitySystemManager.cpp
     src/Camera.cpp
     src/debug_menu/debug_menu.cpp
     src/debug_menu/memory_debug_info.cpp
@@ -35,6 +36,7 @@ set(HEADER_FILES
     src/factania_main.h
     src/System.h
     src/RenderSystem.h
+    src/EntitySystemManager.h
     src/Camera.h
     src/debug_menu/debug_menu.h
     src/debug_menu/memory_debug_info.h

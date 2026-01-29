@@ -13,7 +13,7 @@
 #include "Engine.h"
 
 #include "RenderSystem.h"
-#include "Player.h"
+#include "EntitySystemManager.h"
 
 #include <errno.h>
 #include <dlfcn.h>
@@ -222,6 +222,7 @@ namespace core {
 
         UpdatePlayer(registry);
 
+
         // because i dont have a better place to put it for testing :)
         uint16_t down = keysDown();
 
@@ -244,12 +245,14 @@ namespace core {
             // As far as I'm aware, this is our "tick", so it should run
             // indepedent from any specific loop. Please correct me if wrong -Nick
             swiWaitForVBlank();
-
-            BeginFrame();
+            check_debug_menu();
 
             Update();
+
+
+            BeginFrame();
+            
             Draw();
-            check_debug_menu();
 
             EndFrame();
 
