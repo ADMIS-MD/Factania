@@ -28,6 +28,7 @@ set(SOURCE_FILES
     src/chunk.cpp
     src/Math.cpp
     src/Player.cpp
+    src/building.cpp
 )
 
 set(HEADER_FILES
@@ -46,6 +47,8 @@ set(HEADER_FILES
     src/Transform.h
     src/Player.h
     src/Sprite.h
+    src/building.h
+    src/item.h
 )
 
 # Create fake executable target

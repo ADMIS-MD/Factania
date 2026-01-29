@@ -1,4 +1,18 @@
 #include "building.h"
+#include <iostream>
+
+#define ONE_OVER_SIXTY 0.0166
+
+void TempUpdateBuildings(entt::registry& registry)
+{
+	auto view = registry.view<FactoryBuilding>();
+
+	for (auto entity : view) 
+	{
+		auto& component = view.get<FactoryBuilding>(entity);
+		component.UpdateBuilding(ONE_OVER_SIXTY);
+	}
+}
 
 void FactoryBuilding::UpdateBuilding(float dt)
 {
@@ -68,9 +82,10 @@ bool FactoryBuilding::InputItems(ItemQuantity inputs)
 		if (inputInventory[i].item.itemID == inputs.item.itemID)
 		{
 			inputInventory[i].quantity += inputs.quantity;
-			return;
+			return true;
 		}
 	}
+	return false;
 }
 
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)
@@ -84,12 +99,13 @@ void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 	{
 		outputInventory[i].quantity += recipe->outputItems[i].quantity;
 	}
+	std::cout << "Factory Output: " << recipe->outputItems[0].quantity << " " << recipe->outputItems[0].item.name;
 }
 
-FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1)
+FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_)
 {
 	recipes = recipes_;
-	selectedRecipe = selectedRecipe_;
+	SelectRecipe(selectedRecipe_);
 }
 
 FactoryBuilding::FactoryBuilding()

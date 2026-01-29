@@ -25,6 +25,8 @@
 #include "Save.h"
 #include "Player.h"
 
+#include "building.h"
+
 //-----------------------------------------------------------------------------
 //	Method Declarations
 //-----------------------------------------------------------------------------
@@ -198,6 +200,27 @@ namespace core {
 
         CreatePlayer(registry);
 
+        ItemQuantity ironIngot = ItemQuantity(Item(100, "iron_ingot"), 10);
+        ItemQuantity ironPlate = ItemQuantity(Item(101, "iron_plate"), 1);
+
+        Recipe tempRecipie;
+        tempRecipie.inputItems.push_back(ironIngot);
+        tempRecipie.outputItems.push_back(ironPlate);
+        tempRecipie.recipeDuration = 10;
+
+        std::vector<Recipe> buildingRecipes;
+        buildingRecipes.push_back(tempRecipie);
+
+        FactoryBuilding building = FactoryBuilding(buildingRecipes, 1);
+        building.InputItems(ironIngot);
+        building.InputItems(ironIngot);
+        building.InputItems(ironIngot);
+
+        building.status = BuildingStatus::Idle;
+
+        const entt::entity entityLink = registry.create();
+        registry.emplace<FactoryBuilding>(entityLink);
+
         printf("START:   Exit to loader\n");
         printf("SELECT:  Open Debug Menu\n");
         printf("\nPrinting from Engine\n");
@@ -221,6 +244,8 @@ namespace core {
         }
 
         UpdatePlayer(registry);
+
+        TempUpdateBuildings(registry);
 
         // because i dont have a better place to put it for testing :)
         uint16_t down = keysDown();
