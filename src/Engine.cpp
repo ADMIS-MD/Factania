@@ -52,79 +52,6 @@ namespace core {
         m_systems.push_back(new RenderSystem());
         m_systems.push_back(new EntitySystemManager(m_registry));
 
-
-        // Setup sub screen for the text console
-        consoleDemoInit();
-
-        shouldQuit = false;
-
-        // Print some text in the demo console
-        consoleClear();
-
-        //// Loading save data
-        //memset(&savedata, 0, sizeof(savedata));
-
-        //bool loaded = LoadSave(&savedata);
-
-        //if (loaded) {
-        //    //x = savedata.x;
-        //    //y = savedata.y;
-        //    //z = savedata.z;
-        //    //angle_x = savedata.angle_x;
-        //    //angle_z = savedata.angle_z;
-
-        //    printf("Save file loaded: Revision %i\n", savedata.save_count);
-        //}
-        //else {
-        //    printf("Save file not found\n");
-        //}
-
-        // Save Debug Menu Callbacks
-        //static std::vector<DebugNode*> s_save_menu_nodes;
-
-        //s_save_menu_nodes.push_back(new CallbackDebugNode("Save Game", [this]() -> std::string {
-        //    /*savedata.save_count++;
-        //    savedata.x = x;
-        //    savedata.y = y;
-        //    savedata.z = z;
-        //    savedata.angle_x = angle_x;
-        //    savedata.angle_z = angle_z;
-
-        //    if (save_write(&savedata)) {
-        //        return "Game Saved. Revision " + std::to_string(savedata.save_count);
-        //    }
-        //    return "Save Failed";*/
-        //}));
-
-        //s_save_menu_nodes.push_back(new CallbackDebugNode("Load Save", [this]() -> std::string {
-        //    /*if (save_load(&savedata)) {
-        //        x = savedata.x;
-        //        y = savedata.y;
-        //        z = savedata.z;
-        //        angle_x = savedata.angle_x;
-        //        angle_z = savedata.angle_z;
-
-        //        return "Save Loaded. Revision " + std::to_string(savedata.save_count);
-        //    }
-        //    return "Save file not found";*/
-        //}));
-
-        //s_save_menu_nodes.push_back(new CallbackDebugNode("Delete Save", [this]() -> std::string {
-        //    /*if (save_delete()) {
-        //        savedata.save_count = 0;
-        //        return "Save deleted";
-        //    }
-        //    else {
-        //        return "Failed to delete save";
-        //    }*/
-        //}));
-
-        //add_debug_node_to_root(new SubmenuDebugNode("Save Menu", s_save_menu_nodes));
-
-        load_image();
-
-        CreatePlayer(registry);
-
         ItemQuantity ironIngot = ItemQuantity(Item(100, "iron_ingot"), 10);
         ItemQuantity ironPlate = ItemQuantity(Item(101, "iron_plate"), 1);
 
@@ -143,8 +70,16 @@ namespace core {
 
         building.status = BuildingStatus::Idle;
 
-        const entt::entity entityLink = registry.create();
-        registry.emplace<FactoryBuilding>(entityLink);
+        const entt::entity entityLink = m_registry.create();
+        m_registry.emplace<FactoryBuilding>(entityLink);
+
+        // Setup sub screen for the text console
+        consoleDemoInit();
+
+        shouldQuit = false;
+
+        // Print some text in the demo console
+        consoleClear();
 
         printf("START:   Exit to loader\n");
         printf("SELECT:  Open Debug Menu\n");
@@ -168,9 +103,7 @@ namespace core {
             system->Update(m_registry);
         }
 
-        UpdatePlayer(registry);
-
-        TempUpdateBuildings(registry);
+        TempUpdateBuildings(m_registry);
 
         // because i dont have a better place to put it for testing :)
         uint16_t down = keysDown();
