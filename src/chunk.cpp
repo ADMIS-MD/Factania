@@ -50,7 +50,6 @@ entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, Chu
         if (registry.valid(c.surrounding_chunks[i]))
         {
             // & 0b0111 is mod 4 (x % 4)
-            printf("Put to chunk %d\n", c.surrounding_chunks[i]);
             registry.get<Chunk>(c.surrounding_chunks[i]).surrounding_chunks[(i + 4) & 0b0111] = entity;
         }
     }
@@ -77,13 +76,11 @@ void Chunk::FillSurrounding(ChunkLookup& lookup, entt::registry& registry, Chunk
 
     for (int i = 0; i < 8; ++i)
     {
-        printf("hahaha\n");
         if (!registry.valid(surrounding_chunks[i]))
         {
             MakeChunk(lookup, registry, transforms[i]);
         }
     }
-    printf("fasdlkjfa\n");
 }
 
 void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {

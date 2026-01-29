@@ -103,7 +103,6 @@ namespace core {
 
     void RenderSystem::Draw(entt::registry& registry)
     {
-        printf("Started Draw\n");
         Vec2 world = m_activeCam.WorldToCamera();
         fixed x = m_activeCam.WorldToCamera().X();
         fixed y = m_activeCam.WorldToCamera().Y();
@@ -111,13 +110,9 @@ namespace core {
         GridTransform grid {world};
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
         consoleClear();
-        printf("%d, %d\n", pos.x, pos.y);
-        printf("%d, %d\n", grid.x, grid.y);
-        printf("%f, %f\n", m_activeCam.GetPos().X().GetFloat(), m_activeCam.GetPos().Y().GetFloat());
         entt::entity center = cl.GetChunk(pos);
         if (!registry.valid(center))
         {
-            printf("NOT valid\n");
             center = Chunk::MakeChunk(cl, registry, pos);
         }
         Chunk& center_chunk = registry.get<Chunk>(center);
@@ -135,10 +130,8 @@ namespace core {
             {static_cast<int16>(xc - 1), static_cast<int16>(yc + 0)},
             {static_cast<int16>(xc - 1), static_cast<int16>(yc + 1)},
         };
-        printf("p2\n");
         for (int i = 0; i < 8; ++i)
         {
-            printf("%d\n", center_chunk.surrounding_chunks[i]);
             registry.get<Chunk>(center_chunk.surrounding_chunks[i]).Draw(m_activeCam, transforms[i]);
         }
 
