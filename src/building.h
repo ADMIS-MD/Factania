@@ -30,11 +30,14 @@ public:
 class ItemBuilding : public Building
 {
 public:
-    std::vector<Building> inputs;
-    std::vector<Building> outputs;
+    std::vector<ItemBuilding> inputs;
+    std::vector<ItemBuilding> outputs;
     std::vector<ItemQuantity> inputInventory;
     std::vector<ItemQuantity> outputInventory;
     virtual bool InputItems(ItemQuantity items) = 0;
+    virtual bool TakeItems() = 0;
+
+private:
 };
 
 class FactoryBuilding : ItemBuilding
