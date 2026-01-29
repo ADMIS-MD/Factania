@@ -1,7 +1,12 @@
 #include "chunk.hpp"
-#include "entt.hpp"
+#include "RenderSystem.h"
 
-void Chunk::Draw(Camera cam)
+Chunk::Chunk()
+{
+
+}
+
+void Chunk::Draw(Camera cam, ChunkPosition pos)
 {
     glColor(RGB15(31, 31, 31));
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
@@ -16,12 +21,69 @@ void Chunk::Draw(Camera cam)
         {
             int tile_id = cached_sprites[j * CHUNK_WIDTH + i].tile_pack;
 
-            int x = cam.WorldToCamera().X().GetInt() + i * TILE_SIZE;
-            int y = cam.WorldToCamera().Y().GetInt() + j * TILE_SIZE;
+            int x = cam.WorldToCamera().X().GetInt() + i * TILE_SIZE - pos.x * 8 * TILE_SIZE;
+            int y = cam.WorldToCamera().Y().GetInt() + j * TILE_SIZE - pos.y * 8 * TILE_SIZE;
 
             glSprite(x, y, GL_FLIP_NONE, &core::g_tileset[tile_id]);
         }
     }
+}
+
+entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos)
+{
+    auto entity = lookup.GetChunk(pos);
+    assert(!registry.valid(entity));
+
+    entity = registry.create();
+    Chunk c{};
+    c.surrounding_chunks[0] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 0), static_cast<int16>(pos.y + 1)});
+    c.surrounding_chunks[1] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y + 1)});
+    c.surrounding_chunks[2] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y + 0)});
+    c.surrounding_chunks[3] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y - 1)});
+    c.surrounding_chunks[4] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 0), static_cast<int16>(pos.y - 1)});
+    c.surrounding_chunks[5] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y - 1)});
+    c.surrounding_chunks[6] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y + 0)});
+    c.surrounding_chunks[7] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y + 1)});
+
+    for (int i = 0; i < 8; ++i)
+    {
+        if (registry.valid(c.surrounding_chunks[i]))
+        {
+            // & 0b0111 is mod 4 (x % 4)
+            printf("Put to chunk %d\n", c.surrounding_chunks[i]);
+            registry.get<Chunk>(c.surrounding_chunks[i]).surrounding_chunks[(i + 4) & 0b0111] = entity;
+        }
+    }
+
+    registry.emplace<Chunk>(entity, std::forward<Chunk>(c));
+    lookup.m_chunks.insert({pos, entity});
+
+    return entity;
+}
+
+void Chunk::FillSurrounding(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos)
+{
+    int xc = pos.x, yc = pos.y;
+    const ChunkPosition transforms[8] = {
+        {static_cast<int16>(xc + 0), static_cast<int16>(yc + 1)},
+        {static_cast<int16>(xc + 1), static_cast<int16>(yc + 1)},
+        {static_cast<int16>(xc + 1), static_cast<int16>(yc + 0)},
+        {static_cast<int16>(xc + 1), static_cast<int16>(yc - 1)},
+        {static_cast<int16>(xc + 0), static_cast<int16>(yc - 1)},
+        {static_cast<int16>(xc - 1), static_cast<int16>(yc - 1)},
+        {static_cast<int16>(xc - 1), static_cast<int16>(yc + 0)},
+        {static_cast<int16>(xc - 1), static_cast<int16>(yc + 1)},
+    };
+
+    for (int i = 0; i < 8; ++i)
+    {
+        printf("hahaha\n");
+        if (!registry.valid(surrounding_chunks[i]))
+        {
+            MakeChunk(lookup, registry, transforms[i]);
+        }
+    }
+    printf("fasdlkjfa\n");
 }
 
 void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {
@@ -58,7 +120,7 @@ ChunkPosition ChunkPosition::FromGridTransform(const GridTransform& transform)
         static_cast<int16>(transform.y >> 3)
     };
 }
-
+;
 entt::entity ChunkLookup::GetChunk(GridTransform transform)
 {
     auto pos = ChunkPosition::FromGridTransform(transform);
@@ -69,7 +131,7 @@ entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
 {
     auto it = m_chunks.find(transform);
     if (it == m_chunks.end()) // TODO: Make chunk
-        return {};
+        return entt::null;
 
     return it->second;
 }

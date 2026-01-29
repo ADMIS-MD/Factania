@@ -20,6 +20,8 @@ public:
     explicit operator float() const;
 
     int32 GetInt() const;
+    int32 Floor() const;
+    float GetFloat() const;
     int32 const& GetFixed() const;
     int32& GetFixed();
     static fixed FromFixed(int32 f);
