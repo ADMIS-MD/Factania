@@ -1,5 +1,7 @@
 #pragma once
 
+#include "entt.hpp"
+
 namespace core {
 
     class System
@@ -7,8 +9,8 @@ namespace core {
     public:
         ~System() {}
 
-        virtual void Update() {}
-        virtual void Draw() {}
+        virtual void Update(entt::registry& registry) {}
+        virtual void Draw(entt::registry& registry) {}
     };
 
 }
