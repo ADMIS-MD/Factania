@@ -3,6 +3,9 @@
 #include <list>
 #include <vector>
 #include "Item.h"
+#include <entt.hpp>
+
+void TempUpdateBuildings(entt::registry& registry);
 
 enum class BuildingType {
     None,
@@ -30,8 +33,8 @@ public:
 class ItemBuilding : public Building
 {
 public:
-    std::vector<Building> inputs;
-    std::vector<Building> outputs;
+    std::vector<Building*> inputs;
+    std::vector<Building*> outputs;
     std::vector<ItemQuantity> inputInventory;
     std::vector<ItemQuantity> outputInventory;
     virtual bool InputItems(ItemQuantity items) = 0;
