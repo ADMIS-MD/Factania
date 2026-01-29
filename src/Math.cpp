@@ -32,7 +32,18 @@ fixed::operator float() const
 
 int32 fixed::GetInt() const
 {
+    fixed adj = *this + FromFixed(floatToFixed(.5f, FIXED_POINT_LOC));
+    return int32{adj};
+}
+
+int32 fixed::Floor() const
+{
     return int32{*this};
+}
+
+float fixed::GetFloat() const
+{
+    return float{*this};
 }
 
 int32 const& fixed::GetFixed() const
@@ -99,6 +110,31 @@ fixed& fixed::operator/=(const fixed& f)
 {
     m_value = divf32(m_value, f.m_value);
     return *this;
+}
+
+fixed operator+(fixed a, fixed b)
+{
+    return a += b;
+}
+
+fixed operator-(fixed a, fixed b)
+{
+    return a -= b;
+}
+
+fixed fixed::operator-() const
+{
+    return FromFixed(-m_value);
+}
+
+fixed operator*(fixed a, fixed b)
+{
+    return a *= b;
+}
+
+fixed operator/(fixed a, fixed b)
+{
+    return a /= b;
 }
 
 Vec2::Vec2()
@@ -178,6 +214,11 @@ Vec2& Vec2::operator/=(fixed other)
     X() /= other;
     Y() /= other;
     return *this;
+}
+
+Vec2 Vec2::operator-() const
+{
+    return {-X(), -Y()};
 }
 
 Vec2 operator+(const Vec2& a, const Vec2& b)
@@ -268,11 +309,16 @@ Vec3& Vec3::operator*=(fixed other)
 
 Vec3& Vec3::operator/=(fixed other)
 {
-    arr[0] / other;
-    arr[1] / other;
-    arr[2] / other;
+    arr[0] /= other;
+    arr[1] /= other;
+    arr[2] /= other;
 
     return *this;
+}
+
+Vec3 Vec3::operator-() const
+{
+    return {-X(), -Y(), -Z()};
 }
 
 fixed& Vec3::X()
@@ -371,6 +417,12 @@ Vec3 Vec3::Cross(Vec3& other)
     return out;
 }
 
+Vec3& Vec3::Normalize()
+{
+    normalizef32(&arr->GetFixed());
+    return *this;
+}
+
 fixed& Vec3::operator[](int v)
 {
     return arr[v];
@@ -379,12 +431,6 @@ fixed& Vec3::operator[](int v)
 fixed const& Vec3::operator[](int v) const
 {
     return arr[v];
-}
-
-
-fixed operator+(fixed a, fixed b)
-{
-    return a += b;
 }
 
 bool operator==(fixed a, fixed b)

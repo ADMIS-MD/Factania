@@ -20,6 +20,8 @@ public:
     explicit operator float() const;
 
     int32 GetInt() const;
+    int32 Floor() const;
+    float GetFloat() const;
     int32 const& GetFixed() const;
     int32& GetFixed();
     static fixed FromFixed(int32 f);
@@ -33,6 +35,7 @@ public:
     fixed& operator-=(const fixed& f);
     fixed& operator*=(const fixed& f);
     fixed& operator/=(const fixed& f);
+    fixed operator-() const;
     friend fixed operator+(fixed a, fixed b);
     friend fixed operator-(fixed a, fixed b);
     friend fixed operator*(fixed a, fixed b);
@@ -67,6 +70,7 @@ struct Vec2
     Vec2& operator*=(fixed other);
     // Avoid this function!
     Vec2& operator/=(fixed other);
+    Vec2 operator-() const;
     friend Vec2 operator+(const Vec2& a, const Vec2& b);
     friend Vec2 operator-(const Vec2& a, const Vec2& b);
     friend Vec2 operator*(const Vec2& a, const Vec2& b);
@@ -103,6 +107,7 @@ struct Vec3
     Vec3& operator*=(fixed other);
     // Avoid this function!
     Vec3& operator/=(fixed other);
+    Vec3 operator-() const;
     friend Vec3 operator+(const Vec3& a, const Vec3& b);
     friend Vec3 operator-(const Vec3& a, const Vec3& b);
     friend Vec3 operator*(const Vec3& a, const Vec3& b);
@@ -113,6 +118,8 @@ struct Vec3
 
     fixed Dot(Vec3& other);
     Vec3 Cross(Vec3& other);
+    // Normalizes self
+    Vec3& Normalize();
 
     fixed& operator[](int v);
     fixed const& operator[](int v) const;
