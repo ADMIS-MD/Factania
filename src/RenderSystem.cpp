@@ -109,7 +109,6 @@ namespace core {
 
         GridTransform grid {world};
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
-        consoleClear();
         entt::entity center = cl.GetChunk(pos);
         if (!registry.valid(center))
         {
