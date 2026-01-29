@@ -14,7 +14,7 @@ GridTransform::GridTransform(int32 x, int32 y): x(x),
 GridTransform::GridTransform(): x(0), y(0)
 {}
 
-GridTransform::GridTransform(Vec2& vec) : x((vec.X().GetInt() + 16) / TILE_SIZE), y((vec.Y().GetInt() + 16) / TILE_SIZE)
+GridTransform::GridTransform(Vec2 const& vec) : x((vec.X().GetInt() + 16) / TILE_SIZE), y((vec.Y().GetInt() + 16) / TILE_SIZE)
 {
     if (vec.X() < fixed(0.f))
     {
@@ -59,10 +59,13 @@ GridTransform& GridTransform::operator=(GridTransform&& other) noexcept
     return *this;
 }
 
-GridTransform::GridTransform(Transform const& transform)
+GridTransform::GridTransform(Transform const& transform) : GridTransform(transform.pos)
 {
-    x = transform.pos.X().GetInt();
-    y = transform.pos.Y().GetInt();
+}
+
+u8 GridTransform::CropTo8x8Grid()
+{
+    return (x & 0b0111) + ((y & 0b0111) * 8);
 }
 
 Transform::Transform(Vec2 pos, u8 layer) : pos(pos), layer(layer)

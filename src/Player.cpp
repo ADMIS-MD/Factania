@@ -3,6 +3,9 @@
 
 #include "nds.h"
 #include "Player.h"
+
+#include <chunk.hpp>
+
 #include "Transform.h"
 #include "Sprite.h"
 #include "player_sprite.h"
@@ -135,11 +138,12 @@ entt::entity CreatePlayer(entt::registry& registry)
     return entity;
 }
 
-void UpdatePlayer(entt::registry& registry)
+void UpdatePlayer(entt::registry& registry, ChunkLookup& chl)
 {
     // remove this if already exist 
     scanKeys();
     const uint16_t held = keysHeld();
+    const uint16_t down = keysDown();
 
     Vec2 dir(0.f, 0.f);
     if (held & KEY_LEFT)  dir.X() -= 1.f;
@@ -159,6 +163,23 @@ void UpdatePlayer(entt::registry& registry)
         auto& st = view.get<PlayerState>(player);
         auto& sp = view.get<Sprite>(player);
         const auto& mv = view.get<PlayerMove>(player);
+
+        // TODO: Remove
+        if (down & KEY_A)
+        {
+            GridTransform grid = tr;
+            ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
+            chp.x = -chp.x;
+            chp.y = -chp.y;
+            printf("%d, %d\n", grid.x, grid.y);
+            printf("%d, %d\n", chp.x, chp.y);
+            entt::entity chunk_e = chl.GetChunk(chp);
+            printf("%d\n", static_cast<uint32_t>(chunk_e));
+            Chunk& chunk = registry.get<Chunk>(chunk_e);
+            printf("%d\n", grid.CropTo8x8Grid());
+            chunk.cached_sprites[grid.CropTo8x8Grid()].tile_pack = 1;
+        }
+        // TODO: End remove
 
         if (!st.inputEnabled) {
             // skip update

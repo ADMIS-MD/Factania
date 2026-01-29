@@ -127,7 +127,7 @@ entt::entity ChunkLookup::GetChunk(GridTransform transform)
 entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
 {
     auto it = m_chunks.find(transform);
-    if (it == m_chunks.end()) // TODO: Make chunk
+    if (it == m_chunks.end())
         return entt::null;
 
     return it->second;

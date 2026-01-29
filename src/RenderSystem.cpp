@@ -29,6 +29,8 @@
 //	Method Implementations
 //-----------------------------------------------------------------------------
 
+ChunkLookup chunk_lookup;
+
 namespace core {
 
     // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/tileset_background/source/main.c
@@ -109,13 +111,13 @@ namespace core {
 
         GridTransform grid {world};
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
-        entt::entity center = cl.GetChunk(pos);
+        entt::entity center = chunk_lookup.GetChunk(pos);
         if (!registry.valid(center))
         {
-            center = Chunk::MakeChunk(cl, registry, pos);
+            center = Chunk::MakeChunk(chunk_lookup, registry, pos);
         }
         Chunk& center_chunk = registry.get<Chunk>(center);
-        center_chunk.FillSurrounding(cl, registry, pos);
+        center_chunk.FillSurrounding(chunk_lookup, registry, pos);
         center_chunk.Draw(m_activeCam, pos);
         int xc = pos.x;
         int yc = pos.y;

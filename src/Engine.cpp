@@ -220,7 +220,7 @@ namespace core {
             system->Update(registry);
         }
 
-        UpdatePlayer(registry);
+        UpdatePlayer(registry, chunk_lookup);
 
         // because i dont have a better place to put it for testing :)
         uint16_t down = keysDown();
@@ -257,5 +257,4 @@ namespace core {
                 break;
         }
     }
-
 }

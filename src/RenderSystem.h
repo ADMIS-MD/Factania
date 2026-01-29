@@ -13,6 +13,8 @@
 
 #define TILE_SIZE 32
 
+extern ChunkLookup chunk_lookup;
+
 namespace core {
 
     inline glImage g_tileset[TILE_ROWS * TILE_COLUMNS];
@@ -31,8 +33,6 @@ namespace core {
         int tileset_texture_id;
         int scroll_x = 0;
         int scroll_y = 0;
-
-        ChunkLookup cl;
     };
 
     void BeginFrame();

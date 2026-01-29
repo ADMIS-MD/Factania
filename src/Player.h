@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <chunk.hpp>
 #include <entt.hpp>
 #include "Math.h"
 
@@ -29,4 +30,4 @@ struct PlayerMove
 
 entt::entity CreatePlayer(entt::registry& registry);
 
-void UpdatePlayer(entt::registry& registry);
+void UpdatePlayer(entt::registry& registry, ChunkLookup& chl);
