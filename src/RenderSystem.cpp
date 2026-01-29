@@ -67,6 +67,18 @@ namespace core {
 
     void RenderSystem::Update(entt::registry& registry)
     {
+        frameCount++;
+        if (frameCount >= ticksPerFrame) {
+            frameCount = 0;
+            auto view = registry.view<Sprite, Animation>();
+            for (auto e : view) {
+                auto& sp = view.get<Sprite>(e);
+                auto& an = view.get<Animation>(e);
+                sp.spriteID++;
+                if (sp.spriteID > an.end) sp.spriteID = an.start;
+            }
+        }
+
         const int boxW = SCREENW / 2;
         const int boxH = SCREENH / 2;
 
@@ -135,13 +147,13 @@ namespace core {
         }
 
         auto view = registry.view<Sprite, Transform>();
-        for (auto spriteEntts : view) {
-            auto& sp = view.get<Sprite>(spriteEntts);
-            auto& tr = view.get<Transform>(spriteEntts);
+        for (auto e : view) {
+            auto& sp = view.get<Sprite>(e);
+            auto& tr = view.get<Transform>(e);
 
             int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
-            int drawX = (tr.pos.X() + x).GetInt() - PLAYER_SPR / 2;
-            int drawY = (tr.pos.Y() + y).GetInt() - PLAYER_SPR;
+            int drawX = (tr.pos.X() + x).GetInt() - sp.spriteSize / 2;
+            int drawY = (tr.pos.Y() + y).GetInt() - sp.spriteSize;
 
             glSprite(drawX, drawY, flip, &sp.sprite[sp.spriteID]);
         }

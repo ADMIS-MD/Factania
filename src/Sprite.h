@@ -12,12 +12,13 @@ struct Sprite
 {
 	glImage* sprite;
 	int spriteID = 0;
-	int frame = 0;
-
-	int start = 0;
-	int end = 0;
-
-	int ticksPerFrame = 6;
+	int spriteSize = 0;
 
 	bool xFlip = false;
+};
+
+struct Animation
+{
+	int start = 0;
+	int end = 0;
 };

@@ -27,6 +27,6 @@ struct PlayerMove
 	fixed speed = 2.f;
 };
 
-entt::entity CreatePlayer(entt::registry& registry);
+void CreatePlayerComponent(entt::registry& registry);
 
 void UpdatePlayerComponent(entt::registry& registry);
