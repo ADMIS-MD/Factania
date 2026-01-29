@@ -6,7 +6,7 @@
 class EntitySystemManager : public core::System
 {
 public:
-    EntitySystemManager();
+    EntitySystemManager(entt::registry& registry);
     ~EntitySystemManager();
 
     void Update(entt::registry& registry) override;

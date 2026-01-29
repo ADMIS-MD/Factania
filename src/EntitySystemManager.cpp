@@ -20,7 +20,7 @@
 
 EntitySystemManager::EntitySystemManager(entt::registry& registry)
 {
-	CreatePlayer(entt::registry & registry);
+	CreatePlayer(registry);
 }
 
 EntitySystemManager::~EntitySystemManager()
@@ -30,5 +30,5 @@ EntitySystemManager::~EntitySystemManager()
 
 void EntitySystemManager::Update(entt::registry& registry)
 {
-	
+	UpdatePlayerComponent(registry);
 }
