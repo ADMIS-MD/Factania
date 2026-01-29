@@ -135,10 +135,8 @@ entt::entity CreatePlayer(entt::registry& registry)
     return entity;
 }
 
-void UpdatePlayer(entt::registry& registry)
+void UpdatePlayerComponent(entt::registry& registry)
 {
-    // remove this if already exist 
-    scanKeys();
     const uint16_t held = keysHeld();
 
     Vec2 dir(0.f, 0.f);

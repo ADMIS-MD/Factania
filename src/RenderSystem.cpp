@@ -45,7 +45,7 @@ namespace core {
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
         tileset_texture_id = glLoadTileSet(
-            g_tileset,                                         // glImage array
+            g_tileset,                                       // glImage array
             TILE_SIZE, TILE_SIZE,                            // tile size
             TILE_SIZE * TILE_COLUMNS, TILE_SIZE * TILE_ROWS, // bitmap area that contains tiles (2 rows only)
             GL_RGB256,                                       // texture type

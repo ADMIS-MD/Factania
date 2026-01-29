@@ -29,4 +29,4 @@ struct PlayerMove
 
 entt::entity CreatePlayer(entt::registry& registry);
 
-void UpdatePlayer(entt::registry& registry);
+void UpdatePlayerComponent(entt::registry& registry);
