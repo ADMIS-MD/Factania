@@ -74,18 +74,18 @@ namespace core {
         m_registry.emplace<FactoryBuilding>(entityLink);
 
         // Setup sub screen for the text console
-        consoleDemoInit();
+        // consoleDemoInit();
 
         shouldQuit = false;
 
         // Print some text in the demo console
-        consoleClear();
+        // consoleClear();
 
-        printf("START:   Exit to loader\n");
-        printf("SELECT:  Open Debug Menu\n");
-        printf("\nPrinting from Engine\n");
-        fixed result = fixed{1123.2115f} + fixed{1.963f};
-        printf("fixed 1123.2115 + 1.963 = %f", static_cast<float>(result));
+        // printf("START:   Exit to loader\n");
+        // printf("SELECT:  Open Debug Menu\n");
+        // printf("\nPrinting from Engine\n");
+        // fixed result = fixed{1123.2115f} + fixed{1.963f};
+        // printf("fixed 1123.2115 + 1.963 = %f", static_cast<float>(result));
     }
 
     Engine::~Engine()
