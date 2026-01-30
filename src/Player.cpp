@@ -115,7 +115,7 @@ void CreatePlayerComponent(entt::registry& registry)
     registry.emplace<Transform>(entity, Vec2(fixed(static_cast<int32>(SCREENW / 2)), fixed(static_cast<int32>(SCREENH / 2))), 1);
     registry.emplace<GridTransform>(entity);
     auto& st = registry.emplace<PlayerState>(entity);
-    auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false);
+    auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false, false);
     auto& an = registry.emplace<Animation>(entity);
     registry.emplace<PlayerMove>(entity);
 
