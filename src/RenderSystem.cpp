@@ -14,12 +14,13 @@
 
 #include <chunk.hpp>
 #include <gl2d.h>
+#include "nds.h"
 #include "planet_tiles.h"
-#include <nds.h>
 #include "entt.hpp"
 #include "Sprite.h"
 #include "Player.h"
 #include "BG.h"
+#include "Console.h"
 
 
 //-----------------------------------------------------------------------------
@@ -60,14 +61,18 @@ namespace core {
         if (tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", tileset_texture_id);
 
+
+        // Initialize Debug Console (BG0)
+        ConsoleInit();
+
         // Bottom Screen Init
-        videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE);
+        videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_1D_SIZE_64);
         vramSetBankC(VRAM_C_SUB_BG);
         vramSetBankD(VRAM_D_SUB_SPRITE);
         oamInit(&oamSub, SpriteMapping_1D_64, false);
 
-        // Test Subscreen Background
-        int bg3 = bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
+        // BG3 bitmap
+        int bg3 = bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 4, 0);
         u16* bgGfx = bgGetGfxPtr(bg3);
         dmaCopy(BGBitmap, bgGfx, BGBitmapLen);
         dmaCopy(BGPal, BG_PALETTE_SUB, BGPalLen);
@@ -124,6 +129,8 @@ namespace core {
             m_activeCam.SetPos(camPos);
             break;
         }
+
+        bgUpdate();
     }
 
     void RenderSystem::Draw(entt::registry& registry)

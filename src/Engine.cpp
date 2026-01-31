@@ -20,12 +20,11 @@
 #include <Math.h>
 #include <stdio.h>
 
-#include <nds.h>
 #include <debug_menu/debug_menu.h>
-#include "Save.h"
 #include "Player.h"
 
 #include "building.h"
+#include "Console.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -73,19 +72,7 @@ namespace core {
         const entt::entity entityLink = m_registry.create();
         m_registry.emplace<FactoryBuilding>(entityLink);
 
-        // Setup sub screen for the text console
-        // consoleDemoInit();
-
         shouldQuit = false;
-
-        // Print some text in the demo console
-        // consoleClear();
-
-        // printf("START:   Exit to loader\n");
-        // printf("SELECT:  Open Debug Menu\n");
-        // printf("\nPrinting from Engine\n");
-        // fixed result = fixed{1123.2115f} + fixed{1.963f};
-        // printf("fixed 1123.2115 + 1.963 = %f", static_cast<float>(result));
     }
 
     Engine::~Engine()
@@ -95,6 +82,8 @@ namespace core {
             delete system;
         }
     }
+
+    bool drawConsole = false;
 
     void Engine::Update()
     {
@@ -106,10 +95,15 @@ namespace core {
         TempUpdateBuildings(m_registry);
 
         // because i dont have a better place to put it for testing :)
-        uint16_t down = keysDown();
+        uint16_t up = keysUp();
 
-        if (down & KEY_START)
+        if (up & KEY_START)
             shouldQuit = true;
+
+        if ((up & KEY_L) || (up & KEY_R)) {
+            drawConsole = !drawConsole;
+            ToggleConsole(drawConsole);
+        }
     }
 
     void Engine::Draw()
@@ -127,9 +121,13 @@ namespace core {
             // As far as I'm aware, this is our "tick", so it should run
             // indepedent from any specific loop. Please correct me if wrong -Nick
             swiWaitForVBlank();
-            check_debug_menu();
 
             scanKeys();
+
+            if (drawConsole) {
+                check_debug_menu();
+            }
+
             Update();
 
             BeginFrame();

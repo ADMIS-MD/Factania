@@ -7,7 +7,7 @@
 #include "Sprite.h"
 #include "player_sprite.h"
 
-static glImage g_playerImages[14];
+static glImage g_playerImages[16];
 static int g_playerTexId = -1;
 const uint16_t Player_texcoords[] = {
       0,   0, PLAYER_SPR, PLAYER_SPR,

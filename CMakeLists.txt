@@ -30,6 +30,7 @@ set(SOURCE_FILES
     src/Math.cpp
     src/Player.cpp
     src/building.cpp
+    src/Console.cpp
 )
 
 set(HEADER_FILES
@@ -51,6 +52,7 @@ set(HEADER_FILES
     src/Sprite.h
     src/building.h
     src/Item.h
+    src/Console.h
 )
 
 # Create fake executable target
