@@ -19,7 +19,8 @@
 #include <dlfcn.h>
 #include <Math.h>
 #include <stdio.h>
-#include "nds.h"
+#include <nds.h>
+#include <fat.h> 
 
 #include <debug_menu/debug_menu.h>
 #include "Player.h"
