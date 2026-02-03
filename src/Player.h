@@ -25,7 +25,7 @@ struct PlayerState
 
 struct PlayerMove 
 {
-	fixed speed = 2.f;
+	fixed speed = .2f;
 };
 
 entt::entity CreatePlayer(entt::registry& registry);

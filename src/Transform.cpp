@@ -14,25 +14,10 @@ GridTransform::GridTransform(int32 x, int32 y): x(x),
 GridTransform::GridTransform(): x(0), y(0)
 {}
 
-GridTransform::GridTransform(Vec2 const& vec) : x((vec.X().GetInt() + 16) / TILE_SIZE), y((vec.Y().GetInt() + 16) / TILE_SIZE)
+GridTransform::GridTransform(Vec2 const& vec)
 {
-    if (vec.X() < fixed(0.f))
-    {
-        x = vec.X().GetInt() / TILE_SIZE - 1;
-    }
-    else
-    {
-        x = vec.X().GetInt() / TILE_SIZE;
-    }
-
-    if (vec.Y() < fixed(0.f))
-    {
-        y = vec.Y().GetInt() / TILE_SIZE - 1;
-    }
-    else
-    {
-        y = vec.Y().GetInt() / TILE_SIZE;
-    }
+    x = vec.X().GetInt();
+    y = vec.Y().GetInt();
 }
 
 GridTransform::GridTransform(const GridTransform& other): x(other.x),

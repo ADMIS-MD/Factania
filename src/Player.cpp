@@ -126,7 +126,7 @@ entt::entity CreatePlayer(entt::registry& registry)
 
     const entt::entity entity = registry.create();
 
-    registry.emplace<Transform>(entity, Vec2(fixed(static_cast<int32>(SCREENW / 2)), fixed(static_cast<int32>(SCREENH / 2))), 1);
+    registry.emplace<Transform>(entity, Vec2(FINT(0), FINT(0)), 1);
     registry.emplace<GridTransform>(entity);
     auto& st = registry.emplace<PlayerState>(entity);
     auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, 0, false);

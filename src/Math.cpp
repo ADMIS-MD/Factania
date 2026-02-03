@@ -5,7 +5,6 @@
 #include "Math.h"
 #include "generated_defines.h"
 
-#define FIXED_POINT_LOC 12
 
 fixed::fixed()
 {
@@ -31,12 +30,6 @@ fixed::operator float() const
 }
 
 int32 fixed::GetInt() const
-{
-    fixed adj = *this + FromFixed(floatToFixed(.5f, FIXED_POINT_LOC));
-    return int32{adj};
-}
-
-int32 fixed::Floor() const
 {
     return int32{*this};
 }
@@ -124,7 +117,7 @@ fixed operator-(fixed a, fixed b)
 
 fixed fixed::operator-() const
 {
-    return FromFixed(-m_value);
+    return  FromFixed(-m_value);
 }
 
 fixed operator*(fixed a, fixed b)
@@ -239,19 +232,19 @@ Vec2 operator*(const Vec2& a, const Vec2& b)
     return a1 *= b;
 }
 
-Vec2 operator*(const Vec2& a, float b)
+Vec2 operator*(const Vec2& a, fixed b)
 {
     Vec2 a1(a);
     return a1 *= b;
 }
 
-Vec2 operator*(float a, const Vec2& b)
+Vec2 operator*(fixed a, const Vec2& b)
 {
     Vec2 b1(b);
     return b1 *= a;
 }
 
-Vec2 operator/(const Vec2& a, float b)
+Vec2 operator/(const Vec2& a, fixed b)
 {
     Vec2 a1(a);
     return a1 /= b;

@@ -69,33 +69,42 @@ namespace core {
 
     void RenderSystem::Update(entt::registry& registry)
     {
-        const int boxW = SCREENW / 2;
-        const int boxH = SCREENH / 2;
+        const Vec2 center = m_activeCam.ScreenToWorld(Vec2(FINT(SCREEN_WIDTH / 2), FINT(SCREEN_WIDTH / 2)));
+        const Vec2 scale = m_activeCam.ScreenSpaceFactor();
 
-        const int left = (SCREENW - boxW) / 2;
-        const int right = left + boxW;
-        const int top = (SCREENH - boxH) / 2;
-        const int bottom = top + boxH;
+        const fixed boxW = scale.Y() * FINT(SCREEN_WIDTH) / FINT(2);
+        const fixed boxH = scale.X() * FINT(SCREEN_HEIGHT) / FINT(2);
+
+        const fixed left = (center.X() - boxW) / FINT(2);
+        const fixed right = left + boxW;
+        const fixed top = (center.Y() - boxH) / FINT(2);
+        const fixed bottom = top + boxH;
+
 
         auto view = registry.view<PlayerState, Transform>();
         for (auto e : view) {
             auto& tr = view.get<Transform>(e);
 
             Vec2 camPos = m_activeCam.GetPos();
-            Vec2 screenPos = tr.pos - camPos;
 
-            if (screenPos.X().GetInt() < left) {
-                camPos.X() = tr.pos.X() - fixed(static_cast<int32>(left));
+            consoleClear();
+            DBG_PRINTVEC2(tr.pos);
+            DBG_PRINTVEC2(center);
+            DBG_PRINTVEC2(camPos);
+            printf("%f, %f, %f, %f\n", left.GetFloat(), right.GetFloat(), top.GetFloat(), bottom.GetFloat());
+
+            if (tr.pos.X() < left) {
+                camPos.X() = tr.pos.X() - left;
             }
-            else if (screenPos.X().GetInt() > right) {
-                camPos.X() = tr.pos.X() - fixed(static_cast<int32>(right));
+            else if (tr.pos.X() > right) {
+                camPos.X() = tr.pos.X() - right;
             }
 
-            if (screenPos.Y().GetInt() < top) {
-                camPos.Y() = tr.pos.Y() - fixed(static_cast<int32>(top));
+            if (tr.pos.Y() < top) {
+                camPos.Y() = tr.pos.Y() - top;
             }
-            else if (screenPos.Y().GetInt() > bottom) {
-                camPos.Y() = tr.pos.Y() - fixed(static_cast<int32>(bottom));
+            else if (tr.pos.Y() > bottom) {
+                camPos.Y() = tr.pos.Y() - bottom;
             }
 
             m_activeCam.SetPos(camPos);
@@ -105,9 +114,9 @@ namespace core {
 
     void RenderSystem::Draw(entt::registry& registry)
     {
-        Vec2 world = m_activeCam.WorldToCamera();
-        fixed x = m_activeCam.WorldToCamera().X();
-        fixed y = m_activeCam.WorldToCamera().Y();
+        Vec2 world = m_activeCam.GetPos();
+        fixed x = world.X();
+        fixed y = world.Y();
 
         GridTransform grid {world};
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
@@ -140,12 +149,12 @@ namespace core {
         for (auto spriteEntts : view) {
             auto& sp = view.get<Sprite>(spriteEntts);
             auto& tr = view.get<Transform>(spriteEntts);
+            Vec2 wtc = m_activeCam.WorldToCamera(tr.pos);
+            wtc + sp.camDrawOffset;
 
             int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
-            int drawX = (tr.pos.X() + x).GetInt() - PLAYER_SPR / 2;
-            int drawY = (tr.pos.Y() + y).GetInt() - PLAYER_SPR;
 
-            glSprite(drawX, drawY, flip, &sp.sprite[sp.spriteID]);
+            glSprite(wtc.X().GetInt(), wtc.Y().GetInt(), flip, &sp.sprite[sp.spriteID]);
         }
     }
 
