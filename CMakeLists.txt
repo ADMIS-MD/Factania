@@ -28,6 +28,7 @@ set(SOURCE_FILES
     src/Player.cpp
     src/Conveyer.cpp
     src/building.cpp
+    src/Console.cpp
 )
 
 set(HEADER_FILES
@@ -50,6 +51,7 @@ set(HEADER_FILES
     src/Conveyer.h
     src/building.h
     src/Item.h
+    src/Console.h
 )
 
 # Create fake executable target

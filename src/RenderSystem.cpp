@@ -14,11 +14,13 @@
 
 #include <chunk.hpp>
 #include <gl2d.h>
+#include "nds.h"
 #include "planet_tiles.h"
-#include <nds.h>
 #include "entt.hpp"
 #include "Sprite.h"
 #include "Player.h"
+#include "BG.h"
+#include "Console.h"
 
 
 //-----------------------------------------------------------------------------
@@ -58,6 +60,22 @@ namespace core {
 
         if (tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", tileset_texture_id);
+
+
+        // Initialize Debug Console (BG0)
+        ConsoleInit();
+
+        // Bottom Screen Init
+        videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_1D_SIZE_64);
+        vramSetBankC(VRAM_C_SUB_BG);
+        vramSetBankD(VRAM_D_SUB_SPRITE);
+        oamInit(&oamSub, SpriteMapping_1D_64, false);
+
+        // BG3 bitmap
+        int bg3 = bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 4, 0);
+        u16* bgGfx = bgGetGfxPtr(bg3);
+        dmaCopy(BGBitmap, bgGfx, BGBitmapLen);
+        dmaCopy(BGPal, BG_PALETTE_SUB, BGPalLen);
     }
 
     RenderSystem::~RenderSystem()
@@ -67,6 +85,18 @@ namespace core {
 
     void RenderSystem::Update(entt::registry& registry)
     {
+        frameCount++;
+        if (frameCount >= ticksPerFrame) {
+            frameCount = 0;
+            auto view = registry.view<Sprite, Animation>();
+            for (auto e : view) {
+                auto& sp = view.get<Sprite>(e);
+                auto& an = view.get<Animation>(e);
+                sp.spriteID++;
+                if (sp.spriteID > an.end) sp.spriteID = an.start;
+            }
+        }
+
         const int boxW = SCREENW / 2;
         const int boxH = SCREENH / 2;
 
@@ -99,6 +129,8 @@ namespace core {
             m_activeCam.SetPos(camPos);
             break;
         }
+
+        bgUpdate();
     }
 
     void RenderSystem::Draw(entt::registry& registry)
@@ -134,17 +166,47 @@ namespace core {
             registry.get<Chunk>(center_chunk.surrounding_chunks[i]).Draw(m_activeCam, transforms[i]);
         }
 
+        // Draw every sprite in Mainscreen
         auto view = registry.view<Sprite, Transform>();
-        for (auto spriteEntts : view) {
-            auto& sp = view.get<Sprite>(spriteEntts);
-            auto& tr = view.get<Transform>(spriteEntts);
+        for (auto e : view) {
+            auto& sp = view.get<Sprite>(e);
+            auto& tr = view.get<Transform>(e);
+
+            if (sp.hide == true) continue;
 
             int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
-            int drawX = (tr.pos.X() + x).GetInt() - PLAYER_SPR / 2;
-            int drawY = (tr.pos.Y() + y).GetInt() - PLAYER_SPR;
+            int drawX = (tr.pos.X() + x).GetInt() - sp.spriteSize / 2;
+            int drawY = (tr.pos.Y() + y).GetInt() - sp.spriteSize;
 
             glSprite(drawX, drawY, flip, &sp.sprite[sp.spriteID]);
         }
+
+        // Draw every sprite in Subscreen
+        auto viewSub = registry.view<SubSprite, Transform>();
+        for (auto e : viewSub)
+        {
+            auto& ss = viewSub.get<SubSprite>(e);
+            auto& tr = viewSub.get<Transform>(e);
+
+            int sx = tr.pos.X().GetInt();
+            int sy = tr.pos.Y().GetInt();
+
+            oamSet(&oamSub,
+                ss.oamId,
+                sx, sy,
+                0, 0,
+                ss.size,
+                SpriteColorFormat_256Color,
+                ss.gfx,
+                -1,
+                false,
+                ss.hide,
+                ss.xFlip,
+                false,
+                false
+            );
+        }
+        oamUpdate(&oamSub);
     }
 
     void BeginFrame()
