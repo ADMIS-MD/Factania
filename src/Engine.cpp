@@ -24,6 +24,7 @@
 #include <debug_menu/debug_menu.h>
 #include "Save.h"
 #include "Player.h"
+#include "Conveyer.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -38,6 +39,7 @@
 // fully solid. For example, you could have an empty cube where all the faces
 // are translucent pieces of plastic.
 
+std::vector<Conveyer*> convTest = InitTest();
 
 
 bool file_load(const char *path, void **buffer, size_t *size)
@@ -227,6 +229,9 @@ namespace core {
 
         if (down & KEY_START)
             shouldQuit = true;
+        if (down & KEY_A) {
+			convTest[2]->UpdateBuilding(1.0f);
+        }
     }
 
     void Engine::Draw()
@@ -246,6 +251,8 @@ namespace core {
             swiWaitForVBlank();
 
             BeginFrame();
+
+			printTest(convTest);
 
             Update();
             Draw();

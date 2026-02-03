@@ -4,10 +4,7 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_COMPILER_WORKS 1)
 set(CMAKE_COLOR_DIAGNOSTICS 1)
 
-
-
 project(Factania LANGUAGES C CXX)
-
 
 # Generate h files with infomration
 include(scripts/cmake/git.cmake)
@@ -28,6 +25,8 @@ set(SOURCE_FILES
     src/chunk.cpp
     src/Math.cpp
     src/Player.cpp
+    src/Conveyer.cpp
+    src/building.cpp
 )
 
 set(HEADER_FILES
@@ -46,6 +45,8 @@ set(HEADER_FILES
     src/Transform.h
     src/Player.h
     src/Sprite.h
+    src/Conveyer.h
+    src/building.h
 )
 
 # Create fake executable target

@@ -68,9 +68,10 @@ bool FactoryBuilding::InputItems(ItemQuantity inputs)
 		if (inputInventory[i].item.itemID == inputs.item.itemID)
 		{
 			inputInventory[i].quantity += inputs.quantity;
-			return;
+			return true;
 		}
 	}
+	return false;
 }
 
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)
@@ -86,7 +87,7 @@ void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 	}
 }
 
-FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1)
+FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_)
 {
 	recipes = recipes_;
 	selectedRecipe = selectedRecipe_;
@@ -133,10 +134,10 @@ void PowerGrid::StartGrid()
 {
 	for (int i = 0; i < connectedSources.size(); i++)
 	{
-		connectedSources[i].status == BuildingStatus::Idle;
+		connectedSources[i].status = BuildingStatus::Idle;
 	}
 	for (int i = 0; i < connectedSinks.size(); i++)
 	{
-		connectedSinks[i].status == BuildingStatus::Idle;
+		connectedSinks[i].status = BuildingStatus::Idle;
 	}
 }

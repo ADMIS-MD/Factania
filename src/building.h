@@ -30,8 +30,9 @@ public:
 class ItemBuilding : public Building
 {
 public:
-    std::vector<ItemBuilding> inputs;
-    std::vector<ItemBuilding> outputs;
+    // store pointers to avoid trying to instantiate the abstract base
+    std::vector<ItemBuilding*> inputs;
+    std::vector<ItemBuilding*> outputs;
     std::vector<ItemQuantity> inputInventory;
     std::vector<ItemQuantity> outputInventory;
     virtual bool InputItems(ItemQuantity items) = 0;
@@ -52,8 +53,6 @@ public:
     bool InputItems(ItemQuantity items);
     FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1);
     FactoryBuilding();
-
-
 
 private:
     void ResolveRecipe(Recipe* recipe);
