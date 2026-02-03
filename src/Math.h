@@ -8,6 +8,12 @@
 #include "nds/ndstypes.h"
 #include "nds/arm9/videoGL.h"
 
+#define FIXED_POINT_LOC 12
+
+// Helper for literal values - wrap them in this to convert them to fixed values easily
+#define FINT(i) fixed{static_cast<int32_t>(i)}
+#define FFLOAT(i) fixed{static_cast<float>(i)}
+
 // 20.12 fixed point, use this instead of float
 //  - To create from int literal use `static_cast<int32>(1337)`
 class fixed
@@ -20,7 +26,6 @@ public:
     explicit operator float() const;
 
     int32 GetInt() const;
-    int32 Floor() const;
     float GetFloat() const;
     int32 const& GetFixed() const;
     int32& GetFixed();
@@ -51,7 +56,7 @@ private:
     int32 m_value;
 };
 
-
+#define DBG_PRINTVEC2(name) printf(#name ": %f, %f\n", name.X().GetFloat(), name.Y().GetFloat())
 struct Vec2
 {
     Vec2();
@@ -74,10 +79,10 @@ struct Vec2
     friend Vec2 operator+(const Vec2& a, const Vec2& b);
     friend Vec2 operator-(const Vec2& a, const Vec2& b);
     friend Vec2 operator*(const Vec2& a, const Vec2& b);
-    friend Vec2 operator*(const Vec2& a, float b);
-    friend Vec2 operator*(float a, const Vec2& b);
+    friend Vec2 operator*(const Vec2& a, fixed b);
+    friend Vec2 operator*(fixed a, const Vec2& b);
     // Avoid this function!
-    friend Vec2 operator/(const Vec2& a, float b);
+    friend Vec2 operator/(const Vec2& a, fixed b);
 
     fixed& operator[](int v);
     fixed const& operator[](int v) const;
@@ -132,3 +137,4 @@ struct Vec3
 
     fixed arr[3];
 };
+
