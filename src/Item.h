@@ -1,14 +1,17 @@
 #pragma once
 #include <vector>
+#include <string>
 
 class Item
 {
 public:
     int itemID = 0;
+    std::string name;
 
-    Item(int itemID_ = -1)
+    Item(int itemID_ = -1, std::string name_ = "")
     {
         itemID = itemID_;
+        name = name_;
     }
 
     bool operator==(const Item& other) const 
@@ -31,6 +34,12 @@ class ItemQuantity
 public:
     Item item;
     int quantity;
+
+    ItemQuantity(Item item_, int quantity_)
+    {
+        item = item_;
+        quantity = quantity_;
+    }
 
     ItemQuantity operator-(const ItemQuantity& other) 
     {

@@ -9,7 +9,6 @@
 std::vector<Conveyer*> InitTest()
 {
     static std::vector<Conveyer*> convs;
-    convs.clear();
 
     Conveyer* conv1 = new Conveyer();
     conv1->id = 1;
@@ -27,7 +26,7 @@ std::vector<Conveyer*> InitTest()
     convs.push_back(conv3);
 
     // seed first conveyor with an item (conv1)
-    ItemQuantity itemA;
+    ItemQuantity itemA = ItemQuantity(Item(100, "iron_ingot"), 10);
     itemA.item = Item(1);
     itemA.quantity = 5;
     conv1->outputInventory.push_back(itemA);
@@ -59,7 +58,7 @@ bool Conveyer::InputItems(ItemQuantity items)
 bool Conveyer::TakeItems()
 {
     if (inputs.empty()) return false; 
-    ItemBuilding* upstream = inputs[0];
+    ItemBuilding* upstream = (ItemBuilding*)inputs[0];
     if (!upstream) return false;
 
     if (inputInventory.empty() && !upstream->outputInventory.empty())
@@ -89,4 +88,6 @@ void Conveyer::UpdateBuilding(float dt)
 
     // Otherwise try to pull one from upstream
     TakeItems();
+	//printf("its working");
+	return;
 }
