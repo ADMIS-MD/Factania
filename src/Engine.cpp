@@ -24,6 +24,7 @@
 
 #include <debug_menu/debug_menu.h>
 #include "Player.h"
+#include "Conveyer.h"
 
 #include "building.h"
 #include "Console.h"
@@ -31,6 +32,84 @@
 //-----------------------------------------------------------------------------
 //	Method Declarations
 //-----------------------------------------------------------------------------
+
+// SPDX-License-Identifier: CC0-1.0
+//
+// SPDX-FileContributor: Antonio Ni�o D�az, 2024-2025
+
+// This example shows how to draw a translucent 3D box in which you can see all
+// faces. This is how you would see 3D objects that are translucent, but not
+// fully solid. For example, you could have an empty cube where all the faces
+// are translucent pieces of plastic.
+
+std::vector<Conveyer*> convTest = InitTest();
+
+
+bool file_load(const char *path, void **buffer, size_t *size)
+{
+    // Open the file in read binary mode
+    FILE *f = fopen(path, "rb");
+    if (f == NULL)
+    {
+        perror("fopen");
+        return false;
+    }
+
+    // Move read cursor to the end of the file
+    int ret = fseek(f, 0, SEEK_END);
+    if (ret != 0)
+    {
+        perror("fseek");
+        return false;
+    }
+
+    // Check position of the cursor (we're at the end, so this is the size)
+    *size = ftell(f);
+    if (*size == 0)
+    {
+        printf("Size is 0!");
+        fclose(f);
+        return false;
+    }
+
+    // Move cursor to the start of the file again
+    rewind(f);
+
+    // Allocate buffer to hold data
+    *buffer = malloc(*size);
+    if (*buffer == NULL)
+    {
+        printf("Not enought memory to load %s!", path);
+        fclose(f);
+        return false;
+    }
+
+    // Read all data into the buffer
+    if (fread(*buffer, *size, 1, f) != 1)
+    {
+        perror("fread");
+        fclose(f);
+        free(*buffer);
+        return false;
+    }
+
+    // Close file
+    ret = fclose(f);
+    if (ret != 0)
+    {
+        perror("fclose");
+        free(*buffer);
+        return false;
+    }
+
+    return true;
+}
+
+static void load_image() {
+    char* buf;
+    size_t size;
+
+}
 
 namespace core {
 
@@ -98,9 +177,13 @@ namespace core {
 
         // because i dont have a better place to put it for testing :)
         uint16_t up = keysUp();
+		uint16_t down = keysDown();
 
         if (up & KEY_START)
             shouldQuit = true;
+        if (down & KEY_A) {
+            convTest[2]->UpdateBuilding(1.0f);
+        }
 
         if ((up & KEY_L) || (up & KEY_R)) {
             drawConsole = !drawConsole;
@@ -133,7 +216,8 @@ namespace core {
             Update();
 
             BeginFrame();
-            
+
+            Update();
             Draw();
 
             EndFrame();
