@@ -177,11 +177,13 @@ namespace core {
 
         // because i dont have a better place to put it for testing :)
         uint16_t up = keysUp();
+		uint16_t down = keysDown();
 
         if (up & KEY_START)
             shouldQuit = true;
         if (down & KEY_A) {
-		        convTest[2]->UpdateBuilding(1.0f);
+            convTest[2]->UpdateBuilding(1.0f);
+        }
 
         if ((up & KEY_L) || (up & KEY_R)) {
             drawConsole = !drawConsole;
