@@ -23,7 +23,7 @@ namespace core {
 
 		bool shouldQuit;
 
-		entt::registry registry;
+		entt::registry m_registry;
 	};
 
 }

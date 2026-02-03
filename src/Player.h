@@ -28,6 +28,6 @@ struct PlayerMove
 	fixed speed = .2f;
 };
 
-entt::entity CreatePlayer(entt::registry& registry);
+void CreatePlayerComponent(entt::registry& registry);
 
-void UpdatePlayer(entt::registry& registry, ChunkLookup& chl);
+void UpdatePlayerComponent(entt::registry& registry);

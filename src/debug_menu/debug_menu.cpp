@@ -120,9 +120,6 @@ void check_debug_menu() {
         consoleDebugInit(DebugDevice_NULL);
 
         // Print some controls
-        printf("PAD:     Move\n");
-        printf("A,B,X,Y: Rotate\n");
-        printf("\n");
         printf("START:   Exit to loader\n");
         printf("SELECT:  Open Debug Menu\n");
         printf("\nPrinting from Engine\n");

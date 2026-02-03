@@ -10,7 +10,7 @@
 #include "Sprite.h"
 #include "player_sprite.h"
 
-static glImage g_playerImages[14];
+static glImage g_playerImages[16];
 static int g_playerTexId = -1;
 const uint16_t Player_texcoords[] = {
       0,   0, PLAYER_SPR, PLAYER_SPR,
@@ -34,7 +34,7 @@ const uint16_t Player_texcoords[] = {
      PLAYER_SPR * 3,  PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
 };
 
-static void LoadPlayerSpriteOnce() {
+static void LoadPlayerSprite() {
     if (g_playerTexId >= 0) return;
 
     g_playerTexId = glLoadSpriteSet(
@@ -89,59 +89,45 @@ static inline bool CheckCollision(const Vec2& pos)
     return false;
 }
 
-static inline void SetAnim(Sprite& sp, int start, int end)
+static inline void SetAnim(Sprite& sp, Animation& an, int start, int end)
 {
-    sp.start = start;
-    sp.end = end;
+    an.start = start;
+    an.end = end;
     sp.spriteID = start;
-    sp.frame = 0;
 }
 
-static inline void SetMode(PlayerState& st, Sprite& sp, PlayerMode newMode)
+static inline void SetMode(PlayerState& st, Sprite& sp, Animation& an, PlayerMode newMode)
 {
     if (st.mode == newMode) return;
     st.mode = newMode;
 
     if (newMode == PlayerMode::IDLE) {
-        SetAnim(sp, 0, 5);
+        SetAnim(sp, an, 0, 5);
     }
     else if (newMode == PlayerMode::MOVING) {
-        SetAnim(sp, 6, 15);
+        SetAnim(sp, an, 6, 15);
     }
 }
 
-static inline void AdvanceAnim(Sprite& sp)
+void CreatePlayerComponent(entt::registry& registry)
 {
-    sp.frame++;
-    if (sp.frame >= sp.ticksPerFrame) {
-        sp.frame = 0;
-        sp.spriteID++;
-        if (sp.spriteID > sp.end) sp.spriteID = sp.start;
-    }
-}
-
-entt::entity CreatePlayer(entt::registry& registry)
-{
-    LoadPlayerSpriteOnce();
+    LoadPlayerSprite();
 
     const entt::entity entity = registry.create();
 
     registry.emplace<Transform>(entity, Vec2(FINT(0), FINT(0)), 1);
     registry.emplace<GridTransform>(entity);
     auto& st = registry.emplace<PlayerState>(entity);
-    auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, 0, false);
+    auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false, false);
+    auto& an = registry.emplace<Animation>(entity);
     registry.emplace<PlayerMove>(entity);
 
     st.mode = PlayerMode::IDLE;
-    SetAnim(sp, 0, 5);
-
-    return entity;
+    SetAnim(sp, an, 0, 5);
 }
 
-void UpdatePlayer(entt::registry& registry, ChunkLookup& chl)
+void UpdatePlayerComponent(entt::registry& registry)
 {
-    // remove this if already exist 
-    scanKeys();
     const uint16_t held = keysHeld();
     const uint16_t down = keysDown();
 
@@ -155,13 +141,14 @@ void UpdatePlayer(entt::registry& registry, ChunkLookup& chl)
         dir *= fixed(0.707f);
     }
 
-    auto view = registry.view<Transform, GridTransform, PlayerState, Sprite, PlayerMove>();
+    auto view = registry.view<Transform, GridTransform, PlayerState, Sprite, Animation, PlayerMove>();
 
     for (auto player : view) {
         auto& tr = view.get<Transform>(player);
         auto& gtr = view.get<GridTransform>(player);
         auto& st = view.get<PlayerState>(player);
         auto& sp = view.get<Sprite>(player);
+        auto& an = view.get<Animation>(player);
         const auto& mv = view.get<PlayerMove>(player);
 
         // TODO: Remove
@@ -191,10 +178,8 @@ void UpdatePlayer(entt::registry& registry, ChunkLookup& chl)
         {
             // TODO: change to mine or build if key press or something
 
-            AdvanceAnim(sp);
-
             if (dir.X() != 0.f || dir.Y() != 0.f) {
-                SetMode(st, sp, PlayerMode::MOVING);
+                SetMode(st, sp, an, PlayerMode::MOVING);
             }
             break;
         }
@@ -202,7 +187,7 @@ void UpdatePlayer(entt::registry& registry, ChunkLookup& chl)
         case PlayerMode::MOVING:
         {
             if (dir.X() == 0.f && dir.Y() == 0.f) {
-                SetMode(st, sp, PlayerMode::IDLE);
+                SetMode(st, sp, an, PlayerMode::IDLE);
                 break;
             }
 
@@ -213,8 +198,6 @@ void UpdatePlayer(entt::registry& registry, ChunkLookup& chl)
             else if (dir.X() > 0.f) {
                 sp.xFlip = false;
             }
-
-            AdvanceAnim(sp);
 
             Vec2 delta = dir;
             delta *= mv.speed;
