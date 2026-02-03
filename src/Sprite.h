@@ -20,5 +20,5 @@ struct Sprite
 	int ticksPerFrame = 6;
 
 	bool xFlip = false;
-	Vec2 camDrawOffset = {0, FINT(32)};
+	Vec2 camDrawOffset = {FINT(0), FINT(32)};
 };
