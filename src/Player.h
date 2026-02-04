@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <chunk.hpp>
 #include <entt.hpp>
 #include "Math.h"
 
@@ -22,11 +23,10 @@ struct PlayerState
 	bool inputEnabled = true;
 };
 
-struct PlayerMove 
+struct PlayerMove
 {
-	fixed speed = 2.f;
+	fixed speed = .16666f;
 };
 
 void CreatePlayerComponent(entt::registry& registry);
-
-void UpdatePlayerComponent(entt::registry& registry);
+void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl);

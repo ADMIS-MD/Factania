@@ -22,12 +22,13 @@ struct Transform;
 struct GridTransform {
     GridTransform(int32 x, int32 y);
     GridTransform();
-    explicit GridTransform(Vec2& vec);
+    GridTransform(Vec2 const& vec);
     GridTransform(const GridTransform& other);
     GridTransform(GridTransform&& other) noexcept;
     GridTransform& operator=(const GridTransform& other);
     GridTransform& operator=(GridTransform&& other) noexcept;
     GridTransform(Transform const& transform);
+    u8 CropTo8x8Grid();
 
     int32 x;
     int32 y;

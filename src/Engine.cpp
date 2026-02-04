@@ -226,5 +226,4 @@ namespace core {
                 break;
         }
     }
-
 }
