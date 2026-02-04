@@ -40,7 +40,7 @@ class Chunk
 {
 	Chunk();
 public:
-	void Draw(Camera cam, ChunkPosition pos);
+	void Draw(Camera const& cam, ChunkPosition pos);
 	static entt::entity MakeChunk(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos);
 	void FillSurrounding(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos);
 

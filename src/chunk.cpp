@@ -6,7 +6,7 @@ Chunk::Chunk()
 
 }
 
-void Chunk::Draw(Camera cam, ChunkPosition pos)
+void Chunk::Draw(Camera const& cam, ChunkPosition pos)
 {
     glColor(RGB15(31, 31, 31));
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
@@ -15,16 +15,30 @@ void Chunk::Draw(Camera cam, ChunkPosition pos)
     // tiles that are actually shown on the screen. That would reduce
     // the number of polygons that are sent to the GPU and improve
     // performance.
+    fixed scale = cam.GetScale();
+    fixed fx = FINT(pos.x * 8), fy = FINT(pos.y * 8);
     for (int j = 0; j < CHUNK_HEIGHT; j++)
     {
         for (int i = 0; i < CHUNK_WIDTH; i++)
         {
             int tile_id = cached_sprites[j * CHUNK_WIDTH + i].tile_pack;
 
-            int x = cam.WorldToCamera().X().GetInt() + i * TILE_SIZE - pos.x * 8 * TILE_SIZE;
-            int y = cam.WorldToCamera().Y().GetInt() + j * TILE_SIZE - pos.y * 8 * TILE_SIZE;
+            Vec2 world_pos = {FINT(i) + fx, FINT(j) + fy};
+            Vec2 cam_pos = cam.WorldToCamera(world_pos);
 
-            glSprite(x, y, GL_FLIP_NONE, &core::g_tileset[tile_id]);
+            // Early outs to skip renderings
+            // TODO: Fix
+            // if (cam_pos.X() <= -scale)
+            //     continue;
+            // if (cam_pos.X() > FINT( CHUNK_WIDTH ))
+            //     break;
+            //
+            // if (cam_pos.Y() <= -scale)
+            //     break;
+            // if (cam_pos.Y() > FINT(CHUNK_HEIGHT))
+            //     return;
+
+            glSprite(cam_pos.X().GetInt(), cam_pos.Y().GetInt(), GL_FLIP_NONE, &core::g_tileset[tile_id]);
         }
     }
 }
@@ -127,7 +141,7 @@ entt::entity ChunkLookup::GetChunk(GridTransform transform)
 entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
 {
     auto it = m_chunks.find(transform);
-    if (it == m_chunks.end()) // TODO: Make chunk
+    if (it == m_chunks.end())
         return entt::null;
 
     return it->second;
