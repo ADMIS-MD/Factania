@@ -23,11 +23,10 @@ struct PlayerState
 	bool inputEnabled = true;
 };
 
-struct PlayerMove 
+struct PlayerMove
 {
-	fixed speed = .2f;
+	fixed speed = .16666f;
 };
 
 void CreatePlayerComponent(entt::registry& registry);
-
 void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl);
