@@ -31,6 +31,7 @@ set(SOURCE_FILES
     src/Player.cpp
     src/building.cpp
     src/Console.cpp
+    src/InventoryDebugSystem.cpp
 )
 
 set(HEADER_FILES
@@ -53,6 +54,8 @@ set(HEADER_FILES
     src/building.h
     src/Item.h
     src/Console.h
+    src/Inventory.h
+    src/InventoryDebugSystem.h
 )
 
 # Create fake executable target

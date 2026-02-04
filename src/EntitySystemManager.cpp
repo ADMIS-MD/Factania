@@ -16,6 +16,7 @@
 
 #include "Transform.h"
 #include "Sprite.h"
+#include "InventoryDebugSystem.h"
 #include "cursor.h"
 #include <nds.h>
 
@@ -44,6 +45,7 @@ EntitySystemManager::~EntitySystemManager()
 void EntitySystemManager::Update(entt::registry& registry)
 {
 	UpdatePlayerComponent(registry);
+    UpdateInventoryDebug(registry);
 
     // Test Cursor Entity Update
     touchPosition t;

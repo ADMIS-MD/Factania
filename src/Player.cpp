@@ -3,6 +3,7 @@
 
 #include "nds.h"
 #include "Player.h"
+#include "Inventory.h"
 #include "Transform.h"
 #include "Sprite.h"
 #include "player_sprite.h"
@@ -117,7 +118,10 @@ void CreatePlayerComponent(entt::registry& registry)
     auto& st = registry.emplace<PlayerState>(entity);
     auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false, false);
     auto& an = registry.emplace<Animation>(entity);
+    auto& inv = registry.emplace<Inventory>(entity);
     registry.emplace<PlayerMove>(entity);
+    inv.Add(ItemID::Iron, 5);
+    inv.Add(ItemID::Copper, 2);
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);
