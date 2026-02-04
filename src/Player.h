@@ -24,7 +24,7 @@ struct PlayerState
 
 struct PlayerMove 
 {
-	fixed speed = 2.f;
+	fixed speed = 4.f;
 };
 
 void CreatePlayerComponent(entt::registry& registry);
