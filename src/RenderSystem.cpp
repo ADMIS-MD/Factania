@@ -116,12 +116,6 @@ namespace core {
         for (auto e : view) {
             auto& tr = view.get<Transform>(e);
 
-            consoleClear();
-            DBG_PRINTVEC2(tr.pos);
-            DBG_PRINTVEC2(camPos);
-            DBG_PRINTVEC2(m_activeCam.ScreenSpaceExtent());
-            printf("%f, %f, %f, %f\n", left.GetFloat(), right.GetFloat(), top.GetFloat(), bottom.GetFloat());
-
             if (tr.pos.X() < left) {
                 camPos.X() += tr.pos.X() - left;
             }

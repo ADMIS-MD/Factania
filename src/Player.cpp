@@ -156,12 +156,8 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
         {
             GridTransform grid = tr;
             ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
-            printf("%d, %d\n", grid.x, grid.y);
-            printf("%d, %d\n", chp.x, chp.y);
             entt::entity chunk_e = chl.GetChunk(chp);
-            printf("%d\n", static_cast<uint32_t>(chunk_e));
             Chunk& chunk = registry.get<Chunk>(chunk_e);
-            printf("%d\n", grid.CropTo8x8Grid());
             chunk.cached_sprites[grid.CropTo8x8Grid()].tile_pack = 1;
         }
         // TODO: End remove
