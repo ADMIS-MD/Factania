@@ -8,12 +8,20 @@
 #include <vector>
 
 #include "build_details_menu.h"
+#include "DebugLog.h"
 #include "memory_debug_info.h"
 
 
 std::vector<DebugNode*> main_nodes = {
     new SubmenuDebugNode{"Memory Info", memory_info_debug_page},
-    new SubmenuDebugNode{"Build Info", build_details_debug_page}
+    new SubmenuDebugNode{"Build Info", build_details_debug_page},
+    new FunctionResultNode{
+        []() { return "Debug Log App"; },
+        [](bool& selected)
+        {
+            selected = false;
+            RunDebugLog();
+        }},
 };
 
 void add_debug_node_to_root(DebugNode* node) {
@@ -94,6 +102,8 @@ void MarkerDebugNode::update(bool &selected) {
 
 void FunctionResultNode::update(bool &selected) {
     printf("%s\n", func().c_str());
+    if (selected)
+        selectedUpdate(selected);
 }
 
 void check_debug_menu() {
@@ -118,10 +128,5 @@ void check_debug_menu() {
 
         consoleClear();
         consoleDebugInit(DebugDevice_NULL);
-
-        // Print some controls
-        printf("START:   Exit to loader\n");
-        printf("SELECT:  Open Debug Menu\n");
-        printf("\nPrinting from Engine\n");
     }
 };

@@ -29,6 +29,7 @@ set(SOURCE_FILES
     src/Conveyer.cpp
     src/building.cpp
     src/Console.cpp
+    src/debug_menu/DebugLog.cpp
 )
 
 set(HEADER_FILES
@@ -52,6 +53,7 @@ set(HEADER_FILES
     src/building.h
     src/Item.h
     src/Console.h
+    src/debug_menu/DebugLog.h
 )
 
 # Create fake executable target
