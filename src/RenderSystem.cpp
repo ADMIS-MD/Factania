@@ -87,17 +87,6 @@ namespace core {
 
     void RenderSystem::Update(entt::registry& registry)
     {
-        const Vec2 center = m_activeCam.ScreenToWorld(Vec2(FINT(SCREEN_WIDTH / 2), FINT(SCREEN_WIDTH / 2)));
-        const Vec2 scale = m_activeCam.ScreenSpaceFactor();
-
-        const fixed boxW = scale.Y() * FINT(SCREEN_WIDTH) / FINT(2);
-        const fixed boxH = scale.X() * FINT(SCREEN_HEIGHT) / FINT(2);
-
-        const fixed left = (center.X() - boxW) / FINT(2);
-        const fixed right = left + boxW;
-        const fixed top = (center.Y() - boxH) / FINT(2);
-        const fixed bottom = top + boxH;
-
         frameCount++;
         if (frameCount >= ticksPerFrame) {
             frameCount = 0;
@@ -110,30 +99,41 @@ namespace core {
             }
         }
 
+        const Vec2 screenCenterOffset = m_activeCam.ScreenSpaceExtent() * FFLOAT(.5f);
+        Vec2 camPos = m_activeCam.GetPos();
+
+        // Techincally the same lol
+        const Vec2& boxSize = screenCenterOffset;
+        const Vec2 boxHalfSize = boxSize * FFLOAT(.5f);
+
+
+        const fixed left = boxHalfSize.X() + camPos.X();
+        const fixed right = boxSize.X() + boxHalfSize.X() + camPos.X();
+        const fixed top = boxHalfSize.Y() + camPos.Y();
+        const fixed bottom = boxSize.Y() + boxHalfSize.Y() + camPos.Y();
+
         auto view = registry.view<PlayerState, Transform>();
         for (auto e : view) {
             auto& tr = view.get<Transform>(e);
 
-            Vec2 camPos = m_activeCam.GetPos();
-
             consoleClear();
             DBG_PRINTVEC2(tr.pos);
-            DBG_PRINTVEC2(center);
             DBG_PRINTVEC2(camPos);
+            DBG_PRINTVEC2(m_activeCam.ScreenSpaceExtent());
             printf("%f, %f, %f, %f\n", left.GetFloat(), right.GetFloat(), top.GetFloat(), bottom.GetFloat());
 
             if (tr.pos.X() < left) {
-                camPos.X() = tr.pos.X() - left;
+                camPos.X() += tr.pos.X() - left;
             }
             else if (tr.pos.X() > right) {
-                camPos.X() = tr.pos.X() - right;
+                camPos.X() += tr.pos.X() - right;
             }
 
             if (tr.pos.Y() < top) {
-                camPos.Y() = tr.pos.Y() - top;
+                camPos.Y() += tr.pos.Y() - top;
             }
             else if (tr.pos.Y() > bottom) {
-                camPos.Y() = tr.pos.Y() - bottom;
+                camPos.Y() += tr.pos.Y() - bottom;
             }
 
             m_activeCam.SetPos(camPos);
@@ -184,7 +184,7 @@ namespace core {
 
             auto& tr = view.get<Transform>(spriteEntts);
             Vec2 wtc = m_activeCam.WorldToCamera(tr.pos);
-            wtc + sp.camDrawOffset;
+            wtc += sp.camDrawOffset;
 
             int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
 

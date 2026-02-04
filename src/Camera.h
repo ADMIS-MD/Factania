@@ -12,6 +12,7 @@ public:
 	fixed GetScale() const;
 	Vec2 WorldToCamera() const;
 	Vec2 ScreenSpaceFactor() const;
+	Vec2 ScreenSpaceExtent() const;
 	Vec2 ScreenToWorld(Vec2 screen_pos) const;
 	Vec2 WorldToCamera(Vec2 world_pos) const;
 
@@ -30,4 +31,5 @@ private:
 	// Essentially the grid size - defines scale between world position and screen space
 	fixed m_scaleFactor = 32.f;
 	Vec2 m_cachedScreenToWorld = { FINT(1) / m_scaleFactor, FINT(1) / m_scaleFactor };
+	Vec2 m_cachedScreenExtent = m_cachedScreenToWorld *  Vec2(FINT(SCREEN_WIDTH), FINT(SCREEN_HEIGHT));
 };

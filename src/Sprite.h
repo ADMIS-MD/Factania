@@ -17,6 +17,8 @@ struct Sprite
 
 	bool hide = false;
 	bool xFlip = false;
+
+	Vec2 camDrawOffset = {FINT(-16), FINT(-16)};
 };
 
 struct Animation
@@ -34,5 +36,4 @@ struct SubSprite
 
 	bool hide = false;
 	bool xFlip = false;
-	Vec2 camDrawOffset = {FINT(0), FINT(32)};
 };

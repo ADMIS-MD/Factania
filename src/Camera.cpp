@@ -46,9 +46,16 @@ Vec2 Camera::ScreenSpaceFactor() const
     return m_cachedScreenToWorld;
 }
 
+Vec2 Camera::ScreenSpaceExtent() const
+{
+    return m_cachedScreenExtent;
+}
+
 Vec2 Camera::ScreenToWorld(Vec2 screen_pos) const
 {
-    return m_cachedScreenToWorld * screen_pos + GetPos();
+    Vec2 v = m_cachedScreenToWorld * screen_pos;
+    v.Y() = -v.Y();
+    return v + GetPos();
 }
 
 Vec2 Camera::WorldToCamera(Vec2 world_pos) const
@@ -76,13 +83,13 @@ void Camera::MoveLeft(fixed x)
 
 void Camera::MoveUp(fixed y)
 {
-    m_eye.Y() -= y;
+    m_eye.Y() += y;
     UpdateCache();
 }
 
 void Camera::MoveDown(fixed y)
 {
-    m_eye.Y() += y;
+    m_eye.Y() -= y;
     UpdateCache();
 }
 
@@ -95,9 +102,10 @@ void Camera::SetScale(fixed scale)
 void Camera::UpdateCache()
 {
     Vec2 v = this->GetPos();
-    v.X() = -v.X();
+    v = -v;
     v *= m_scaleFactor;
     m_cachedWorldToCamera = v;
 
-    m_cachedScreenToWorld =  { FINT(1) / m_scaleFactor, FINT(1) / m_scaleFactor };
+    m_cachedScreenToWorld = { FINT(1) / m_scaleFactor, FINT(1) / m_scaleFactor };
+    m_cachedScreenExtent = m_cachedScreenToWorld * Vec2(FINT(SCREEN_WIDTH), FINT(SCREEN_HEIGHT));
 }

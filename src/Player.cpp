@@ -126,7 +126,7 @@ void CreatePlayerComponent(entt::registry& registry)
     SetAnim(sp, an, 0, 5);
 }
 
-void UpdatePlayerComponent(entt::registry& registry)
+void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
 {
     const uint16_t held = keysHeld();
     const uint16_t down = keysDown();
@@ -156,8 +156,6 @@ void UpdatePlayerComponent(entt::registry& registry)
         {
             GridTransform grid = tr;
             ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
-            chp.x = -chp.x;
-            chp.y = -chp.y;
             printf("%d, %d\n", grid.x, grid.y);
             printf("%d, %d\n", chp.x, chp.y);
             entt::entity chunk_e = chl.GetChunk(chp);

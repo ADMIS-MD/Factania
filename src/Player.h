@@ -30,4 +30,4 @@ struct PlayerMove
 
 void CreatePlayerComponent(entt::registry& registry);
 
-void UpdatePlayerComponent(entt::registry& registry);
+void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl);
