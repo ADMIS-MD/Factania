@@ -18,6 +18,7 @@
 #include "Sprite.h"
 #include "InventoryDebugSystem.h"
 #include "cursor.h"
+#include "building.h"
 #include <nds.h>
 #include <RenderSystem.h>
 
@@ -47,6 +48,14 @@ void EntitySystemManager::Update(entt::registry& registry)
 {
   UpdateInventoryDebug(registry);
 	UpdatePlayerComponent(registry, chunk_lookup);
+
+    auto factoryBuildingView = registry.view<FactoryBuilding>();
+
+    for (auto entity : factoryBuildingView)
+    {
+        auto& component = factoryBuildingView.get<FactoryBuilding>(entity);
+        component.UpdateBuilding(0.0166f);
+    }
 
     // Test Cursor Entity Update
     touchPosition t;

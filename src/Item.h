@@ -19,11 +19,11 @@ public:
     {
         return itemID == other.itemID;
     }
-    Item& operator=(const Item& other) 
+    Item& operator=(const Item& other)
     {
         itemID = other.itemID;
+        name = other.name;
         return *this;
-
     }
     Item& operator=(const int other) 
     {
