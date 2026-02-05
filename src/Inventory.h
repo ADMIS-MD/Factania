@@ -4,18 +4,18 @@
 
 struct Inventory
 {
-	static constexpr int MAX_ITEMS = (int)ItemID::Count;
+	static constexpr int MAX_ITEMS = (int)ItemType::Count;
 	int quantities[MAX_ITEMS] = { 0 };
 
-	bool AddItem(ItemID id, int amount = 1)
+	bool AddItem(ItemType type, int amount = 1)
 	{
-		quantities[(int)id] += amount;
+		quantities[(int)type] += amount;
 		return true;
 	}
 
-	bool RemoveItem(ItemID id, int amount = 1)
+	bool RemoveItem(ItemType type, int amount = 1)
 	{
-		int& quant = quantities[(int)id];
+		int& quant = quantities[(int)type];
 		if (quant < amount)
 		{
 			return false;
@@ -25,8 +25,8 @@ struct Inventory
 		return true;
 	}
 
-	int GetItem(ItemID id) const
+	int GetItem(ItemType type) const
 	{
-		return quantities[(int)id];
+		return quantities[(int)type];
 	}
 };

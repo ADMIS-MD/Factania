@@ -15,17 +15,20 @@ public:
         name = name_;
     }
 
-    Item& operator==(const Item& other) const 
+    bool operator==(const Item& other) const 
     {
         return itemID == other.itemID;
     }
     Item& operator=(const Item& other) 
     {
-        return itemID = other.itemID;
+        itemID = other.itemID;
+        return *this;
+
     }
     Item& operator=(const int other) 
     {
-        return itemID = other;
+        itemID = other;
+        return *this;
     }
 };
 
@@ -90,7 +93,7 @@ public:
     }
 };
 
-enum class ItemID : int
+enum class ItemType : int
 {
     Iron = 0,
     Copper,
@@ -98,15 +101,15 @@ enum class ItemID : int
     Count
 };
 
-inline const char* ItemName(ItemID id)
+inline const char* ItemName(ItemType id)
 {
     switch (id)
     {
-    case ItemID::Iron:
+    case ItemType::Iron:
         return "Iron";
-    case ItemID::Copper:
+    case ItemType::Copper:
         return "Copper";
-    case ItemID::Coal:
+    case ItemType::Coal:
         return "Coal";
     default: 
         return "Unknown";
