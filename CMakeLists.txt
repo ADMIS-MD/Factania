@@ -29,6 +29,7 @@ set(SOURCE_FILES
     src/Conveyer.cpp
     src/building.cpp
     src/Console.cpp
+    src/InventoryDebugSystem.cpp
     src/debug_menu/DebugLog.cpp
 )
 
@@ -53,6 +54,8 @@ set(HEADER_FILES
     src/building.h
     src/Item.h
     src/Console.h
+    src/Inventory.h
+    src/InventoryDebugSystem.h
     src/debug_menu/DebugLog.h
 )
 

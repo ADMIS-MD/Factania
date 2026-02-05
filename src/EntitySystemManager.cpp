@@ -16,6 +16,7 @@
 
 #include "Transform.h"
 #include "Sprite.h"
+#include "InventoryDebugSystem.h"
 #include "cursor.h"
 #include <nds.h>
 #include <RenderSystem.h>
@@ -44,6 +45,7 @@ EntitySystemManager::~EntitySystemManager()
 
 void EntitySystemManager::Update(entt::registry& registry)
 {
+  UpdateInventoryDebug(registry);
 	UpdatePlayerComponent(registry, chunk_lookup);
 
     // Test Cursor Entity Update

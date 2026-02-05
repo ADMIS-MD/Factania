@@ -3,6 +3,7 @@
 
 #include "nds.h"
 #include "Player.h"
+#include "Inventory.h"
 
 #include <chunk.hpp>
 
@@ -132,7 +133,10 @@ void CreatePlayerComponent(entt::registry& registry)
     auto& st = registry.emplace<PlayerState>(entity);
     auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false, false);
     auto& an = registry.emplace<Animation>(entity);
+    auto& inv = registry.emplace<Inventory>(entity);
     registry.emplace<PlayerMove>(entity);
+    inv.AddItem(ItemType::Iron, 5);
+    inv.AddItem(ItemType::Copper, 2);
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);

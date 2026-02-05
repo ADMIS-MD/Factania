@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <cstdint>
 
 class Item
 {
@@ -18,13 +19,16 @@ public:
     {
         return itemID == other.itemID;
     }
-    bool operator=(const Item& other) 
+    Item& operator=(const Item& other) 
     {
-        return itemID = other.itemID;
+        itemID = other.itemID;
+        return *this;
+
     }
-    bool operator=(const int other) 
+    Item& operator=(const int other) 
     {
-        return itemID = other;
+        itemID = other;
+        return *this;
     }
 };
 
@@ -79,7 +83,7 @@ public:
     float recipeDuration;
     float powerDraw;
 
-    Recipe operator=(const Recipe& other) 
+    Recipe& operator=(const Recipe& other) 
     {
         inputItems = other.inputItems;
         outputItems = other.outputItems;
@@ -88,3 +92,26 @@ public:
         return *this;
     }
 };
+
+enum class ItemType : int
+{
+    Iron = 0,
+    Copper,
+    Coal,
+    Count
+};
+
+inline const char* ItemName(ItemType id)
+{
+    switch (id)
+    {
+    case ItemType::Iron:
+        return "Iron";
+    case ItemType::Copper:
+        return "Copper";
+    case ItemType::Coal:
+        return "Coal";
+    default: 
+        return "Unknown";
+    }
+}
