@@ -18,13 +18,15 @@ public:
     {
         return itemID == other.itemID;
     }
-    bool operator=(const Item& other) 
+    Item& operator=(const Item& other)
     {
-        return itemID = other.itemID;
+        itemID = other.itemID;
+        return *this;
     }
-    bool operator=(const int other) 
+    Item& operator=(const int other) 
     {
-        return itemID = other;
+        itemID = other;
+        return *this;
     }
 };
 

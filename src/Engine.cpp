@@ -76,7 +76,7 @@ namespace core {
         std::vector<Recipe> buildingRecipes;
         buildingRecipes.push_back(tempRecipie);
 
-        FactoryBuilding building = FactoryBuilding(buildingRecipes, 1);
+        FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
         building.InputItems(ironIngot);
         building.InputItems(ironIngot);
         building.InputItems(ironIngot);
@@ -84,7 +84,7 @@ namespace core {
         building.status = BuildingStatus::Idle;
 
         const entt::entity entityLink = m_registry.create();
-        m_registry.emplace<FactoryBuilding>(entityLink);
+        m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
 
         shouldQuit = false;
     }
@@ -105,8 +105,6 @@ namespace core {
         {
             system->Update(m_registry);
         }
-
-        TempUpdateBuildings(m_registry);
 
         // because i dont have a better place to put it for testing :)
         uint16_t up = keysUp();

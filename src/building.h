@@ -55,6 +55,7 @@ public:
     bool InputItems(ItemQuantity items) override;
     bool TakeItems() override;
     FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1);
+    FactoryBuilding(const FactoryBuilding& other);
     FactoryBuilding();
 
 private:
