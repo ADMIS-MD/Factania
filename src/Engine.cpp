@@ -24,6 +24,7 @@
 
 #include <debug_menu/debug_menu.h>
 #include "Player.h"
+#include "Conveyer.h"
 
 #include "building.h"
 #include "Console.h"
@@ -31,6 +32,17 @@
 //-----------------------------------------------------------------------------
 //	Method Declarations
 //-----------------------------------------------------------------------------
+
+// SPDX-License-Identifier: CC0-1.0
+//
+// SPDX-FileContributor: Antonio Ni�o D�az, 2024-2025
+
+// This example shows how to draw a translucent 3D box in which you can see all
+// faces. This is how you would see 3D objects that are translucent, but not
+// fully solid. For example, you could have an empty cube where all the faces
+// are translucent pieces of plastic.
+
+std::vector<Conveyer*> convTest = InitTest();
 
 namespace core {
 
@@ -98,9 +110,13 @@ namespace core {
 
         // because i dont have a better place to put it for testing :)
         uint16_t up = keysUp();
+		uint16_t down = keysDown();
 
         if (up & KEY_START)
             shouldQuit = true;
+        if (down & KEY_A) {
+            convTest[2]->UpdateBuilding(1.0f);
+        }
 
         if ((up & KEY_L) || (up & KEY_R)) {
             drawConsole = !drawConsole;
@@ -133,7 +149,7 @@ namespace core {
             Update();
 
             BeginFrame();
-            
+
             Draw();
 
             EndFrame();
@@ -142,5 +158,4 @@ namespace core {
                 break;
         }
     }
-
 }

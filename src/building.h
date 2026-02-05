@@ -38,22 +38,24 @@ public:
     std::vector<ItemQuantity> inputInventory;
     std::vector<ItemQuantity> outputInventory;
     virtual bool InputItems(ItemQuantity items) = 0;
+    virtual bool TakeItems() = 0;
+
+private:
 };
 
-class FactoryBuilding : ItemBuilding
+class FactoryBuilding : public ItemBuilding
 {
 public:
     BuildingStatus status = BuildingStatus::Unpowered;
-    std::vector<Recipe> recipes;   
+    std::vector<Recipe> recipes;
     int selectedRecipe = -1;
 
-    void UpdateBuilding(float dt);
+    void UpdateBuilding(float dt) override;
     void SelectRecipe(int recipeNum);
-    bool InputItems(ItemQuantity items);
+    bool InputItems(ItemQuantity items) override;
+    bool TakeItems() override;
     FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1);
     FactoryBuilding();
-
-
 
 private:
     void ResolveRecipe(Recipe* recipe);
@@ -61,13 +63,12 @@ private:
     bool inputInventoryChanged = true;
 };
 
-class PowerGrid : Building
+class PowerGrid : public Building
 {
 public:
     std::vector<FactoryBuilding> connectedSinks;
     std::vector<FactoryBuilding> connectedSources;
-    //std::vector<FactoryBuilding> connectedStorage;
-    void UpdateBuilding(float dt);
+    void UpdateBuilding(float dt) override;
     void StartGrid();
 
 private:
