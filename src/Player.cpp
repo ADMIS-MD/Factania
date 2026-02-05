@@ -239,7 +239,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
                 break;
             }
 
-            miningTimer++;
+            miningTimer++; // we know our clock cycle
 
             if (miningTimer >= 60)
             {
