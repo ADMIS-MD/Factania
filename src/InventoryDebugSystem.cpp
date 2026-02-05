@@ -1,6 +1,6 @@
 #include "InventoryDebugSystem.h"
 
-#include "inventory.h"
+#include "Inventory.h"
 #include <nds.h>
 
 void UpdateInventoryDebug(entt::registry& registry)
