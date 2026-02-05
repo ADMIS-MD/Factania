@@ -31,6 +31,8 @@
 //	Method Implementations
 //-----------------------------------------------------------------------------
 
+ChunkLookup chunk_lookup;
+
 namespace core {
 
     // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/tileset_background/source/main.c
@@ -97,33 +99,35 @@ namespace core {
             }
         }
 
-        const int boxW = SCREENW / 2;
-        const int boxH = SCREENH / 2;
+        const Vec2 screenCenterOffset = m_activeCam.ScreenSpaceExtent() * FFLOAT(.5f);
+        Vec2 camPos = m_activeCam.GetPos();
 
-        const int left = (SCREENW - boxW) / 2;
-        const int right = left + boxW;
-        const int top = (SCREENH - boxH) / 2;
-        const int bottom = top + boxH;
+        // Techincally the same lol
+        const Vec2& boxSize = screenCenterOffset;
+        const Vec2 boxHalfSize = boxSize * FFLOAT(.5f);
+
+
+        const fixed left = boxHalfSize.X() + camPos.X();
+        const fixed right = boxSize.X() + boxHalfSize.X() + camPos.X();
+        const fixed top = boxHalfSize.Y() + camPos.Y();
+        const fixed bottom = boxSize.Y() + boxHalfSize.Y() + camPos.Y();
 
         auto view = registry.view<PlayerState, Transform>();
         for (auto e : view) {
             auto& tr = view.get<Transform>(e);
 
-            Vec2 camPos = m_activeCam.GetPos();
-            Vec2 screenPos = tr.pos - camPos;
-
-            if (screenPos.X().GetInt() < left) {
-                camPos.X() = tr.pos.X() - fixed(static_cast<int32>(left));
+            if (tr.pos.X() < left) {
+                camPos.X() += tr.pos.X() - left;
             }
-            else if (screenPos.X().GetInt() > right) {
-                camPos.X() = tr.pos.X() - fixed(static_cast<int32>(right));
+            else if (tr.pos.X() > right) {
+                camPos.X() += tr.pos.X() - right;
             }
 
-            if (screenPos.Y().GetInt() < top) {
-                camPos.Y() = tr.pos.Y() - fixed(static_cast<int32>(top));
+            if (tr.pos.Y() < top) {
+                camPos.Y() += tr.pos.Y() - top;
             }
-            else if (screenPos.Y().GetInt() > bottom) {
-                camPos.Y() = tr.pos.Y() - fixed(static_cast<int32>(bottom));
+            else if (tr.pos.Y() > bottom) {
+                camPos.Y() += tr.pos.Y() - bottom;
             }
 
             m_activeCam.SetPos(camPos);
@@ -135,19 +139,19 @@ namespace core {
 
     void RenderSystem::Draw(entt::registry& registry)
     {
-        Vec2 world = m_activeCam.WorldToCamera();
-        fixed x = m_activeCam.WorldToCamera().X();
-        fixed y = m_activeCam.WorldToCamera().Y();
+        Vec2 world = m_activeCam.GetPos();
+        fixed x = world.X();
+        fixed y = world.Y();
 
         GridTransform grid {world};
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
-        entt::entity center = cl.GetChunk(pos);
+        entt::entity center = chunk_lookup.GetChunk(pos);
         if (!registry.valid(center))
         {
-            center = Chunk::MakeChunk(cl, registry, pos);
+            center = Chunk::MakeChunk(chunk_lookup, registry, pos);
         }
         Chunk& center_chunk = registry.get<Chunk>(center);
-        center_chunk.FillSurrounding(cl, registry, pos);
+        center_chunk.FillSurrounding(chunk_lookup, registry, pos);
         center_chunk.Draw(m_activeCam, pos);
         int xc = pos.x;
         int yc = pos.y;
@@ -168,17 +172,17 @@ namespace core {
 
         // Draw every sprite in Mainscreen
         auto view = registry.view<Sprite, Transform>();
-        for (auto e : view) {
-            auto& sp = view.get<Sprite>(e);
-            auto& tr = view.get<Transform>(e);
-
+        for (auto spriteEntts : view) {
+            auto& sp = view.get<Sprite>(spriteEntts);
             if (sp.hide == true) continue;
 
-            int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
-            int drawX = (tr.pos.X() + x).GetInt() - sp.spriteSize / 2;
-            int drawY = (tr.pos.Y() + y).GetInt() - sp.spriteSize;
+            auto& tr = view.get<Transform>(spriteEntts);
+            Vec2 wtc = m_activeCam.WorldToCamera(tr.pos);
+            wtc += sp.camDrawOffset;
 
-            glSprite(drawX, drawY, flip, &sp.sprite[sp.spriteID]);
+            int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
+
+            glSprite(wtc.X().GetInt(), wtc.Y().GetInt(), flip, &sp.sprite[sp.spriteID]);
         }
 
         // Draw every sprite in Subscreen

@@ -88,6 +88,11 @@ bool FactoryBuilding::InputItems(ItemQuantity inputs)
 	return false;
 }
 
+bool FactoryBuilding::TakeItems()
+{
+	return false;
+}
+
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 {
 	inputInventoryChanged = true;
@@ -149,10 +154,10 @@ void PowerGrid::StartGrid()
 {
 	for (int i = 0; i < connectedSources.size(); i++)
 	{
-		connectedSources[i].status == BuildingStatus::Idle;
+		connectedSources[i].status = BuildingStatus::Idle;
 	}
 	for (int i = 0; i < connectedSinks.size(); i++)
 	{
-		connectedSinks[i].status == BuildingStatus::Idle;
+		connectedSinks[i].status = BuildingStatus::Idle;
 	}
 }

@@ -47,8 +47,11 @@ public:
 
 class FunctionResultNode : public DebugNode {
 public:
-    FunctionResultNode(const std::function<std::string()>& _func) : func(_func) {};
+    FunctionResultNode(
+        const std::function<std::string()>& _func,
+        std::function<void(bool& selected)> _update = [](bool& selected){}) : func(_func), selectedUpdate(_update) {};
     std::function<std::string()> func;
+    std::function<void(bool& selected)> selectedUpdate;
     void update(bool& selected) override;
 };
 

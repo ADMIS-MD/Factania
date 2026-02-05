@@ -19,6 +19,7 @@
 #include "InventoryDebugSystem.h"
 #include "cursor.h"
 #include <nds.h>
+#include <RenderSystem.h>
 
 //-----------------------------------------------------------------------------
 //	Methods
@@ -44,8 +45,8 @@ EntitySystemManager::~EntitySystemManager()
 
 void EntitySystemManager::Update(entt::registry& registry)
 {
-	UpdatePlayerComponent(registry);
-    UpdateInventoryDebug(registry);
+  UpdateInventoryDebug(registry);
+	UpdatePlayerComponent(registry, chunk_lookup);
 
     // Test Cursor Entity Update
     touchPosition t;
