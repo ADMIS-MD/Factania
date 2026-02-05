@@ -65,26 +65,27 @@ namespace core {
         m_systems.push_back(new RenderSystem());
         m_systems.push_back(new EntitySystemManager(m_registry));
 
-        ItemQuantity ironIngot = ItemQuantity(Item(100, "iron_ingot"), 10);
-        ItemQuantity ironPlate = ItemQuantity(Item(101, "iron_plate"), 1);
+        //temp testing stuff
+        ItemQuantity ironIngot = ItemQuantity(Item(100, "iron_ingot"), 1);
+        ItemQuantity ironPlate = ItemQuantity(Item(101, "air"), 0);
 
         Recipe tempRecipie;
-        tempRecipie.inputItems.push_back(ironIngot);
-        tempRecipie.outputItems.push_back(ironPlate);
-        tempRecipie.recipeDuration = 10;
+        tempRecipie.inputItems.push_back(ironPlate);
+        tempRecipie.outputItems.push_back(ironIngot);
+        tempRecipie.recipeDuration = 1;
 
         std::vector<Recipe> buildingRecipes;
         buildingRecipes.push_back(tempRecipie);
 
         FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
-        building.InputItems(ironIngot);
-        building.InputItems(ironIngot);
+        ironIngot.quantity = 10;
         building.InputItems(ironIngot);
 
         building.status = BuildingStatus::Idle;
 
         const entt::entity entityLink = m_registry.create();
         m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
+        //end of testing stuffs
 
         shouldQuit = false;
     }
