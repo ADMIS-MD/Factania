@@ -16,6 +16,7 @@
 
 #include "Transform.h"
 #include "Sprite.h"
+#include "InventoryDebugSystem.h"
 #include "cursor.h"
 #include "building.h"
 #include <nds.h>
@@ -45,6 +46,7 @@ EntitySystemManager::~EntitySystemManager()
 
 void EntitySystemManager::Update(entt::registry& registry)
 {
+  UpdateInventoryDebug(registry);
 	UpdatePlayerComponent(registry, chunk_lookup);
 
     auto factoryBuildingView = registry.view<FactoryBuilding>();
