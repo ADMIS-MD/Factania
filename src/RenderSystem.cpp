@@ -156,19 +156,16 @@ namespace core {
         center_chunk.Draw(m_activeCam, pos);
         int xc = pos.x;
         int yc = pos.y;
-        const ChunkPosition transforms[8] = {
-            {static_cast<int16>(xc + 0), static_cast<int16>(yc + 1)},
-            {static_cast<int16>(xc + 1), static_cast<int16>(yc + 1)},
-            {static_cast<int16>(xc + 1), static_cast<int16>(yc + 0)},
-            {static_cast<int16>(xc + 1), static_cast<int16>(yc - 1)},
-            {static_cast<int16>(xc + 0), static_cast<int16>(yc - 1)},
-            {static_cast<int16>(xc - 1), static_cast<int16>(yc - 1)},
-            {static_cast<int16>(xc - 1), static_cast<int16>(yc + 0)},
-            {static_cast<int16>(xc - 1), static_cast<int16>(yc + 1)},
-        };
-        for (int i = 0; i < 8; ++i)
+
+
+        for (int16 i = xc - 1; i <= xc + 2; ++i)
         {
-            registry.get<Chunk>(center_chunk.surrounding_chunks[i]).Draw(m_activeCam, transforms[i]);
+            for (int16 j = yc - 1; j <= yc + 2; ++j)
+            {
+                ChunkPosition p = {i, j};
+                Chunk const& chunk = registry.get<Chunk>(chunk_lookup.GetChunk(p));
+                chunk.Draw(m_activeCam, p);
+            }
         }
 
         // Draw every sprite in Mainscreen

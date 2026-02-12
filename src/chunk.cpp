@@ -6,7 +6,7 @@ Chunk::Chunk()
 
 }
 
-void Chunk::Draw(Camera const& cam, ChunkPosition pos)
+void Chunk::Draw(Camera const& cam, ChunkPosition pos) const
 {
     glColor(RGB15(31, 31, 31));
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
@@ -76,23 +76,17 @@ entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, Chu
 
 void Chunk::FillSurrounding(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos)
 {
-    int xc = pos.x, yc = pos.y;
-    const ChunkPosition transforms[8] = {
-        {static_cast<int16>(xc + 0), static_cast<int16>(yc + 1)},
-        {static_cast<int16>(xc + 1), static_cast<int16>(yc + 1)},
-        {static_cast<int16>(xc + 1), static_cast<int16>(yc + 0)},
-        {static_cast<int16>(xc + 1), static_cast<int16>(yc - 1)},
-        {static_cast<int16>(xc + 0), static_cast<int16>(yc - 1)},
-        {static_cast<int16>(xc - 1), static_cast<int16>(yc - 1)},
-        {static_cast<int16>(xc - 1), static_cast<int16>(yc + 0)},
-        {static_cast<int16>(xc - 1), static_cast<int16>(yc + 1)},
-    };
+    int16 xc = pos.x, yc = pos.y;
 
-    for (int i = 0; i < 8; ++i)
+    for (int16 i = xc - 1; i <= xc + 2; ++i)
     {
-        if (!registry.valid(surrounding_chunks[i]))
+        for (int16 j = yc - 1; j <= yc + 2; ++j)
         {
-            MakeChunk(lookup, registry, transforms[i]);
+            ChunkPosition chp = ChunkPosition {i, j};
+            if (!registry.valid(lookup.GetChunk(chp)))
+            {
+                MakeChunk(lookup, registry, chp);
+            }
         }
     }
 }
