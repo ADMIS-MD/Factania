@@ -135,8 +135,8 @@ void CreatePlayerComponent(entt::registry& registry)
     auto& an = registry.emplace<Animation>(entity);
     auto& inv = registry.emplace<Inventory>(entity);
     registry.emplace<PlayerMove>(entity);
-    inv.AddItem(ItemType::Iron, 5);
-    inv.AddItem(ItemType::Copper, 2);
+    inv.AddItem(ItemType::IronOre, 5);
+    inv.AddItem(ItemType::CopperOre, 2);
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);
@@ -249,7 +249,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
             if (miningTimer >= 60)
             {
                 miningTimer = 0;
-                inv.AddItem(ItemType::Iron);
+                inv.AddItem(ItemType::IronOre);
             }
 
             break;

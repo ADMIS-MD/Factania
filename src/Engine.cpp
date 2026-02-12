@@ -144,7 +144,8 @@ namespace core {
             scanKeys();
 
             if (drawConsole) {
-                check_debug_menu();
+                // temp clearing this out
+                //check_debug_menu();
             }
 
             Update();

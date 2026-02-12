@@ -29,4 +29,25 @@ struct Inventory
 	{
 		return quantities[(int)type];
 	}
+
+	void ClearInventory()
+	{
+		for (int i = 0; i < MAX_ITEMS; ++i)
+		{
+			quantities[i] = 0;
+		}
+	}
+
+	void PrintInventory(Inventory inv)
+	{
+		printf("Inventory:\n");
+		for (int i = 0; i < (int)ItemType::Count; ++i)
+		{
+			int q = inv.quantities[i];
+			if (q > 0)
+			{
+				printf("  %s x%d\n", ItemName((ItemType)i), q);
+			}
+		}
+	}
 };
