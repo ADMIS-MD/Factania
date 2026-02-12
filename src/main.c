@@ -17,6 +17,5 @@
 
 int main(void)
 {
-    defaultExceptionHandler();
 	return factania_main();
 }

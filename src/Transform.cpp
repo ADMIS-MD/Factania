@@ -48,7 +48,7 @@ GridTransform::GridTransform(Transform const& transform) : GridTransform(transfo
 {
 }
 
-u8 GridTransform::CropTo8x8Grid()
+u8 GridTransform::CropTo8x8Grid() const
 {
     return (x & 0b0111) + ((y & 0b0111) * 8);
 }

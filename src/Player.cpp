@@ -6,6 +6,7 @@
 #include "Inventory.h"
 
 #include <chunk.hpp>
+#include <RenderSystem.h>
 
 #include "Transform.h"
 #include "Sprite.h"
@@ -57,32 +58,28 @@ static void LoadPlayerSprite() {
     }
 }
 
-static inline int32 WorldToTile(const fixed& p)
+static inline bool CheckCollision(entt::registry const& r, const Vec2& pos)
 {
-    // TODO: convert given world position to tilemap position
-    return 0;
-}
+    int32 playerTileX = pos.X().GetInt();
+    int32 playerTileY = pos.Y().GetInt();
 
-static inline bool CheckCollision(const Vec2& pos) 
-{
-    int32 playerTileX = WorldToTile(pos.X());
-    int32 playerTileY = WorldToTile(pos.Y());
-
-    // TODO: get tilemap array?
-    return false;
+    consoleClear();
+    printf("%d, %d\n", playerTileX, playerTileY);
 
     for (int indexX = -1; indexX <= 1; ++indexX) {
         for (int indexY = -1; indexY <= 1; ++indexY) {
             int checkX = playerTileX + indexX;
             int checkY = playerTileY + indexY;
 
-            // TODO: if (tile is empty) continue;
+            GridTransform t = {checkX, checkY};
+            Chunk const& c = r.get<Chunk>(chunk_lookup.GetChunk(t));
+            if (c.top_entity_ids[t.CropTo8x8Grid()] == entt::null)
+                continue;
 
-            fixed tileSize = 16.f;
-            fixed minX = fixed(static_cast<int32>(checkX)) * tileSize;
-            fixed minY = fixed(static_cast<int32>(checkY)) * tileSize;
-            fixed maxX = minX + tileSize;
-            fixed maxY = minY + tileSize;
+            fixed minX = fixed(static_cast<int32>(checkX));
+            fixed minY = fixed(static_cast<int32>(checkY));
+            fixed maxX = minX + FINT(1);
+            fixed maxY = minY + FINT(1);
 
             if (pos.X() >= minX && pos.X() < maxX && pos.Y() >= minY && pos.Y() < maxY) {
                 return true;
@@ -167,6 +164,27 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
         auto& an = view.get<Animation>(player);
         const auto& mv = view.get<PlayerMove>(player);
 
+        // TODO: Remove
+        if (down & KEY_A)
+        {
+            GridTransform grid = tr;
+            ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
+            Chunk& chunk = chl.GetChunkObj(registry, chp);
+
+            entt::entity new_obj = registry.create();
+            registry.emplace<ChunkSprite>(new_obj, ChunkSprite { 1, RGB15(15, 15, 0) });
+            registry.emplace<GridTransform>(new_obj, grid);
+        }
+        if (down & KEY_B)
+        {
+            GridTransform grid = tr;
+            ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
+            Chunk& chunk = chl.GetChunkObj(registry, chp);
+            if (chunk.top_entity_ids[grid.CropTo8x8Grid()] != entt::null)
+                registry.destroy(chunk.top_entity_ids[grid.CropTo8x8Grid()]);
+        }
+        // TODO: End remove
+
         if (!st.inputEnabled) {
             // skip update
             continue;
@@ -218,19 +236,17 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
 
             Vec2 next = tr.pos;
             next.X() += delta.X();
-            if (!CheckCollision(next)) {
+            if (!CheckCollision(registry, next)) {
                 tr.pos.X() = next.X();
             }
 
             next = tr.pos;
             next.Y() += delta.Y();
-            if (!CheckCollision(next)) {
+            if (!CheckCollision(registry, next)) {
                 tr.pos.Y() = next.Y();
             }
 
-            gtr.x = WorldToTile(tr.pos.X());
-            gtr.y = WorldToTile(tr.pos.Y());
-
+            gtr = tr.pos;
             break;
         }
 
