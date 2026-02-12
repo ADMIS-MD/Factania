@@ -4,9 +4,7 @@
 #include <vector>
 #include "Item.h"
 #include <entt.hpp>
-
-void TempUpdateBuildings(entt::registry& registry);
-
+#include "Inventory.h";
 enum class BuildingType {
     None,
     Source,
@@ -35,10 +33,9 @@ class ItemBuilding : public Building
 public:
     std::vector<Building*> inputs;
     std::vector<Building*> outputs;
-    std::vector<ItemQuantity> inputInventory;
-    std::vector<ItemQuantity> outputInventory;
-    virtual bool InputItems(ItemQuantity items) = 0;
-    virtual bool TakeItems() = 0;
+    Inventory inputInventory;
+    Inventory outputInventory;
+    virtual bool InputItems(ItemType item, int count) = 0;
 
 private:
 };
@@ -52,8 +49,7 @@ public:
 
     void UpdateBuilding(float dt) override;
     void SelectRecipe(int recipeNum);
-    bool InputItems(ItemQuantity items) override;
-    bool TakeItems() override;
+    bool InputItems(ItemType item, int count) override;
     FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_ = -1);
     FactoryBuilding(const FactoryBuilding& other);
     FactoryBuilding();

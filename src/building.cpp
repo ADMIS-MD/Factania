@@ -10,10 +10,9 @@ void FactoryBuilding::UpdateBuilding(float dt)
 
 	if (inputInventoryChanged == true)
 	{
-		for (int i = 0; i < inputInventory.size(); i++) //loop through inventory
+		for (int i = 0; i < inputInventory.MAX_ITEMS; i++) //loop through inventory
 		{
-			if (recipes[selectedRecipe].inputItems[0].quantity > inputInventory[i].quantity ||
-				recipes[selectedRecipe].inputItems[0].item.itemID != inputInventory[i].item.itemID) //see if we have enough items to craft
+			if (recipes[selectedRecipe].inputs.quantities[i] > inputInventory.quantities[i]) //see if we have enough items to craft
 			{
 				status = BuildingStatus::Idle;
 				inputInventoryChanged = false;
@@ -46,54 +45,30 @@ void FactoryBuilding::SelectRecipe(int recipeNum)
 	
 
 	//output items inside into player inv if any inside
+	//empty all items in building
 
 	inputInventoryChanged = true;
 	selectedRecipe = recipeNum;
-
-	inputInventory = recipes[selectedRecipe].inputItems;
-	outputInventory = recipes[selectedRecipe].outputItems;
-	
-	for (int i = 0; i < inputInventory.size(); i++)
-	{
-		inputInventory[i].quantity = 0;
-	}
-	for (int i = 0; i < outputInventory.size(); i++)
-	{
-		outputInventory[i].quantity = 0;
-	}
 }
 
-bool FactoryBuilding::InputItems(ItemQuantity inputs)
+bool FactoryBuilding::InputItems(ItemType item, int count)
 {
 	inputInventoryChanged = true;
-	for (int i = 0; i < inputInventory.size(); i++)
-	{
-		if (inputInventory[i].item.itemID == inputs.item.itemID)
-		{
-			inputInventory[i].quantity += inputs.quantity;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool FactoryBuilding::TakeItems()
-{
-	return false;
+	inputInventory.AddItem(item, count);
 }
 
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 {
 	inputInventoryChanged = true;
-	for (int i = 0; i < inputInventory.size(); i++)
+	for (int i = 0; i < recipe->inputs.MAX_ITEMS; i++)
 	{
-		inputInventory[i].quantity -= recipe->inputItems[i].quantity;
+		inputInventory.AddItem((ItemType)i, recipe->inputs.quantities[i]);
 	}
-	for (int i = 0; i < recipe->outputItems.size(); i++)
+	for (int i = 0; i < recipe->outputs.MAX_ITEMS; i++)
 	{
-		outputInventory[i].quantity += recipe->outputItems[i].quantity;
+		inputInventory.AddItem((ItemType)i, recipe->outputs.quantities[i]);
 	}
-	std::cout << "Factory Output: " << outputInventory[0].quantity << " " << recipe->outputItems[0].item.name;
+	//std::cout << "Factory Output: " << outputInventory[0].quantity << " " << recipe->outputItems[0].item.name;
 }
 
 FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_)
