@@ -1,9 +1,15 @@
 #include "chunk.hpp"
+
+#include <Engine.h>
+#include <Sprite.h>
+#include <nds/arm9/input.h>
+
 #include "RenderSystem.h"
 
 Chunk::Chunk()
 {
-
+    std::fill(std::begin(top_entity_ids), std::end(top_entity_ids), entt::null);
+    std::fill(std::begin(surrounding_chunks), std::end(surrounding_chunks), entt::null);
 }
 
 void Chunk::Draw(Camera const& cam, ChunkPosition pos)
@@ -50,14 +56,30 @@ entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, Chu
 
     entity = registry.create();
     Chunk c{};
-    c.surrounding_chunks[0] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 0), static_cast<int16>(pos.y + 1)});
-    c.surrounding_chunks[1] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y + 1)});
-    c.surrounding_chunks[2] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y + 0)});
-    c.surrounding_chunks[3] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y - 1)});
-    c.surrounding_chunks[4] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x + 0), static_cast<int16>(pos.y - 1)});
-    c.surrounding_chunks[5] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y - 1)});
-    c.surrounding_chunks[6] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y + 0)});
-    c.surrounding_chunks[7] = lookup.GetChunk( ChunkPosition {static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y + 1)});
+    c.surrounding_chunks[0] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x + 0), static_cast<int16>(pos.y + 1)
+    });
+    c.surrounding_chunks[1] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y + 1)
+    });
+    c.surrounding_chunks[2] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y + 0)
+    });
+    c.surrounding_chunks[3] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x + 1), static_cast<int16>(pos.y - 1)
+    });
+    c.surrounding_chunks[4] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x + 0), static_cast<int16>(pos.y - 1)
+    });
+    c.surrounding_chunks[5] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y - 1)
+    });
+    c.surrounding_chunks[6] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y + 0)
+    });
+    c.surrounding_chunks[7] = lookup.GetChunk(ChunkPosition{
+        static_cast<int16>(pos.x - 1), static_cast<int16>(pos.y + 1)
+    });
 
     for (int i = 0; i < 8; ++i)
     {
@@ -97,32 +119,33 @@ void Chunk::FillSurrounding(ChunkLookup& lookup, entt::registry& registry, Chunk
     }
 }
 
-void orecontext_generate_probabilities(OreType const* ores, u8 count, u16* out) {
-    u32 sum = 0;
-    for(int i = 0; i < count; ++i) {
-        sum += ores[i].spawn_chance;
+entt::entity Chunk::FindEntityByLayer
+    (entt::registry const& r, GridTransform const& tr, u8 begin_layer, u8 end_layer, bool* get_last) const
+{
+    u8 ch_pos = tr.CropTo8x8Grid();
+    entt::entity it = top_entity_ids[ch_pos];
+    entt::entity last = entt::null;
+    while (r.valid(it))
+    {
+        GridTransform const& grid = r.get<GridTransform>(it);
+        FactoryLayer const& fl = r.get<FactoryLayer>(it);
+
+        if (grid.layer >= begin_layer && grid.layer <= end_layer)
+        {
+            return it;
+        }
+
+        last = it;
+        it = fl.below;
     }
 
-    u32 multiplier = UINT32_MAX / sum;
-    u32 acc = 0;
-    for(int i = 0; i < count - 1; ++i) {
-        acc += ores[i].spawn_chance;
-        u32 outv = acc * multiplier;
-        out[i] = static_cast<u16>(outv << 16);
+    if (get_last)
+    {
+        *get_last = last != entt::null;
+        return last;
     }
+    return entt::null;
 }
-
-u32 next_seed_a(u32 seed) {
-    srand(seed);
-    return rand();
-}
-
-u32 scale_to(u32 max, u32 value) {
-    u32 scalar = UINT32_MAX / max;
-    return value / scalar;
-}
-
-#define ORE_TEXTURE_INDEX 1
 
 ChunkPosition ChunkPosition::FromGridTransform(const GridTransform& transform)
 {
@@ -132,13 +155,44 @@ ChunkPosition ChunkPosition::FromGridTransform(const GridTransform& transform)
     };
 }
 ;
-entt::entity ChunkLookup::GetChunk(GridTransform transform)
+
+entt::entity ChunkLookup::GetChunk(GridTransform transform) const
 {
     auto pos = ChunkPosition::FromGridTransform(transform);
     return GetChunk(pos);
 }
 
-entt::entity ChunkLookup::GetChunk(ChunkPosition transform)
+Chunk& ChunkLookup::GetChunkObj(entt::registry& r, ChunkPosition transform)
+{
+    auto ent = GetChunk(transform);
+    return r.get<Chunk>(ent);
+}
+
+Chunk& ChunkLookup::GetChunkObj(entt::registry& r, GridTransform transform)
+{
+    auto ent = GetChunk(transform);
+    return r.get<Chunk>(ent);
+}
+
+Chunk const& ChunkLookup::GetChunkObj(entt::registry const& r, ChunkPosition transform) const
+{
+    auto ent = GetChunk(transform);
+    return r.get<Chunk>(ent);
+}
+
+Chunk const& ChunkLookup::GetChunkObj(entt::registry const& r, GridTransform transform) const
+{
+    auto ent = GetChunk(transform);
+    return r.get<Chunk>(ent);
+}
+
+entt::entity ChunkLookup::ChunkSearchEntity(entt::registry const& r, GridTransform transform, u8 top_search_layer,
+                                            u8 bottom_search_layer)
+{
+    return GetChunkObj(r, transform).FindEntityByLayer(r, transform, top_search_layer, bottom_search_layer);
+}
+
+entt::entity ChunkLookup::GetChunk(ChunkPosition transform) const
 {
     auto it = m_chunks.find(transform);
     if (it == m_chunks.end())
@@ -157,86 +211,162 @@ bool operator==(ChunkPosition const& a, ChunkPosition const& b)
     return a.x == b.x && a.y == b.y;
 }
 
-// entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry) {
-//     //  8 bits for ore spawn chance
-//     u8 ore_chance = static_cast<u8>(local_seed);
-//     u16 ore_type = static_cast<u16>(local_seed >> 8);
-//     u8 ore_spawn_amount = static_cast<u8>(local_seed >> 24) / 4;
-//
-//     entt::entity chunk_entity = registry.create();
-//     Chunk& chunk = registry.emplace<Chunk>(chunk_entity);
-//
-//     // Spawn ore?
-//     // TODO: Wave function collapse ? Perlin noise
-//     if(ore_chance > context.ore_chance) {
-//         // TODO: don't think this works properly yet
-//         u8 ore_idx = bsearch_T<u16, u8>(ore_type, context.generated_probabilities, context.ore_count - 1);
-//         if (ore_idx != 255) {
-//             u8 probability_v = context.generated_probabilities[ore_idx];
-//             if (ore_type < probability_v)
-//                 ore_idx = 0;
-//         } else
-//             ore_idx = 0;
-//
-//         OreType* ore = context.ores + ore_idx;
-//
-//         u32 ore_seed = local_seed;
-//         printf("osa%d\n", ore_spawn_amount);
-//         for (int i = 0; i < ore_spawn_amount; ++i) {
-//             ore_seed = next_seed_a(ore_seed);
-//             u8 pos = static_cast<u8>(ore_seed) / 4;
-//             u32 ore_amount = scale_to(ore->amount_variance, ore_seed);
-//             ore_amount = ore->base_amount + ore_amount - ore_amount / 2;
-//
-//             GridTransform world_pos = *chunk_position;
-//             world_pos.x += pos % 8;
-//             world_pos.y += pos / 8;
-//
-//             ChunkSprite s = {
-//                 ORE_TEXTURE_INDEX, ore->color
-//             };
-//
-//             entt::entity ore_entity = registry.create();
-//             registry.emplace<GridTransform>(ore_entity, world_pos);
-//             registry.emplace<ChunkSprite>(ore_entity, s);
-//             registry.emplace<FactoryLayer>(ore_entity, chunk_push_entity(
-//                 chunk, pos, s, ore_entity, registry
-//             ));
-//         }
-//         printf("done\n");
-//     }
-//
-//     return chunk_entity;
-// }
+static void ChunkUpdateEntityHelper(Chunk& storage, u8 position, entt::registry& registry)
+{
+    entt::entity search = storage.top_entity_ids[position];
+    while (registry.valid(search))
+    {
+        FactoryLayer& layer = registry.get<FactoryLayer>(search);
+        if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
+        {
+            storage.cached_sprites[position] = *sp;
+            return;
+        }
 
-FactoryLayer chunk_push_entity(Chunk &storage, u8 position, ChunkSprite sprite, entt::entity e, entt::registry& registry) {
-    auto current_entity = storage.top_entity_ids[position];
-    u8 next_layer = 0;
-    if (static_cast<u32>(current_entity) != 0) {
-        auto& prev_layer = registry.get<FactoryLayer>(current_entity);
-        prev_layer.above = e;
-        next_layer = prev_layer.layer + 1;
+        search = layer.below;
     }
 
-    storage.cached_sprites[position] = sprite;
-    storage.top_entity_ids[position] = e;
-    return {
-        {}, current_entity
-    };
+    storage.cached_sprites[position] = {};
 }
 
-void chunk_pop_entity(Chunk &storage, u8 position, FactoryLayer& layer, entt::registry &registry) {
-    auto underneath = layer.below;
-    if (static_cast<u32>(underneath) != 0) {
-        registry.get<FactoryLayer>(underneath).above = {};
-        storage.cached_sprites[position] = registry.get<ChunkSprite>(underneath);
-        storage.top_entity_ids[position] = underneath;
-    } else {
-        storage.cached_sprites[position] = ChunkSprite {0, RGB15(31,31,31)};
-        storage.top_entity_ids[position] = {};
+static void ChunkOnSpriteDestroyUpdateHelper(entt::entity exclude, Chunk& storage, u8 position, entt::registry& registry)
+{
+    entt::entity search = storage.top_entity_ids[position];
+    while (registry.valid(search))
+    {
+        FactoryLayer& layer = registry.get<FactoryLayer>(search);
+        if (search == exclude)
+        {
+            search = layer.below;
+            continue;
+        }
+
+        if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
+        {
+            storage.cached_sprites[position] = *sp;
+            return;
+        }
+
+        search = layer.below;
+    }
+
+    storage.cached_sprites[position] = {};
+}
+
+static void ChunkRemoveLayer(entt::registry& r, entt::entity entity)
+{
+    GridTransform& grid = r.get<GridTransform>(entity);
+    FactoryLayer& layer = r.get<FactoryLayer>(entity);
+
+    if (r.valid(layer.above))
+    {
+        r.get<FactoryLayer>(layer.above).below = layer.below;
+    }
+    else
+    {
+        // If was topmost, get rid of self
+        entt::entity chunk_e = chunk_lookup.GetChunk(grid);
+        Chunk& chunk = r.get<Chunk>(chunk_e);
+        u8 chunk_grid_pos = grid.CropTo8x8Grid();
+        printf("aa %d, %d\n", chunk.top_entity_ids[chunk_grid_pos], layer.below);
+        chunk.top_entity_ids[chunk_grid_pos] = layer.below;
+    }
+
+    if (r.valid(layer.below))
+    {
+        r.get<FactoryLayer>(layer.below).above = layer.above;
     }
 }
 
-void chunk_update_entity(Chunk &storage, u8 position, entt::registry &registry) {
-    storage.cached_sprites[position] = registry.get<ChunkSprite>(storage.top_entity_ids[position]);
+static void ChunkAddLayerHelper(entt::registry& r, entt::entity entity)
+{
+    GridTransform& grid = r.get<GridTransform>(entity);
+    FactoryLayer* p_layer = r.try_get<FactoryLayer>(entity);
+
+    // Clear if entity was already referring to something
+    FactoryLayer layer;
+    layer.components_dependent_on = 1;
+    if (p_layer)
+    {
+        layer.components_dependent_on = p_layer->components_dependent_on;
+        ChunkRemoveLayer(r, entity);
+    }
+
+    entt::entity chunk_e = chunk_lookup.GetChunk(grid);
+    Chunk& chunk = r.get<Chunk>(chunk_e);
+    u8 chunk_pos = grid.CropTo8x8Grid();
+
+    bool get_last;
+    entt::entity find = chunk.FindEntityByLayer(r, grid, grid.layer, 255, &get_last);
+    if (r.valid(find))
+    {
+        GridTransform find_tr = r.get<GridTransform>(find);
+        FactoryLayer find_fl = r.get<FactoryLayer>(find);
+        // If the search failed, we are given the closest match (above us)
+        if (get_last)
+        {
+            layer.above = find;
+            find_fl.below = entity;
+        } else
+        {
+            assert(find_tr.layer != grid.layer && "Did not check if layer was occupied before placing at layer");
+
+            layer.above = find_fl.above;
+            layer.below = find;
+            find_fl.above = entity;
+
+            if (!r.valid(layer.above))
+            {
+                chunk.top_entity_ids[chunk_pos] = entity;
+            }
+        }
+    }
+    else
+    {
+        chunk.top_entity_ids[chunk_pos] = entity;
+    }
+    r.emplace<FactoryLayer>(entity);
+    ChunkUpdateEntityHelper(chunk, chunk_pos, r);
+}
+
+static void GridTransformRemoveDependents(entt::registry& r, entt::entity entity)
+{
+    if (r.try_get<ChunkSprite>(entity)) r.remove<ChunkSprite>(entity);
+    ChunkRemoveLayer(r, entity);
+}
+
+static void FactoryLayerRemoveDependents(entt::registry& r, entt::entity entity)
+{
+    if (r.try_get<GridTransform>(entity)) r.remove<GridTransform>(entity);
+}
+
+static void UpdateChunkSprite(entt::registry& r, entt::entity entity)
+{
+    if (auto* gt = r.try_get<GridTransform>(entity); gt != nullptr)
+    {
+        Chunk& chunk = r.get<Chunk>(chunk_lookup.GetChunk(*gt));
+        ChunkUpdateEntityHelper(chunk, gt->CropTo8x8Grid(), r);
+    }
+}
+
+static void UpdateChunkSpriteRemove(entt::registry& r, entt::entity entity)
+{
+    if (auto* gt = r.try_get<GridTransform>(entity); gt != nullptr)
+    {
+        Chunk& chunk = r.get<Chunk>(chunk_lookup.GetChunk(*gt));
+        ChunkOnSpriteDestroyUpdateHelper(entity, chunk, gt->CropTo8x8Grid(), r);
+    }
+}
+
+void SetupChunkCallbacks(entt::registry& r)
+{
+    r.on_construct<GridTransform>().connect<ChunkAddLayerHelper>();
+    r.on_update<GridTransform>().connect<ChunkAddLayerHelper>();
+    r.on_destroy<GridTransform>().connect<GridTransformRemoveDependents>();
+
+    r.on_construct<ChunkSprite>().connect<UpdateChunkSprite>();
+    r.on_update<ChunkSprite>().connect<UpdateChunkSprite>();
+    r.on_destroy<ChunkSprite>().connect<UpdateChunkSpriteRemove>();
+
+    r.on_destroy<FactoryLayer>().connect<FactoryLayerRemoveDependents>();
 }
