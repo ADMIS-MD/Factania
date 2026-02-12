@@ -8,10 +8,10 @@
 #include "Camera.h"
 #include "chunk.hpp"
 
-#define TILE_ROWS    1
-#define TILE_COLUMNS 2
+#define TILE_ROWS    2
+#define TILE_COLUMNS 7
 
-#define TILE_SIZE 32
+#define TILE_SIZE 16
 
 extern ChunkLookup chunk_lookup;
 
@@ -30,7 +30,7 @@ namespace core {
     private:
         Camera m_activeCam;
         
-        int tileset_texture_id;
+        int m_tileset_texture_id;
         int scroll_x = 0;
         int scroll_y = 0;
 

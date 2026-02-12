@@ -15,7 +15,7 @@
 #include <chunk.hpp>
 #include <gl2d.h>
 #include "nds.h"
-#include "planet_tiles.h"
+#include "FactaniaSpriteSheet.h"
 #include "entt.hpp"
 #include "Sprite.h"
 #include "Player.h"
@@ -44,24 +44,25 @@ namespace core {
         videoSetMode(MODE_0_3D);
 
         // Setup some memory to be used for textures and for texture palettes
-        vramSetBankA(VRAM_A_TEXTURE_SLOT0);
-        vramSetBankB(VRAM_B_TEXTURE_SLOT1);
+        vramSetBankA(VRAM_A_TEXTURE);
+        vramSetBankB(VRAM_B_TEXTURE);
+        vramSetBankC(VRAM_C_TEXTURE);
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
-        tileset_texture_id = glLoadTileSet(
+        m_tileset_texture_id = glLoadTileSet(
             g_tileset,                                       // glImage array
             TILE_SIZE, TILE_SIZE,                            // tile size
-            TILE_SIZE * TILE_COLUMNS, TILE_SIZE * TILE_ROWS, // bitmap area that contains tiles (2 rows only)
+            TILE_SIZE * TILE_COLUMNS, TILE_SIZE * TILE_ROWS, // bitmap area that contains tiles
             GL_RGB256,                                       // texture type
-            TILE_SIZE * TILE_COLUMNS, TILE_SIZE,             // full VRAM texture size
+            128, 32,                                         // full VRAM texture size
             TEXGEN_TEXCOORD,                                 // texture params
             256,                                             // palette entries
-            planet_tilesPal,                                 // palette
-            planet_tilesBitmap                               // bitmap data
+            FactaniaSpriteSheetPal,                          // palette
+            FactaniaSpriteSheetBitmap                        // bitmap data
         );
 
-        if (tileset_texture_id < 0)
-            printf("Failed to load texture: %d\n", tileset_texture_id);
+        if (m_tileset_texture_id < 0)
+            printf("Failed to load texture: %d\n", m_tileset_texture_id);
 
 
         // Initialize Debug Console (BG0)
@@ -82,7 +83,7 @@ namespace core {
 
     RenderSystem::~RenderSystem()
     {
-        glDeleteTextures(1, &tileset_texture_id);
+        glDeleteTextures(1, &m_tileset_texture_id);
     }
 
     void RenderSystem::Update(entt::registry& registry)
@@ -143,7 +144,7 @@ namespace core {
         fixed x = world.X();
         fixed y = world.Y();
 
-        GridTransform grid {world};
+        GridTransform grid{ world };
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
         entt::entity center = chunk_lookup.GetChunk(pos);
         if (!registry.valid(center))
@@ -155,19 +156,16 @@ namespace core {
         center_chunk.Draw(m_activeCam, pos);
         int xc = pos.x;
         int yc = pos.y;
-        const ChunkPosition transforms[8] = {
-            {static_cast<int16>(xc + 0), static_cast<int16>(yc + 1)},
-            {static_cast<int16>(xc + 1), static_cast<int16>(yc + 1)},
-            {static_cast<int16>(xc + 1), static_cast<int16>(yc + 0)},
-            {static_cast<int16>(xc + 1), static_cast<int16>(yc - 1)},
-            {static_cast<int16>(xc + 0), static_cast<int16>(yc - 1)},
-            {static_cast<int16>(xc - 1), static_cast<int16>(yc - 1)},
-            {static_cast<int16>(xc - 1), static_cast<int16>(yc + 0)},
-            {static_cast<int16>(xc - 1), static_cast<int16>(yc + 1)},
-        };
-        for (int i = 0; i < 8; ++i)
+
+
+        for (int16 i = xc - 1; i <= xc + 2; ++i)
         {
-            registry.get<Chunk>(center_chunk.surrounding_chunks[i]).Draw(m_activeCam, transforms[i]);
+            for (int16 j = yc - 1; j <= yc + 2; ++j)
+            {
+                ChunkPosition p = {i, j};
+                Chunk const& chunk = registry.get<Chunk>(chunk_lookup.GetChunk(p));
+                chunk.Draw(m_activeCam, p);
+            }
         }
 
         // Draw every sprite in Mainscreen
