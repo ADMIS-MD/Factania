@@ -95,9 +95,12 @@ public:
 
 enum class ItemType : int
 {
-    Iron = 0,
-    Copper,
+    IronOre = 0,
+    CopperOre,
+    AdmisiumOre,
     Coal,
+    IronPlate,
+    CopperPlate,
     Count
 };
 
@@ -105,12 +108,18 @@ inline const char* ItemName(ItemType id)
 {
     switch (id)
     {
-    case ItemType::Iron:
-        return "Iron";
-    case ItemType::Copper:
-        return "Copper";
+    case ItemType::IronOre:
+        return "Iron Ore";
+    case ItemType::CopperOre:
+        return "Copper Ore";
     case ItemType::Coal:
-        return "Coal";
+        return "Coal Ore";
+    case ItemType::AdmisiumOre:
+        return "Admisium Ore";
+    case ItemType::IronPlate:
+        return "Iron Plate";
+    case ItemType::CopperPlate:
+        return "Copper Ore";
     default: 
         return "Unknown";
     }

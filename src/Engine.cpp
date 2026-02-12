@@ -145,7 +145,7 @@ namespace core {
             swiWaitForVBlank();
 
             scanKeys();
-            check_debug_menu();
+            //check_debug_menu(); // commenting out for now
 
             Update();
 
