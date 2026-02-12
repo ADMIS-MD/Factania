@@ -66,20 +66,16 @@ namespace core {
         m_systems.push_back(new EntitySystemManager(m_registry));
 
         //temp testing stuff
-        ItemQuantity ironIngot = ItemQuantity(Item(100, "iron_ingot"), 1);
-        ItemQuantity ironPlate = ItemQuantity(Item(101, "air"), 0);
-
         Recipe tempRecipie;
-        tempRecipie.inputItems.push_back(ironPlate);
-        tempRecipie.outputItems.push_back(ironIngot);
+        tempRecipie.inputs.quantities[(int)ItemType::Coal] = 1;
+        tempRecipie.outputs.quantities[(int)ItemType::Iron] = 1;
         tempRecipie.recipeDuration = 1;
 
         std::vector<Recipe> buildingRecipes;
         buildingRecipes.push_back(tempRecipie);
 
         FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
-        ironIngot.quantity = 10;
-        building.InputItems(ironIngot);
+        building.InputItems(ItemType::Coal, 20);
 
         building.status = BuildingStatus::Idle;
 
