@@ -122,7 +122,7 @@ u32 scale_to(u32 max, u32 value) {
     return value / scalar;
 }
 
-#define ORE_TEXTURE_INDEX 1
+#define ORE_TEXTURE_INDEX 8
 
 ChunkPosition ChunkPosition::FromGridTransform(const GridTransform& transform)
 {
