@@ -3,6 +3,7 @@
 
 #include "nds.h"
 #include "Player.h"
+#include "Inventory.h"
 
 #include <chunk.hpp>
 #include <RenderSystem.h>
@@ -34,6 +35,8 @@ const uint16_t Player_texcoords[] = {
      PLAYER_SPR * 2,  PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
      PLAYER_SPR * 3,  PLAYER_SPR * 3, PLAYER_SPR, PLAYER_SPR,
 };
+
+static uint8 miningTimer = 0;
 
 static void LoadPlayerSprite() {
     if (g_playerTexId >= 0) return;
@@ -98,12 +101,22 @@ static inline void SetMode(PlayerState& st, Sprite& sp, Animation& an, PlayerMod
     if (st.mode == newMode) return;
     st.mode = newMode;
 
-    if (newMode == PlayerMode::IDLE) {
+    switch (newMode)
+    {
+    case PlayerMode::IDLE:
         SetAnim(sp, an, 0, 5);
-    }
-    else if (newMode == PlayerMode::MOVING) {
+        break;
+    case PlayerMode::MOVING:
         SetAnim(sp, an, 6, 15);
+        break;
+    case PlayerMode::MINING:
+        SetAnim(sp, an, 0, 5); // until we get something better?
+        break;
+    default:
+        SetAnim(sp, an, 0, 5); // just idle if we don't have something set
+        break;
     }
+
 }
 
 void CreatePlayerComponent(entt::registry& registry)
@@ -117,7 +130,10 @@ void CreatePlayerComponent(entt::registry& registry)
     auto& st = registry.emplace<PlayerState>(entity);
     auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false, false);
     auto& an = registry.emplace<Animation>(entity);
+    auto& inv = registry.emplace<Inventory>(entity);
     registry.emplace<PlayerMove>(entity);
+    inv.AddItem(ItemType::Iron, 5);
+    inv.AddItem(ItemType::Copper, 2);
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);
@@ -179,18 +195,33 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
         {
             // TODO: change to mine or build if key press or something
 
-            if (dir.X() != 0.f || dir.Y() != 0.f) {
+            if (dir.X() != 0.f || dir.Y() != 0.f)
+            {
                 SetMode(st, sp, an, PlayerMode::MOVING);
             }
+
+            if (down & KEY_A)
+            {
+                SetMode(st, sp, an, PlayerMode::MINING);
+            }
+
             break;
         }
 
         case PlayerMode::MOVING:
         {
-            if (dir.X() == 0.f && dir.Y() == 0.f) {
+            if (dir.X() == 0.f && dir.Y() == 0.f)
+            {
                 SetMode(st, sp, an, PlayerMode::IDLE);
                 break;
             }
+
+            // mining should take precedence when moving :3
+            if (down & KEY_A)
+            {
+                SetMode(st, sp, an, PlayerMode::MINING);
+            }
+
 
             // flip sprite
             if (dir.X() < 0.f) {
@@ -221,7 +252,21 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
 
         case PlayerMode::MINING:
         {
-            // TODO
+            if (!(held & KEY_A))
+            {
+                SetMode(st, sp, an, PlayerMode::IDLE);
+                miningTimer = 0;
+                break;
+            }
+
+            miningTimer++; // we know our clock cycle
+
+            if (miningTimer >= 60)
+            {
+                miningTimer = 0;
+                printf("GET IRON.\n");
+            }
+
             break;
         }
 

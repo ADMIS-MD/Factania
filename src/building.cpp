@@ -1,19 +1,6 @@
 #include "building.h"
 #include <iostream>
 
-#define ONE_OVER_SIXTY 0.0166
-
-void TempUpdateBuildings(entt::registry& registry)
-{
-	auto view = registry.view<FactoryBuilding>();
-
-	for (auto entity : view) 
-	{
-		auto& component = view.get<FactoryBuilding>(entity);
-		component.UpdateBuilding(ONE_OVER_SIXTY);
-	}
-}
-
 void FactoryBuilding::UpdateBuilding(float dt)
 {
 	if (status == BuildingStatus::Unpowered || selectedRecipe == -1)
@@ -52,24 +39,26 @@ void FactoryBuilding::UpdateBuilding(float dt)
 
 void FactoryBuilding::SelectRecipe(int recipeNum)
 {
-	if (recipeNum < 0 || recipeNum >= recipes.size()) //check if selecting valid recipe
+	if (!(recipeNum >= 0 && recipeNum <= recipes.size())) //check if selecting valid recipe
 	{
 		return; //out of bounds
 	}
+	
 
 	//output items inside into player inv if any inside
 
 	inputInventoryChanged = true;
 	selectedRecipe = recipeNum;
 
-	for (int i = 0; i < recipes[selectedRecipe].inputItems.size(); i++)
+	inputInventory = recipes[selectedRecipe].inputItems;
+	outputInventory = recipes[selectedRecipe].outputItems;
+	
+	for (int i = 0; i < inputInventory.size(); i++)
 	{
-		inputInventory[i].item = recipes[selectedRecipe].inputItems[i].item;
 		inputInventory[i].quantity = 0;
 	}
-	for (int i = 0; i < recipes[selectedRecipe].outputItems.size(); i++)
+	for (int i = 0; i < outputInventory.size(); i++)
 	{
-		outputInventory[i].item = recipes[selectedRecipe].outputItems[i].item;
 		outputInventory[i].quantity = 0;
 	}
 }
@@ -104,13 +93,29 @@ void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 	{
 		outputInventory[i].quantity += recipe->outputItems[i].quantity;
 	}
-	std::cout << "Factory Output: " << recipe->outputItems[0].quantity << " " << recipe->outputItems[0].item.name;
+	std::cout << "Factory Output: " << outputInventory[0].quantity << " " << recipe->outputItems[0].item.name;
 }
 
 FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_)
 {
 	recipes = recipes_;
+
 	SelectRecipe(selectedRecipe_);
+}
+
+FactoryBuilding::FactoryBuilding(const FactoryBuilding& other)
+{
+	status = other.status;
+	recipes = other.recipes;
+	selectedRecipe = other.selectedRecipe;
+
+	inputs = other.inputs;
+	outputs = other.outputs;
+	inputInventory = other.inputInventory;
+	outputInventory = other.outputInventory;
+
+	craftTimer = 0;
+	inputInventoryChanged = true;
 }
 
 FactoryBuilding::FactoryBuilding()
