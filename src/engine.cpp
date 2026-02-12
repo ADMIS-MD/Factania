@@ -20,6 +20,8 @@
 #include <debug_menu/debug_menu.h>
 #include "test.h"
 #include "save.h"
+#include <dswifi9.h>
+#include <multiplayer/MultiplayerTest.h>
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -27,12 +29,14 @@
 
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Ni�o D�az, 2024-2025
+// SPDX-FileContributor: Antonio Niño Díaz, 2024-2025
 
 // This example shows how to draw a translucent 3D box in which you can see all
 // faces. This is how you would see 3D objects that are translucent, but not
 // fully solid. For example, you could have an empty cube where all the faces
 // are translucent pieces of plastic.
+
+
 
 static void draw_box(float bx_, float by_, float bz_, float ex_, float ey_, float ez_)
 {
@@ -212,7 +216,7 @@ namespace core {
         printf("PAD:     Move\n");
         printf("A,B,X,Y: Rotate\n");
         printf("\n");
-        printf("START:   Exit to loader\n");
+        printf("START:   Multiplaye Test\n");
         printf("SELECT:  Open Debug Menu\n");
         printf("\nPrinting from Engine\n");
     }
@@ -248,7 +252,11 @@ namespace core {
             angle_z -= 3;
 
         if (down & KEY_START)
-            shouldQuit = true;
+			printf("Starting Multiplayer Test2...\n"), startMult();
+        if (keys & KEY_L)
+            z += 0.05;
+        if (keys & KEY_R)
+			z -= 0.05;
     }
 
     void engine::draw()
