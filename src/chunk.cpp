@@ -210,66 +210,73 @@ bool operator==(ChunkPosition const& a, ChunkPosition const& b)
 {
     return a.x == b.x && a.y == b.y;
 }
-//
-// static void ChunkUpdateEntityHelper(Chunk& storage, u8 position, entt::registry& registry)
-// {
-//     entt::entity search = storage.top_entity_ids[position];
-//     while (registry.valid(search))
-//     {
-//         FactoryLayer& layer = registry.get<FactoryLayer>(search);
-//         if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
-//         {
-//             storage.cached_sprites[position] = *sp;
-//             return;
-//         }
-//
-//         search = layer.below;
-//     }
-//
-//     storage.cached_sprites[position] = {};
-// }
-//
-// static void ChunkRemoveLayerHelper1(entt::registry& r, entt::entity entity)
-// {
-//     GridTransform& grid = r.get<GridTransform>(entity);
-//     FactoryLayer& layer = r.get<FactoryLayer>(entity);
-//
-//     if (r.valid(layer.above))
-//     {
-//         r.get<FactoryLayer>(layer.above).below = layer.below;
-//     }
-//     else
-//     {
-//         // If was topmost, get rid of self
-//         entt::entity chunk_e = chunk_lookup.GetChunk(layer.last);
-//         Chunk& chunk = r.get<Chunk>(chunk_e);
-//         u8 chunk_grid_pos = layer.last.CropTo8x8Grid();
-//
-//         chunk.top_entity_ids[chunk_grid_pos] = layer.below;
-//         ChunkUpdateEntityHelper(chunk, chunk_grid_pos, r);
-//     }
-//
-//     if (r.valid(layer.below))
-//     {
-//         r.get<FactoryLayer>(layer.below).above = layer.above;
-//     }
-// }
-//
-// static void ChunkSpriteModificationHelper(entt::registry& r, entt::entity entity);
-//
-// static void ChunkRemoveLayerHelper(entt::registry& r, entt::entity entity)
-// {
-//     ChunkRemoveLayerHelper1(r, entity);
-//     ChunkSpriteModificationHelper(r, entity);
-//     r.erase<FactoryLayer>(entity);
-// }
-//
-// static void ChunkRemoveLayerHelperWithoutFL(entt::registry& r, entt::entity entity)
-// {
-//     ChunkRemoveLayerHelper1(r, entity);
-//     if (r.try_get<ChunkSprite>(entity))
-//         r.erase<ChunkSprite>(entity);
-// }
+
+static void ChunkUpdateEntityHelper(Chunk& storage, u8 position, entt::registry& registry)
+{
+    entt::entity search = storage.top_entity_ids[position];
+    while (registry.valid(search))
+    {
+        FactoryLayer& layer = registry.get<FactoryLayer>(search);
+        if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
+        {
+            storage.cached_sprites[position] = *sp;
+            return;
+        }
+
+        search = layer.below;
+    }
+
+    storage.cached_sprites[position] = {};
+}
+
+static void ChunkOnSpriteDestroyUpdateHelper(entt::entity exclude, Chunk& storage, u8 position, entt::registry& registry)
+{
+    entt::entity search = storage.top_entity_ids[position];
+    while (registry.valid(search))
+    {
+        FactoryLayer& layer = registry.get<FactoryLayer>(search);
+        if (search == exclude)
+        {
+            search = layer.below;
+            continue;
+        }
+
+        if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
+        {
+            storage.cached_sprites[position] = *sp;
+            return;
+        }
+
+        search = layer.below;
+    }
+
+    storage.cached_sprites[position] = {};
+}
+
+static void ChunkRemoveLayer(entt::registry& r, entt::entity entity)
+{
+    GridTransform& grid = r.get<GridTransform>(entity);
+    FactoryLayer& layer = r.get<FactoryLayer>(entity);
+
+    if (r.valid(layer.above))
+    {
+        r.get<FactoryLayer>(layer.above).below = layer.below;
+    }
+    else
+    {
+        // If was topmost, get rid of self
+        entt::entity chunk_e = chunk_lookup.GetChunk(grid);
+        Chunk& chunk = r.get<Chunk>(chunk_e);
+        u8 chunk_grid_pos = grid.CropTo8x8Grid();
+        printf("aa %d, %d\n", chunk.top_entity_ids[chunk_grid_pos], layer.below);
+        chunk.top_entity_ids[chunk_grid_pos] = layer.below;
+    }
+
+    if (r.valid(layer.below))
+    {
+        r.get<FactoryLayer>(layer.below).above = layer.above;
+    }
+}
 
 static void ChunkAddLayerHelper(entt::registry& r, entt::entity entity)
 {
@@ -282,14 +289,12 @@ static void ChunkAddLayerHelper(entt::registry& r, entt::entity entity)
     if (p_layer)
     {
         layer.components_dependent_on = p_layer->components_dependent_on;
-        ChunkRemoveLayerHelper1(r, entity);
+        ChunkRemoveLayer(r, entity);
     }
 
     entt::entity chunk_e = chunk_lookup.GetChunk(grid);
     Chunk& chunk = r.get<Chunk>(chunk_e);
     u8 chunk_pos = grid.CropTo8x8Grid();
-
-    layer.last = grid;
 
     bool get_last;
     entt::entity find = chunk.FindEntityByLayer(r, grid, grid.layer, 255, &get_last);
@@ -324,18 +329,33 @@ static void ChunkAddLayerHelper(entt::registry& r, entt::entity entity)
     ChunkUpdateEntityHelper(chunk, chunk_pos, r);
 }
 
-static void ModfiySpriteLayer(entt::registry r, entt::entity entity)
-{
-}
-
 static void GridTransformRemoveDependents(entt::registry& r, entt::entity entity)
 {
     if (r.try_get<ChunkSprite>(entity)) r.remove<ChunkSprite>(entity);
+    ChunkRemoveLayer(r, entity);
 }
 
 static void FactoryLayerRemoveDependents(entt::registry& r, entt::entity entity)
 {
     if (r.try_get<GridTransform>(entity)) r.remove<GridTransform>(entity);
+}
+
+static void UpdateChunkSprite(entt::registry& r, entt::entity entity)
+{
+    if (auto* gt = r.try_get<GridTransform>(entity); gt != nullptr)
+    {
+        Chunk& chunk = r.get<Chunk>(chunk_lookup.GetChunk(*gt));
+        ChunkUpdateEntityHelper(chunk, gt->CropTo8x8Grid(), r);
+    }
+}
+
+static void UpdateChunkSpriteRemove(entt::registry& r, entt::entity entity)
+{
+    if (auto* gt = r.try_get<GridTransform>(entity); gt != nullptr)
+    {
+        Chunk& chunk = r.get<Chunk>(chunk_lookup.GetChunk(*gt));
+        ChunkOnSpriteDestroyUpdateHelper(entity, chunk, gt->CropTo8x8Grid(), r);
+    }
 }
 
 void SetupChunkCallbacks(entt::registry& r)
@@ -344,9 +364,9 @@ void SetupChunkCallbacks(entt::registry& r)
     r.on_update<GridTransform>().connect<ChunkAddLayerHelper>();
     r.on_destroy<GridTransform>().connect<GridTransformRemoveDependents>();
 
-    r.on_construct<ChunkSprite>().connect<ChunkSpriteModificationHelper>();
-    r.on_update<ChunkSprite>().connect<ChunkSpriteModificationHelper>();
-    r.on_destroy<ChunkSprite>().connect<ChunkSpriteModificationHelper>();
+    r.on_construct<ChunkSprite>().connect<UpdateChunkSprite>();
+    r.on_update<ChunkSprite>().connect<UpdateChunkSprite>();
+    r.on_destroy<ChunkSprite>().connect<UpdateChunkSpriteRemove>();
 
     r.on_destroy<FactoryLayer>().connect<FactoryLayerRemoveDependents>();
 }

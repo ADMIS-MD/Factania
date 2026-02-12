@@ -59,7 +59,6 @@ public:
 };
 
 struct FactoryLayer {
-	GridTransform last;
     entt::entity above = entt::null;
     entt::entity below = entt::null;
 
