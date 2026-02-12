@@ -43,6 +43,13 @@
 // are translucent pieces of plastic.
 
 std::vector<Conveyer*> convTest = InitTest();
+bool drawConsole = false;
+
+static void vblank_handler(void)
+{
+    scanKeys();
+    check_debug_menu();
+}
 
 namespace core {
 
@@ -87,6 +94,8 @@ namespace core {
         m_registry.emplace<FactoryBuilding>(entityLink);
 
         shouldQuit = false;
+
+        irqSet(IRQ_VBLANK, vblank_handler);
     }
 
     Engine::~Engine()
@@ -96,8 +105,6 @@ namespace core {
             delete system;
         }
     }
-
-    bool drawConsole = false;
 
     void Engine::Update()
     {
@@ -140,11 +147,8 @@ namespace core {
             // indepedent from any specific loop. Please correct me if wrong -Nick
             swiWaitForVBlank();
 
-            scanKeys();
-
-            if (drawConsole) {
-                check_debug_menu();
-            }
+            // Now handled in interrupt
+            // scanKeys();
 
             Update();
 

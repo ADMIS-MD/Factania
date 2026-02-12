@@ -54,10 +54,13 @@ set(HEADER_FILES
     src/Item.h
     src/Console.h
     src/debug_menu/DebugLog.h
+        src/debug_menu/stacktrace_debug_menu.cpp
+        src/debug_menu/stacktrace_debug_menu.h
 )
 
 # Create fake executable target
 add_executable(Factania ${SOURCE_FILES} ${HEADER_FILES})
+set_property(TARGET Factania PROPERTY CXX_STANDARD 23)
 
 target_include_directories(Factania PRIVATE
         # Include all sdk header directories

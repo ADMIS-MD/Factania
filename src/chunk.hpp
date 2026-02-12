@@ -20,8 +20,8 @@
 class ChunkLookup;
 
 struct ChunkSprite {
-    u16 tile_pack;
-    rgb color;
+    u16 tile_pack = 0;
+    rgb color = RGB15(31, 31, 31);
 };
 
 struct ChunkPosition
@@ -43,16 +43,28 @@ public:
 	void Draw(Camera const& cam, ChunkPosition pos);
 	static entt::entity MakeChunk(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos);
 	void FillSurrounding(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos);
+	// Searches top down for an entity within the layers provided
+	entt::entity FindEntityByLayer(
+		entt::registry const& r,
+		GridTransform const& tr,
+		u8 begin_layer = 0,
+		u8 end_layer = 255,
+		// If nullptr, ignored. If valid and search failed, will be set to true and entity returned is the closest match
+		bool* get_last = nullptr
+	) const;
 
-	ChunkSprite cached_sprites[64] = { 0 };
-    entt::entity top_entity_ids[64] = { entt::null }; // The topmost object's entity id, if it has an entity on it
-    entt::entity surrounding_chunks[8] = { entt::null }; // In clock order
+	ChunkSprite cached_sprites[64];
+    entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
+    entt::entity surrounding_chunks[8]; // In clock order
 };
 
 struct FactoryLayer {
-    u8 layer;
-    entt::entity above {};
-    entt::entity below {};
+	GridTransform last;
+    entt::entity above = entt::null;
+    entt::entity below = entt::null;
+
+	// Count the number of things that need this structure to auto-remove when required
+	int components_dependent_on = 0;
 };
 
 
@@ -61,13 +73,20 @@ class ChunkLookup {
     std::unordered_map<ChunkPosition, entt::entity, HashForHelper<ChunkPosition>> m_chunks;
 
 public:
-	entt::entity GetChunk(ChunkPosition transform);
-	entt::entity GetChunk(GridTransform transform);
+	entt::entity GetChunk(ChunkPosition transform) const;
+	entt::entity GetChunk(GridTransform transform) const;
+	Chunk& GetChunkObj(entt::registry& r, ChunkPosition transform);
+	Chunk& GetChunkObj(entt::registry& r, GridTransform transform);
+	Chunk const& GetChunkObj(entt::registry const& r, ChunkPosition transform) const;
+	Chunk const& GetChunkObj(entt::registry const& r, GridTransform transform) const;
+	// Search for an entity between the layers provided (inclusive)
+	entt::entity ChunkSearchEntity
+		(entt::registry const& r, GridTransform transform, u8 begin_layer = 0, u8 end_layer = 255);
 
 	friend Chunk;
 };
 
-u32 reinterpret_array_as_u32(u16 arr[2]);
+void SetupChunkCallbacks(entt::registry& r);
 
 struct OreType {
 	u16 spawn_chance;
@@ -106,8 +125,3 @@ T bsearch_T(T value, T const* list, ST size) {
 		return half;
 	}
 }
-
-entt::entity make_chunk(u32 local_seed, GridTransform* chunk_position, OreContext& context, entt::registry& registry);
-FactoryLayer chunk_push_entity(Chunk &storage, u8 position, ChunkSprite sprite, entt::entity e, entt::registry& registry);
-void chunk_pop_entity(Chunk &storage, u8 position, FactoryLayer& layer, entt::registry &registry);
-void chunk_update_entity(Chunk &storage, u8 position, entt::registry &registry);
