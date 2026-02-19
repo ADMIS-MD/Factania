@@ -10,9 +10,10 @@ Chunk::Chunk()
 {
     std::fill(std::begin(top_entity_ids), std::end(top_entity_ids), entt::null);
     std::fill(std::begin(surrounding_chunks), std::end(surrounding_chunks), entt::null);
+    std::fill(std::begin(cached_sprites), std::end(cached_sprites), ChunkSprite{0, RGB15(15, 15, 15)});
 }
 
-void Chunk::Draw(Camera const& cam, ChunkPosition pos) const
+void Chunk::Draw(Camera const& cam, ChunkPosition pos)
 {
     glColor(RGB15(31, 31, 31));
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
@@ -100,9 +101,9 @@ void Chunk::FillSurrounding(ChunkLookup& lookup, entt::registry& registry, Chunk
 {
     int16 xc = pos.x, yc = pos.y;
 
-    for (int16 i = xc - 1; i <= xc + 2; ++i)
+    for (int16 i = xc; i <= xc + 2; ++i)
     {
-        for (int16 j = yc - 1; j <= yc + 2; ++j)
+        for (int16 j = yc; j <= yc + 2; ++j)
         {
             ChunkPosition chp = ChunkPosition {i, j};
             if (!registry.valid(lookup.GetChunk(chp)))
@@ -208,24 +209,26 @@ bool operator==(ChunkPosition const& a, ChunkPosition const& b)
 static void ChunkUpdateEntityHelper(Chunk& storage, u8 position, entt::registry& registry)
 {
     entt::entity search = storage.top_entity_ids[position];
+
     while (registry.valid(search))
     {
         FactoryLayer& layer = registry.get<FactoryLayer>(search);
         if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
         {
-            storage.cached_sprites[position] = *sp;
+            storage.cached_sprites[position]= *sp;
             return;
         }
 
         search = layer.below;
     }
 
-    storage.cached_sprites[position] = {};
+    storage.cached_sprites[position] = {0, RGB15(31, 31, 31)};
 }
 
 static void ChunkOnSpriteDestroyUpdateHelper(entt::entity exclude, Chunk& storage, u8 position, entt::registry& registry)
 {
     entt::entity search = storage.top_entity_ids[position];
+
     while (registry.valid(search))
     {
         FactoryLayer& layer = registry.get<FactoryLayer>(search);
@@ -237,14 +240,14 @@ static void ChunkOnSpriteDestroyUpdateHelper(entt::entity exclude, Chunk& storag
 
         if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
         {
-            storage.cached_sprites[position] = *sp;
+            storage.cached_sprites[position]= *sp;
             return;
         }
 
         search = layer.below;
     }
 
-    storage.cached_sprites[position] = {};
+    storage.cached_sprites[position] = {0, RGB15(31, 31, 31)};
 }
 
 static void ChunkRemoveLayer(entt::registry& r, entt::entity entity)

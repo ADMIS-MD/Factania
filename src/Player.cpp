@@ -171,9 +171,23 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
             ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
             Chunk& chunk = chl.GetChunkObj(registry, chp);
 
-            entt::entity new_obj = registry.create();
-            registry.emplace<ChunkSprite>(new_obj, ChunkSprite { 1, RGB15(15, 15, 0) });
-            registry.emplace<GridTransform>(new_obj, grid);
+            entt::entity parent = registry.create();
+
+            entt::entity e_0 = registry.create();
+            registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
+            registry.emplace<GridTransform>(e_0, grid);
+
+            // entt::entity e_0 = registry.create();
+            // registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
+            // registry.emplace<GridTransform>(e_0, grid);
+            //
+            // entt::entity e_0 = registry.create();
+            // registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
+            // registry.emplace<GridTransform>(e_0, grid);
+            //
+            // entt::entity e_0 = registry.create();
+            // registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
+            // registry.emplace<GridTransform>(e_0, grid);
         }
         if (down & KEY_B)
         {

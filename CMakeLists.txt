@@ -31,6 +31,7 @@ set(SOURCE_FILES
     src/Console.cpp
     src/InventoryDebugSystem.cpp
     src/debug_menu/DebugLog.cpp
+    src/Parent.cpp
 )
 
 set(HEADER_FILES
@@ -59,6 +60,7 @@ set(HEADER_FILES
     src/debug_menu/DebugLog.h
         src/debug_menu/stacktrace_debug_menu.cpp
         src/debug_menu/stacktrace_debug_menu.h
+        src/Parent.h
 )
 
 # Create fake executable target
