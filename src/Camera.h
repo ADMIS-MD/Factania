@@ -29,7 +29,7 @@ private:
 	Vec2 m_eye = { 0.0f , 0.0f };
 	Vec2 m_cachedWorldToCamera = { 0.0f, 0.0f };
 	// Essentially the grid size - defines scale between world position and screen space
-	fixed m_scaleFactor = 32.f;
+	fixed m_scaleFactor = 16.f;
 	Vec2 m_cachedScreenToWorld = { FINT(1) / m_scaleFactor, FINT(1) / m_scaleFactor };
 	Vec2 m_cachedScreenExtent = m_cachedScreenToWorld *  Vec2(FINT(SCREEN_WIDTH), FINT(SCREEN_HEIGHT));
 };

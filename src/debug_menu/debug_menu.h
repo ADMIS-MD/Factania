@@ -73,6 +73,8 @@ private:
     std::vector<DebugNode*> result_page;
 };
 
+__attribute__((noreturn))
+void crash_debug_handler();
 void check_debug_menu();
 void add_debug_node_to_root(DebugNode* node);
 

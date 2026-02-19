@@ -37,6 +37,7 @@ EntitySystemManager::EntitySystemManager(entt::registry& registry)
     const entt::entity entity = registry.create();
     registry.emplace<Transform>(entity);
     registry.emplace<SubSprite>(entity, cursorGfx, 0, SpriteSize_32x32, 32, false, false);
+    SetupChunkCallbacks(registry);
 }
 
 EntitySystemManager::~EntitySystemManager()

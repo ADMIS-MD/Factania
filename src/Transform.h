@@ -28,10 +28,11 @@ struct GridTransform {
     GridTransform& operator=(const GridTransform& other);
     GridTransform& operator=(GridTransform&& other) noexcept;
     GridTransform(Transform const& transform);
-    u8 CropTo8x8Grid();
+    u8 CropTo8x8Grid() const;
 
     int32 x;
     int32 y;
+    u8 layer;
 };
 
 // Positions for anything else

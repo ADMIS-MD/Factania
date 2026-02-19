@@ -4,12 +4,15 @@
 
 #include "debug_menu.h"
 
+#include <Console.h>
+#include <Engine.h>
 #include <nds.h>
 #include <vector>
 
 #include "build_details_menu.h"
 #include "DebugLog.h"
 #include "memory_debug_info.h"
+#include "stacktrace_debug_menu.h"
 
 
 std::vector<DebugNode*> main_nodes = {
@@ -22,6 +25,13 @@ std::vector<DebugNode*> main_nodes = {
             selected = false;
             RunDebugLog();
         }},
+    new FunctionResultNode {
+        []() { return "Stack Trace"; },
+        [](bool& selected)
+        {
+            selected = false;
+            StackTraceDisplay();
+        }}
 };
 
 void add_debug_node_to_root(DebugNode* node) {
@@ -106,9 +116,32 @@ void FunctionResultNode::update(bool &selected) {
         selectedUpdate(selected);
 }
 
+__attribute__((noreturn))
+void crash_debug_handler()
+{
+    ToggleConsole(true);
+    consoleClear();
+    std::vector<DebugState> node_stack {{main_nodes, 0, "!! CRASH !! - Debug Menu"}};
+    bool selected = false;
+
+    debug_print(node_stack, selected);
+
+    while (true) {
+        // scanKeys();
+        debug_print(node_stack, selected);
+
+        if (node_stack.size() == 0)
+            break;
+
+        swiWaitForVBlank();
+    }
+    exit(0);
+}
+
 void check_debug_menu() {
     if (keysDown() & KEY_SELECT) {
-        consoleDebugInit(DebugDevice_NOCASH);
+        bool old_toggle = drawConsole;
+        ToggleConsole(true);
         consoleClear();
 
         std::vector<DebugState> node_stack {{main_nodes, 0, "Debug Menu"}};
@@ -117,7 +150,7 @@ void check_debug_menu() {
         debug_print(node_stack, selected);
 
         while (true) {
-            scanKeys();
+            // scanKeys();
             debug_print(node_stack, selected);
 
             if (node_stack.size() == 0)
@@ -127,6 +160,6 @@ void check_debug_menu() {
         }
 
         consoleClear();
-        consoleDebugInit(DebugDevice_NULL);
+        ToggleConsole(old_toggle);
     }
 };
