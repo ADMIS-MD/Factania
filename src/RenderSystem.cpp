@@ -158,12 +158,12 @@ namespace core {
         int yc = pos.y;
 
 
-        for (int16 i = xc - 1; i <= xc + 2; ++i)
+        for (int16 i = xc; i <= xc + 2; ++i)
         {
-            for (int16 j = yc - 1; j <= yc + 2; ++j)
+            for (int16 j = yc; j <= yc + 2; ++j)
             {
                 ChunkPosition p = {i, j};
-                Chunk const& chunk = registry.get<Chunk>(chunk_lookup.GetChunk(p));
+                Chunk& chunk = registry.get<Chunk>(chunk_lookup.GetChunk(p));
                 chunk.Draw(m_activeCam, p);
             }
         }

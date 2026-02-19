@@ -19,6 +19,7 @@
 
 class ChunkLookup;
 
+constexpr u16 NULL_TILE = 0;
 struct ChunkSprite {
     u16 tile_pack = 0;
     rgb color = RGB15(31, 31, 31);
@@ -41,7 +42,7 @@ class Chunk
 	Chunk();
 
 public:
-	void Draw(Camera const& cam, ChunkPosition pos) const;
+	void Draw(Camera const& cam, ChunkPosition pos);
 	static entt::entity MakeChunk(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos);
 	void FillSurrounding(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos);
 	// Searches top down for an entity within the layers provided
