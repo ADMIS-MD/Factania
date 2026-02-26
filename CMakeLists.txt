@@ -26,6 +26,7 @@ set(SOURCE_FILES
     src/chunk.cpp
     src/Math.cpp
     src/Player.cpp
+    src/Perlin.cpp
     src/Conveyer.cpp
     src/building.cpp
     src/Console.cpp
@@ -52,6 +53,7 @@ set(HEADER_FILES
     src/Transform.cpp
     src/Transform.h
     src/Player.h
+    src/Perlin.h
     src/Sprite.h
     src/Conveyer.h
     src/building.h

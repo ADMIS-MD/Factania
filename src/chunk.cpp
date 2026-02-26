@@ -5,12 +5,15 @@
 #include "Engine.h"
 #include "Sprite.h"
 #include "RenderSystem.h"
+#include <chrono>
 
 Chunk::Chunk()
 {
     std::fill(std::begin(top_entity_ids), std::end(top_entity_ids), entt::null);
     std::fill(std::begin(surrounding_chunks), std::end(surrounding_chunks), entt::null);
     std::fill(std::begin(cached_sprites), std::end(cached_sprites), ChunkSprite{0, RGB15(15, 15, 15)});
+
+    perlin
 }
 
 void Chunk::Draw(Camera const& cam, ChunkPosition pos)
@@ -90,6 +93,10 @@ entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, Chu
             registry.get<Chunk>(c.surrounding_chunks[i]).surrounding_chunks[(i + 4) & 0b0111] = entity;
         }
     }
+
+    fixed scale = 0.04f;
+
+    float value = 
 
     registry.emplace<Chunk>(entity, std::forward<Chunk>(c));
     lookup.m_chunks.insert({pos, entity});
