@@ -1,9 +1,9 @@
 #include "chunk.hpp"
 
-#include <Engine.h>
-#include <Sprite.h>
 #include <nds/arm9/input.h>
 
+#include "Engine.h"
+#include "Sprite.h"
 #include "RenderSystem.h"
 
 Chunk::Chunk()
@@ -262,7 +262,7 @@ static void ChunkRemoveLayer(entt::registry& r, entt::entity entity)
     else
     {
         // If was topmost, get rid of self
-        entt::entity chunk_e = chunk_lookup.GetChunk(grid);
+        entt::entity chunk_e = r.ctx().get<ChunkLookup>().GetChunk(grid);
         Chunk& chunk = r.get<Chunk>(chunk_e);
         u8 chunk_grid_pos = grid.CropTo8x8Grid();
         printf("aa %d, %d\n", chunk.top_entity_ids[chunk_grid_pos], layer.below);
@@ -289,7 +289,7 @@ static void ChunkAddLayerHelper(entt::registry& r, entt::entity entity)
         ChunkRemoveLayer(r, entity);
     }
 
-    entt::entity chunk_e = chunk_lookup.GetChunk(grid);
+    entt::entity chunk_e = r.ctx().get<ChunkLookup>().GetChunk(grid);
     Chunk& chunk = r.get<Chunk>(chunk_e);
     u8 chunk_pos = grid.CropTo8x8Grid();
 
@@ -341,7 +341,7 @@ static void UpdateChunkSprite(entt::registry& r, entt::entity entity)
 {
     if (auto* gt = r.try_get<GridTransform>(entity); gt != nullptr)
     {
-        Chunk& chunk = r.get<Chunk>(chunk_lookup.GetChunk(*gt));
+        Chunk& chunk = r.get<Chunk>(r.ctx().get<ChunkLookup>().GetChunk(*gt));
         ChunkUpdateEntityHelper(chunk, gt->CropTo8x8Grid(), r);
     }
 }
@@ -350,7 +350,7 @@ static void UpdateChunkSpriteRemove(entt::registry& r, entt::entity entity)
 {
     if (auto* gt = r.try_get<GridTransform>(entity); gt != nullptr)
     {
-        Chunk& chunk = r.get<Chunk>(chunk_lookup.GetChunk(*gt));
+        Chunk& chunk = r.get<Chunk>(r.ctx().get<ChunkLookup>().GetChunk(*gt));
         ChunkOnSpriteDestroyUpdateHelper(entity, chunk, gt->CropTo8x8Grid(), r);
     }
 }
