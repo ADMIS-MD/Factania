@@ -73,6 +73,7 @@ namespace core {
         m_systems.push_back(new EntitySystemManager(m_registry));
 
         //temp testing stuff
+        //std::vector<Conveyer*> convTest = InitTest();
         Recipe tempRecipie;
         tempRecipie.inputs.quantities[(int)ItemType::Coal] = 1;
         tempRecipie.outputs.quantities[(int)ItemType::Iron] = 1;
@@ -86,8 +87,13 @@ namespace core {
 
         building.status = BuildingStatus::Idle;
 
+		//convTest[0]->inputs[0] = &building;
+
         const entt::entity entityLink = m_registry.create();
         m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
+        //if (auto* convBuilding = dynamic_cast<FactoryBuilding*>(convTest[0])) {
+        //    m_registry.emplace<FactoryBuilding>(entityLink, *convBuilding);
+        //}
         //end of testing stuffs
 
         shouldQuit = false;

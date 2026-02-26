@@ -56,6 +56,7 @@ set(HEADER_FILES
     src/Item.h
     src/Console.h
     src/Inventory.h
+    src/ItemType.h
     src/InventoryDebugSystem.h
     src/debug_menu/DebugLog.h
         src/debug_menu/stacktrace_debug_menu.cpp

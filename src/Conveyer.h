@@ -5,8 +5,8 @@ class Conveyer : public ItemBuilding
 {
 public:
 	int id = 0;
-	bool TakeItems() override;
-	bool InputItems(ItemQuantity items) override;
+	bool TakeItems();
+	bool InputItems(ItemType items, int count) override;
 	void UpdateBuilding(float dt) override;
 };
 
