@@ -20,7 +20,7 @@ void Parent::AttachEntities(entt::registry& registry, entt::entity parent, entt:
     registry.emplace<Parent>(child, std::forward<Parent>(Parent {parent}));
 
     if (children_c == nullptr)
-        registry.emplace<Children>(parent, child);
+        registry.emplace<Children>(parent, std::forward<Children>(Children{child}));
     else
     {
         assert(children_c->GetChildCount() < MAX_CHILD_COUNT);
