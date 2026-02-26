@@ -13,6 +13,7 @@
 #include "EntitySystemManager.h"
 
 #include <nds.h>
+#include <Parent.h>
 
 #include "Player.h"
 #include "Transform.h"
@@ -39,6 +40,7 @@ EntitySystemManager::EntitySystemManager(entt::registry& registry)
     registry.emplace<Transform>(entity);
     registry.emplace<SubSprite>(entity, cursorGfx, 0, SpriteSize_32x32, 32, false, false);
     SetupChunkCallbacks(registry);
+    setup_parents(registry);
 }
 
 EntitySystemManager::~EntitySystemManager()

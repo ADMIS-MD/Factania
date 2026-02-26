@@ -10,7 +10,6 @@ Chunk::Chunk()
 {
     std::fill(std::begin(top_entity_ids), std::end(top_entity_ids), entt::null);
     std::fill(std::begin(surrounding_chunks), std::end(surrounding_chunks), entt::null);
-    std::fill(std::begin(cached_sprites), std::end(cached_sprites), ChunkSprite{0, RGB15(15, 15, 15)});
 }
 
 void Chunk::Draw(Camera const& cam, ChunkPosition pos)
