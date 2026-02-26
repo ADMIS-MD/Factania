@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by willb on 1/20/2026.
 //
 
@@ -35,6 +35,10 @@ public:
     fixed Sqrt();
     void SqrtAsynch();
     static fixed SqrtAsynchResult();
+
+    // Math helpers
+    static fixed Abs(fixed v);
+    static int32 Floor(const fixed& v);
 
     fixed& operator+=(const fixed& f);
     fixed& operator-=(const fixed& f);

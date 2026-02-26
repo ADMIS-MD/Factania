@@ -12,15 +12,16 @@
 
 #include "EntitySystemManager.h"
 
-#include "Player.h"
+#include <nds.h>
 
+#include "Player.h"
 #include "Transform.h"
 #include "Sprite.h"
 #include "InventoryDebugSystem.h"
-#include "cursor.h"
 #include "building.h"
-#include <nds.h>
-#include <RenderSystem.h>
+#include "Pause.h"
+
+#include "cursor.h"
 
 //-----------------------------------------------------------------------------
 //	Methods
@@ -47,8 +48,11 @@ EntitySystemManager::~EntitySystemManager()
 
 void EntitySystemManager::Update(entt::registry& registry)
 {
-  UpdateInventoryDebug(registry);
-	UpdatePlayerComponent(registry, chunk_lookup);
+    if (registry.ctx().get<PauseControl>().PauseEntity()) {
+        return;
+    }
+    UpdateInventoryDebug(registry);
+	UpdatePlayerComponent(registry, registry.ctx().get<ChunkLookup>());
 
     auto factoryBuildingView = registry.view<FactoryBuilding>();
 
