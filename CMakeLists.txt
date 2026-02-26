@@ -64,9 +64,9 @@ set(HEADER_FILES
     src/BuildMode.h
     src/Pause.h
     src/debug_menu/DebugLog.h
-        src/debug_menu/stacktrace_debug_menu.cpp
-        src/debug_menu/stacktrace_debug_menu.h
-        src/Parent.h
+    src/debug_menu/stacktrace_debug_menu.cpp
+    src/debug_menu/stacktrace_debug_menu.h
+    src/Parent.h
 )
 
 # Create fake executable target

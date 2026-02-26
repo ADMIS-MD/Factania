@@ -59,7 +59,6 @@ public:
 	ChunkSprite cached_sprites[64];
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
     entt::entity surrounding_chunks[8]; // In clock order
-	Perlin perlin;
 };
 
 struct FactoryLayer {

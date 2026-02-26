@@ -12,7 +12,14 @@
 
 #include "Perlin.h"
 #include <numeric>
+#include <algorithm>
 #include <random>
+
+//-----------------------------------------------------------------------------
+//	Globals
+//-----------------------------------------------------------------------------
+
+Perlin g_perlin;
 
 //-----------------------------------------------------------------------------
 //	Helpers
@@ -44,9 +51,14 @@ static float Gradient(int hash, float x, float y)
 //	Methods
 //-----------------------------------------------------------------------------
 
-Perlin::Perlin(unsigned seed)
+Perlin::Perlin()
 {
-	m_permutationTable.resize(128);
+
+}
+
+void Perlin::Seed(unsigned seed)
+{
+	m_permutationTable.resize(256);
 	std::iota(m_permutationTable.begin(), m_permutationTable.end(), 0);
 
 	std::mt19937 rng(seed);
