@@ -66,6 +66,8 @@ static inline bool CheckCollision(entt::registry const& r, const Vec2& pos)
     consoleClear();
     printf("%d, %d\n", playerTileX, playerTileY);
 
+    if (keysHeld() & )
+
     for (int indexX = -1; indexX <= 1; ++indexX) {
         for (int indexY = -1; indexY <= 1; ++indexY) {
             int checkX = playerTileX + indexX;
