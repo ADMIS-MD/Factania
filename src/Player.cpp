@@ -6,8 +6,8 @@
 #include "Inventory.h"
 
 #include <chunk.hpp>
-#include <RenderSystem.h>
 
+#include "RenderSystem.h"
 #include "Transform.h"
 #include "Sprite.h"
 #include "player_sprite.h"
@@ -72,7 +72,7 @@ static inline bool CheckCollision(entt::registry const& r, const Vec2& pos)
             int checkY = playerTileY + indexY;
 
             GridTransform t = {checkX, checkY};
-            Chunk const& c = r.get<Chunk>(chunk_lookup.GetChunk(t));
+            Chunk const& c = r.get<Chunk>(r.ctx().get<ChunkLookup>().GetChunk(t));
             if (c.top_entity_ids[t.CropTo8x8Grid()] == entt::null)
                 continue;
 

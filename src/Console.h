@@ -5,8 +5,9 @@
 
 #include "nds.h"
 
-extern PrintConsole g_console;
-
 void ConsoleInit();
 
+bool ConsoleVisible();
+
 void ToggleConsole(bool drawConsole);
+void ConsoleTick();

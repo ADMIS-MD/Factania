@@ -7,7 +7,7 @@ namespace core {
     class System
     {
     public:
-        ~System() {}
+        virtual ~System() = default;
 
         virtual void Update(entt::registry& registry) {}
         virtual void Draw(entt::registry& registry) {}

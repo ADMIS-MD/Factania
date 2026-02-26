@@ -12,22 +12,21 @@
 
 #include "Engine.h"
 
-#include "RenderSystem.h"
-#include "EntitySystemManager.h"
-
 #include <errno.h>
 #include <dlfcn.h>
-#include <Math.h>
 #include <stdio.h>
 #include <nds.h>
 #include <fat.h> 
 
 #include <debug_menu/debug_menu.h>
-#include "Player.h"
-#include "Conveyer.h"
-
-#include "building.h"
+#include "RenderSystem.h"
+#include "EntitySystemManager.h"
 #include "Console.h"
+#include "Pause.h"
+#include "Player.h"
+#include "Math.h"
+#include "Conveyer.h"
+#include "building.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -42,14 +41,8 @@
 // fully solid. For example, you could have an empty cube where all the faces
 // are translucent pieces of plastic.
 
+// Test code? might have to remove later
 std::vector<Conveyer*> convTest = InitTest();
-bool drawConsole = false;
-
-static void vblank_handler(void)
-{
-    scanKeys();
-    check_debug_menu();
-}
 
 namespace core {
 
@@ -72,7 +65,11 @@ namespace core {
         m_systems.push_back(new RenderSystem());
         m_systems.push_back(new EntitySystemManager(m_registry));
 
+        m_registry.ctx().emplace<PauseControl>();
+        m_registry.ctx().emplace<ChunkLookup>();
+
         //temp testing stuff
+        //std::vector<Conveyer*> convTest = InitTest();
         Recipe tempRecipie;
         tempRecipie.inputs.quantities[(int)ItemType::Coal] = 1;
         tempRecipie.outputs.quantities[(int)ItemType::Iron] = 1;
@@ -86,13 +83,14 @@ namespace core {
 
         building.status = BuildingStatus::Idle;
 
+		//convTest[0]->inputs[0] = &building;
+
         const entt::entity entityLink = m_registry.create();
         m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
+        //if (auto* convBuilding = dynamic_cast<FactoryBuilding*>(convTest[0])) {
+        //    m_registry.emplace<FactoryBuilding>(entityLink, *convBuilding);
+        //}
         //end of testing stuffs
-
-        shouldQuit = false;
-
-        irqSet(IRQ_VBLANK, vblank_handler);
     }
 
     Engine::~Engine()
@@ -105,24 +103,30 @@ namespace core {
 
     void Engine::Update()
     {
-        for (auto system : m_systems)
-        {
-            system->Update(m_registry);
-        }
-
         // because i dont have a better place to put it for testing :)
         uint16_t up = keysUp();
 		uint16_t down = keysDown();
 
-        if (up & KEY_START)
-            shouldQuit = true;
+        if (up & KEY_START) {
+            m_registry.ctx().get<PauseControl>().pause = !m_registry.ctx().get<PauseControl>().pause;
+        }
+
         if (down & KEY_A) {
             convTest[2]->UpdateBuilding(1.0f);
         }
 
         if ((up & KEY_L) || (up & KEY_R)) {
-            drawConsole = !drawConsole;
-            ToggleConsole(drawConsole);
+            if (ConsoleVisible()) {
+                ToggleConsole(false);
+            }
+            else {
+                ToggleConsole(true);
+            }
+        }
+
+        for (auto system : m_systems)
+        {
+            system->Update(m_registry);
         }
     }
 
@@ -142,8 +146,8 @@ namespace core {
             // indepedent from any specific loop. Please correct me if wrong -Nick
             swiWaitForVBlank();
 
-            // Now handled in interrupt
-            // scanKeys();
+            scanKeys();
+            check_debug_menu();
 
             Update();
 
@@ -152,9 +156,6 @@ namespace core {
             Draw();
 
             EndFrame();
-
-            if (shouldQuit)
-                break;
         }
     }
 }

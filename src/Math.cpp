@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by willb on 1/20/2026.
 //
 
@@ -79,6 +79,23 @@ void fixed::SqrtAsynch()
 fixed fixed::SqrtAsynchResult()
 {
     return FromFixed(sqrtf32_result());
+}
+
+fixed fixed::Abs(fixed v)
+{
+    if (v.m_value < 0)
+        v.m_value = -v.m_value;
+    return v;
+}
+
+int32 fixed::Floor(const fixed& v)
+{
+    const int32 raw = v.m_value;
+    if (raw >= 0)
+        return raw >> FIXED_POINT_LOC;
+
+    const int32 mask = (1 << FIXED_POINT_LOC) - 1;
+    return -(((-raw) + mask) >> FIXED_POINT_LOC);
 }
 
 fixed& fixed::operator+=(const fixed& f)

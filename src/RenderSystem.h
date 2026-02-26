@@ -7,13 +7,13 @@
 
 #include "Camera.h"
 #include "chunk.hpp"
+#include "Math.h"
+
+#include "BuildMode.h"
 
 #define TILE_ROWS    2
 #define TILE_COLUMNS 7
-
-#define TILE_SIZE 16
-
-extern ChunkLookup chunk_lookup;
+#define TILE_SIZE    16
 
 namespace core {
 
@@ -27,17 +27,21 @@ namespace core {
 
         void Update(entt::registry& registry) override;
         void Draw(entt::registry& registry) override;
+
+        bool IsTransitioning() const;
+
     private:
         Camera m_activeCam;
-        
+
+        BuildMode m_buildMode;
+
         int m_tileset_texture_id;
         int scroll_x = 0;
         int scroll_y = 0;
 
-        ChunkLookup cl;
-
         int frameCount = 0;
         int ticksPerFrame = 6;
+
     };
 
     void BeginFrame();

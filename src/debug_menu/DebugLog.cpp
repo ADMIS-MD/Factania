@@ -9,10 +9,8 @@ void RunDebugLog()
 {
     while (true)
     {
-        // scanKeys();
+        scanKeys();
         if (keysDown() & KEY_B)
             break;
-
-
     }
 }

@@ -4,7 +4,8 @@
 #include <vector>
 #include "Item.h"
 #include <entt.hpp>
-#include "Inventory.h";
+#include "Inventory.h"
+
 enum class BuildingType {
     None,
     Source,
