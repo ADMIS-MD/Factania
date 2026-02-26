@@ -116,8 +116,8 @@ namespace core {
         oamUpdate(&oamSub);
 
         if (registry.ctx().get<PauseControl>().pause) {
-            setBrightness(1, -8);
-            setBrightness(2, -8);
+            setBrightness(1, -4);
+            setBrightness(2, -4);
             return;
         }
         else {
