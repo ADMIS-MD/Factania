@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //
-//	File:   RenderSystem.cpp
+//  File:   RenderSystem.cpp
 //  Author: Nicholas Brennan
 //  Date:   01/20/2026
 //
@@ -10,18 +10,18 @@
 //	Includes
 //-----------------------------------------------------------------------------
 
-#include "RenderSystem.h"
-
 #include <chunk.hpp>
 #include <gl2d.h>
-#include "nds.h"
-#include "FactaniaSpriteSheet.h"
-#include "entt.hpp"
-#include "Sprite.h"
+#include <nds.h>
+#include <entt.hpp>
+
+#include "RenderSystem.h"
 #include "Player.h"
-#include "BG.h"
+#include "Sprite.h"
+#include "Pause.h"
 #include "Console.h"
 
+#include "FactaniaSpriteSheet.h"
 
 //-----------------------------------------------------------------------------
 //	Defines
@@ -31,8 +31,6 @@
 //	Method Implementations
 //-----------------------------------------------------------------------------
 
-ChunkLookup chunk_lookup;
-
 namespace core {
 
     // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/tileset_background/source/main.c
@@ -41,12 +39,17 @@ namespace core {
     {
         glScreen2D();
 
-        videoSetMode(MODE_0_3D);
+        // Main (top)
+        videoSetMode(MODE_0_3D
+            | DISPLAY_BG0_ACTIVE
+            | DISPLAY_BG1_ACTIVE
+            | DISPLAY_BG2_ACTIVE
+            | DISPLAY_SPR_ACTIVE
+            | DISPLAY_SPR_1D_BMP
+            | DISPLAY_SPR_1D_SIZE_128);
 
-        // Setup some memory to be used for textures and for texture palettes
+        // 3D textures
         vramSetBankA(VRAM_A_TEXTURE);
-        vramSetBankB(VRAM_B_TEXTURE);
-        vramSetBankC(VRAM_C_TEXTURE);
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
         m_tileset_texture_id = glLoadTileSet(
@@ -64,113 +67,158 @@ namespace core {
         if (m_tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", m_tileset_texture_id);
 
+        // Main OAM (used by build-mode captured overlay)
+        oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
 
-        // Initialize Debug Console (BG0)
+        // Debug console (BG0) under main screen
         ConsoleInit();
 
-        // Bottom Screen Init
-        videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_1D_SIZE_64);
+        // Sub (bottom)
+        videoSetModeSub(MODE_5_2D
+            | DISPLAY_BG3_ACTIVE
+            | DISPLAY_SPR_ACTIVE
+            | DISPLAY_SPR_1D_BMP
+            | DISPLAY_SPR_1D_SIZE_128);
+
+        // Pause image load
+        vramSetBankB(VRAM_B_MAIN_SPRITE_0x06400000);
+        PauseUI::PauseImageInit();
+
+        // Bank B is for captureing
+        vramSetBankB(VRAM_B_LCD);
         vramSetBankC(VRAM_C_SUB_BG);
         vramSetBankD(VRAM_D_SUB_SPRITE);
-        oamInit(&oamSub, SpriteMapping_1D_64, false);
 
-        // BG3 bitmap
-        int bg3 = bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 4, 0);
-        u16* bgGfx = bgGetGfxPtr(bg3);
-        dmaCopy(BGBitmap, bgGfx, BGBitmapLen);
-        dmaCopy(BGPal, BG_PALETTE_SUB, BGPalLen);
+        oamInit(&oamSub, SpriteMapping_Bmp_1D_128, false);
+
+        oamClear(&oamMain, 0, 128);
+        oamClear(&oamSub, 0, 128);
+
+        // BuildMode initialization
+        m_buildMode.Init();
     }
 
     RenderSystem::~RenderSystem()
     {
+        setBrightness(1, 0);
         glDeleteTextures(1, &m_tileset_texture_id);
+    }
+
+    bool RenderSystem::IsTransitioning() const
+    {
+        return m_buildMode.IsTransitioning();
     }
 
     void RenderSystem::Update(entt::registry& registry)
     {
-        frameCount++;
-        if (frameCount >= ticksPerFrame) {
-            frameCount = 0;
-            auto view = registry.view<Sprite, Animation>();
+        // OAM commits once per frame
+        oamUpdate(&oamMain);
+        oamUpdate(&oamSub);
+
+        if (registry.ctx().get<PauseControl>().pause) {
+            setBrightness(1, -4);
+            setBrightness(2, -4);
+            return;
+        }
+        else {
+            setBrightness(1, m_buildMode.GetFlashLevel());
+            setBrightness(2, 0);
+        }
+
+        // Build mode update
+        m_buildMode.Update(registry, m_activeCam);
+
+        if (m_buildMode.IsTransitioning()) {
+            registry.ctx().get<PauseControl>().transition = true;
+        }
+        else {
+            registry.ctx().get<PauseControl>().transition = false;
+            // Previous update logic
+            frameCount++;
+            if (frameCount >= ticksPerFrame) {
+                frameCount = 0;
+                auto view = registry.view<Sprite, Animation>();
+                for (auto e : view) {
+                    auto& sp = view.get<Sprite>(e);
+                    auto& an = view.get<Animation>(e);
+                    sp.spriteID++;
+                    if (sp.spriteID > an.end) sp.spriteID = an.start;
+                }
+            }
+
+            const Vec2 screenCenterOffset = m_activeCam.ScreenSpaceExtent() * FFLOAT(.5f);
+            Vec2 camPos = m_activeCam.GetPos();
+
+            // Techincally the same lol
+            const Vec2& boxSize = screenCenterOffset;
+            const Vec2 boxHalfSize = boxSize * FFLOAT(.5f);
+
+
+            const fixed left = boxHalfSize.X() + camPos.X();
+            const fixed right = boxSize.X() + boxHalfSize.X() + camPos.X();
+            const fixed top = boxHalfSize.Y() + camPos.Y();
+            const fixed bottom = boxSize.Y() + boxHalfSize.Y() + camPos.Y();
+
+            auto view = registry.view<PlayerState, Transform>();
             for (auto e : view) {
-                auto& sp = view.get<Sprite>(e);
-                auto& an = view.get<Animation>(e);
-                sp.spriteID++;
-                if (sp.spriteID > an.end) sp.spriteID = an.start;
+                auto& tr = view.get<Transform>(e);
+
+                if (tr.pos.X() < left) {
+                    camPos.X() += tr.pos.X() - left;
+                }
+                else if (tr.pos.X() > right) {
+                    camPos.X() += tr.pos.X() - right;
+                }
+
+                if (tr.pos.Y() < top) {
+                    camPos.Y() += tr.pos.Y() - top;
+                }
+                else if (tr.pos.Y() > bottom) {
+                    camPos.Y() += tr.pos.Y() - bottom;
+                }
+                m_activeCam.SetPos(camPos);
+                break;
             }
         }
 
-        const Vec2 screenCenterOffset = m_activeCam.ScreenSpaceExtent() * FFLOAT(.5f);
-        Vec2 camPos = m_activeCam.GetPos();
-
-        // Techincally the same lol
-        const Vec2& boxSize = screenCenterOffset;
-        const Vec2 boxHalfSize = boxSize * FFLOAT(.5f);
-
-
-        const fixed left = boxHalfSize.X() + camPos.X();
-        const fixed right = boxSize.X() + boxHalfSize.X() + camPos.X();
-        const fixed top = boxHalfSize.Y() + camPos.Y();
-        const fixed bottom = boxSize.Y() + boxHalfSize.Y() + camPos.Y();
-
-        auto view = registry.view<PlayerState, Transform>();
-        for (auto e : view) {
-            auto& tr = view.get<Transform>(e);
-
-            if (tr.pos.X() < left) {
-                camPos.X() += tr.pos.X() - left;
-            }
-            else if (tr.pos.X() > right) {
-                camPos.X() += tr.pos.X() - right;
-            }
-
-            if (tr.pos.Y() < top) {
-                camPos.Y() += tr.pos.Y() - top;
-            }
-            else if (tr.pos.Y() > bottom) {
-                camPos.Y() += tr.pos.Y() - bottom;
-            }
-
-            m_activeCam.SetPos(camPos);
-            break;
-        }
-
+        ConsoleTick();
         bgUpdate();
     }
 
     void RenderSystem::Draw(entt::registry& registry)
     {
         Vec2 world = m_activeCam.GetPos();
-        fixed x = world.X();
-        fixed y = world.Y();
+
+        auto& lookup = registry.ctx().get<ChunkLookup>();
 
         GridTransform grid{ world };
         ChunkPosition pos = ChunkPosition::FromGridTransform(grid);
-        entt::entity center = chunk_lookup.GetChunk(pos);
-        if (!registry.valid(center))
-        {
-            center = Chunk::MakeChunk(chunk_lookup, registry, pos);
-        }
-        Chunk& center_chunk = registry.get<Chunk>(center);
-        center_chunk.FillSurrounding(chunk_lookup, registry, pos);
-        center_chunk.Draw(m_activeCam, pos);
-        int xc = pos.x;
-        int yc = pos.y;
+        entt::entity center = lookup.GetChunk(pos);
 
+        // Don't touch chunk if paused
+        if (registry.valid(center) || !registry.ctx().get<PauseControl>().PauseEntity()) {
+            if (!registry.valid(center)) {
+                center = Chunk::MakeChunk(lookup, registry, pos);
+            }
+            Chunk& center_chunk = registry.get<Chunk>(center);
+            if (!registry.ctx().get<PauseControl>().PauseEntity()) {
+                center_chunk.FillSurrounding(lookup, registry, pos);
+            }
 
-        for (int16 i = xc; i <= xc + 2; ++i)
-        {
-            for (int16 j = yc; j <= yc + 2; ++j)
-            {
-                ChunkPosition p = {i, j};
-                Chunk& chunk = registry.get<Chunk>(chunk_lookup.GetChunk(p));
-                chunk.Draw(m_activeCam, p);
+            for (int16 i = pos.x; i <= pos.x + 2; ++i) {
+                for (int16 j = pos.y; j <= pos.y + 2; ++j) {
+                    ChunkPosition p{ i, j };
+                    entt::entity e = lookup.GetChunk(p);
+                    if (!registry.valid(e)) continue;
+                    registry.get<Chunk>(e).Draw(m_activeCam, p);
+                }
             }
         }
 
-        // Draw every sprite in Mainscreen
+        // Draw every sprite in Main screen
         auto view = registry.view<Sprite, Transform>();
-        for (auto spriteEntts : view) {
+        for (auto spriteEntts : view)
+        {
             auto& sp = view.get<Sprite>(spriteEntts);
             if (sp.hide == true) continue;
 
@@ -179,9 +227,11 @@ namespace core {
             wtc += sp.camDrawOffset;
 
             int flip = sp.xFlip ? GL_FLIP_H : GL_FLIP_NONE;
-
             glSprite(wtc.X().GetInt(), wtc.Y().GetInt(), flip, &sp.sprite[sp.spriteID]);
         }
+
+        // Build-mode captured overlay on Main screen
+        m_buildMode.DrawMainOverlay();
 
         // Draw every sprite in Subscreen
         auto viewSub = registry.view<SubSprite, Transform>();
@@ -208,7 +258,24 @@ namespace core {
                 false
             );
         }
-        oamUpdate(&oamSub);
+
+        // Build mode capture on Sub screen
+        m_buildMode.DrawSubOverlay();
+
+        // Pause UI
+        if (!registry.ctx().get<PauseControl>().pause) {
+            PauseUI::HidePauseObj();
+            return;
+        }
+
+        if (m_buildMode.IsBankBCapture()) {
+            PauseUI::HidePauseObj();
+            PauseUI::DrawPauseSpr();
+            m_buildMode.SkipCapture();
+        }
+        else {
+            PauseUI::DrawPauseObj();
+        }
     }
 
     void BeginFrame()

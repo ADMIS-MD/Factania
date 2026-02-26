@@ -4,16 +4,15 @@
 
 #include "debug_menu.h"
 
-#include <Console.h>
-#include <Engine.h>
 #include <nds.h>
 #include <vector>
 
+#include "Console.h"
+#include "Engine.h"
 #include "build_details_menu.h"
 #include "DebugLog.h"
 #include "memory_debug_info.h"
 #include "stacktrace_debug_menu.h"
-
 
 std::vector<DebugNode*> main_nodes = {
     new SubmenuDebugNode{"Memory Info", memory_info_debug_page},
@@ -127,39 +126,40 @@ void crash_debug_handler()
     debug_print(node_stack, selected);
 
     while (true) {
-        // scanKeys();
+        scanKeys();
         debug_print(node_stack, selected);
+
+        swiWaitForVBlank();
+        ConsoleTick();
 
         if (node_stack.size() == 0)
             break;
-
-        swiWaitForVBlank();
     }
     exit(0);
 }
 
 void check_debug_menu() {
-    if (keysDown() & KEY_SELECT) {
-        bool old_toggle = drawConsole;
-        ToggleConsole(true);
-        consoleClear();
+    if (ConsoleVisible()) {
+        if (keysDown() & KEY_SELECT) {
+            consoleClear();
 
-        std::vector<DebugState> node_stack {{main_nodes, 0, "Debug Menu"}};
-        bool selected = false;
+            std::vector<DebugState> node_stack{ {main_nodes, 0, "Debug Menu"} };
+            bool selected = false;
 
-        debug_print(node_stack, selected);
-
-        while (true) {
-            // scanKeys();
             debug_print(node_stack, selected);
 
-            if (node_stack.size() == 0)
-                break;
+            while (true) {
+                scanKeys();
+                debug_print(node_stack, selected);
 
-            swiWaitForVBlank();
+                swiWaitForVBlank();
+                ConsoleTick();
+
+                if (node_stack.size() == 0)
+                    break;
+            }
+
+            consoleClear();
         }
-
-        consoleClear();
-        ToggleConsole(old_toggle);
     }
 };

@@ -32,6 +32,8 @@ set(SOURCE_FILES
     src/InventoryDebugSystem.cpp
     src/debug_menu/DebugLog.cpp
     src/Parent.cpp
+    src/BuildMode.cpp
+    src/Pause.cpp
 )
 
 set(HEADER_FILES
@@ -58,6 +60,8 @@ set(HEADER_FILES
     src/Inventory.h
     src/ItemType.h
     src/InventoryDebugSystem.h
+    src/BuildMode.h
+    src/Pause.h
     src/debug_menu/DebugLog.h
         src/debug_menu/stacktrace_debug_menu.cpp
         src/debug_menu/stacktrace_debug_menu.h
