@@ -119,7 +119,7 @@ inline const char* ItemName(ItemType id)
     case ItemType::IronPlate:
         return "Iron Plate";
     case ItemType::CopperPlate:
-        return "Copper Ore";
+        return "Copper Plate";
     default: 
         return "Unknown";
     }
