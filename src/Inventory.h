@@ -27,12 +27,18 @@ inline const char* InventoryTagName(InventoryTag tag)
 struct Inventory
 {
 	static constexpr int MAX_ITEMS = (int)ItemType::Count;
-	static constexpr int UNLIMITED = -1;
+	static constexpr int UNLIMITED = -1; // no cap 
 
 	int quantities[MAX_ITEMS] = { 0 };
 	int capacity = UNLIMITED; // total item cap across all types
 	InventoryTag tag = InventoryTag::Generic;
 
+	/*
+	*	How to use:
+	*	Inventory() -> generic, unlimited
+	*   Inventory(InventoryTag::Player, 100) -> player inventory, capped at 100
+	*   Inventory(InventoryTag::Building) -> building inventory, unlimited
+	*/
 	Inventory() = default;
 	explicit Inventory(InventoryTag tag_, int capacity_ = UNLIMITED) : capacity(capacity_), tag(tag_) {}
 
@@ -56,12 +62,26 @@ struct Inventory
 
 	bool AddItem(ItemType type, int amount = 1)
 	{
+		if (amount <= 0)
+		{
+			return false;
+		}
+		if (!CanAdd(amount))
+		{
+			return false;
+		}
+
 		quantities[(int)type] += amount;
 		return true;
 	}
 
 	bool RemoveItem(ItemType type, int amount = 1)
 	{
+		if (amount <= 0)
+		{
+			return false;
+		}
+
 		int& quant = quantities[(int)type];
 		if (quant < amount)
 		{
@@ -102,9 +122,22 @@ struct Inventory
 	// returns how much was actually moved
 	int TransferTo(Inventory& target, ItemType type, int amount = 1)
 	{
+		if (amount <= 0)
+		{
+			return 0;
+		}
+
 		int available = GetItem(type);
+		// check what would be smaller, the amount we want, or the total amount of said item from other inventory
 		int toMove = (amount < available) ? amount : available;
+
+		if (toMove <= 0)
+		{
+			return 0;
+		}
+
 		
+		// this clamps it, we check how much space is leftover, and only take what we can
 		if (!target.CanAdd(toMove))
 		{
 			int space = (target.capacity == UNLIMITED) ? toMove : (target.capacity - target.TotalCount());
@@ -112,12 +145,12 @@ struct Inventory
 
 			if (toMove <= 0)
 			{
-				return 0;
+				return 0; // target is full
 			}
 		}
 
-		RemoveItem(type, toMove);
 		target.AddItem(type, toMove);
+		RemoveItem(type, toMove);
 		return toMove;
 	}
 };
