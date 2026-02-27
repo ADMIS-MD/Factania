@@ -35,8 +35,13 @@ namespace core {
 
     // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/tileset_background/source/main.c
 
+    Tile::Tile(glImage _image, bool _collision, bool _transparent) : image(_image), collision(_collision), transparent(_transparent)
+    {
+    }
+
     RenderSystem::RenderSystem() : m_activeCam(Camera())
     {
+
         glScreen2D();
 
         // Main (top)
@@ -52,8 +57,9 @@ namespace core {
         vramSetBankA(VRAM_A_TEXTURE);
         vramSetBankE(VRAM_E_TEX_PALETTE);
 
+        glImage tileset[16];
         m_tileset_texture_id = glLoadTileSet(
-            g_tileset,                                       // glImage array
+            tileset,                                         // glImage array
             TILE_SIZE, TILE_SIZE,                            // tile size
             TILE_SIZE * TILE_COLUMNS, TILE_SIZE * TILE_ROWS, // bitmap area that contains tiles
             GL_RGB256,                                       // texture type
@@ -63,6 +69,10 @@ namespace core {
             FactaniaSpriteSheetPal,                          // palette
             FactaniaSpriteSheetBitmap                        // bitmap data
         );
+        for (int i = 0; i < 16; ++i)
+        {
+            g_tileset[i].image = tileset[i];
+        }
 
         if (m_tileset_texture_id < 0)
             printf("Failed to load texture: %d\n", m_tileset_texture_id);

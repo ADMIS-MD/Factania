@@ -3,12 +3,13 @@
 #include <nds/ndstypes.h>
 #include <stdlib.h>
 #include <entt.hpp>
-#include <nds/arm9/videoGL.h>
+#include <gl2d.h>
 
 #include "Transform.h"
 #include "Camera.h"
 
 #define CHUNK_SIZE 8
+#define CHUNK_LAYERS 2
 
 #define CHUNK_WIDTH CHUNK_SIZE
 #define CHUNK_HEIGHT CHUNK_SIZE
@@ -23,6 +24,13 @@ constexpr u16 NULL_TILE = 0;
 struct ChunkSprite {
     u16 tile_pack = 0;
     rgb color = RGB15(31, 31, 31);
+	int flip_mode = GL_FLIP_NONE;
+};
+
+struct LayeredChunkSprite
+{
+	ChunkSprite layers[CHUNK_LAYERS] = {};
+	int layer_count = 1;
 };
 
 struct ChunkPosition
@@ -55,7 +63,7 @@ public:
 		bool* get_last = nullptr
 	) const;
 
-	ChunkSprite cached_sprites[64];
+	LayeredChunkSprite cached_sprites[64];
     entt::entity top_entity_ids[64]; // The topmost object's entity id, if it has an entity on it
     entt::entity surrounding_chunks[8]; // In clock order
 };

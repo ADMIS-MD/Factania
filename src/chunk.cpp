@@ -27,26 +27,29 @@ void Chunk::Draw(Camera const& cam, ChunkPosition pos)
     {
         for (int i = 0; i < CHUNK_WIDTH; i++)
         {
-            int tile_id = cached_sprites[j * CHUNK_WIDTH + i].tile_pack;
+            LayeredChunkSprite& layers = cached_sprites[j * CHUNK_WIDTH + i];
+                ChunkSprite& sprite = layers.layers[0];
 
-            Vec2 world_pos = {FINT(i) + fx, FINT(j) + fy};
-            Vec2 cam_pos = cam.WorldToCamera(world_pos);
+                Vec2 world_pos = {FINT(i) + fx, FINT(j) + fy};
+                Vec2 cam_pos = cam.WorldToCamera(world_pos);
 
-            // Early outs to skip renderings
-            // TODO: Fix
-            // if (cam_pos.X() <= -scale)
-            //     continue;
-            // if (cam_pos.X() > FINT( CHUNK_WIDTH ))
-            //     break;
-            //
-            // if (cam_pos.Y() <= -scale)
-            //     break;
-            // if (cam_pos.Y() > FINT(CHUNK_HEIGHT))
-            //     return;
+                // Early outs to skip renderings
+                // TODO: Fix
+                // if (cam_pos.X() <= -scale)
+                //     continue;
+                // if (cam_pos.X() > FINT( CHUNK_WIDTH ))
+                //     break;
+                //
+                // if (cam_pos.Y() <= -scale)
+                //     break;
+                // if (cam_pos.Y() > FINT(CHUNK_HEIGHT))
+                //     return;
 
-            glSprite(cam_pos.X().GetInt(), cam_pos.Y().GetInt(), GL_FLIP_NONE, &core::g_tileset[tile_id]);
+                glColor(sprite.color);
+                glSprite(cam_pos.X().GetInt(), cam_pos.Y().GetInt(), sprite.flip_mode, &core::g_tileset[sprite.tile_pack].image);
         }
     }
+    glColor(RGB15(31, 31, 31));
 }
 
 entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, ChunkPosition pos)
@@ -208,27 +211,35 @@ bool operator==(ChunkPosition const& a, ChunkPosition const& b)
 static void ChunkUpdateEntityHelper(Chunk& storage, u8 position, entt::registry& registry)
 {
     entt::entity search = storage.top_entity_ids[position];
+    auto& layered_sprite = storage.cached_sprites[position];
 
-    while (registry.valid(search))
+    int tile_layer = 0;
+    while (registry.valid(search) && tile_layer < CHUNK_LAYERS)
     {
         FactoryLayer& layer = registry.get<FactoryLayer>(search);
         if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
         {
-            storage.cached_sprites[position]= *sp;
-            return;
+            layered_sprite.layers[tile_layer] = *sp;
+            ++tile_layer;
         }
 
         search = layer.below;
     }
-
-    storage.cached_sprites[position] = {0, RGB15(31, 31, 31)};
+    if (tile_layer < CHUNK_LAYERS)
+    {
+        layered_sprite.layers[tile_layer] = {0, RGB15(31, 31, 31)};
+        ++tile_layer;
+    }
+    layered_sprite.layer_count = tile_layer;
 }
 
 static void ChunkOnSpriteDestroyUpdateHelper(entt::entity exclude, Chunk& storage, u8 position, entt::registry& registry)
 {
     entt::entity search = storage.top_entity_ids[position];
+    auto& layered_sprite = storage.cached_sprites[position];
 
-    while (registry.valid(search))
+    int tile_layer = 0;
+    while (registry.valid(search) && tile_layer < CHUNK_LAYERS)
     {
         FactoryLayer& layer = registry.get<FactoryLayer>(search);
         if (search == exclude)
@@ -239,14 +250,18 @@ static void ChunkOnSpriteDestroyUpdateHelper(entt::entity exclude, Chunk& storag
 
         if (ChunkSprite* sp = registry.try_get<ChunkSprite>(search); sp)
         {
-            storage.cached_sprites[position]= *sp;
-            return;
+            layered_sprite.layers[tile_layer] = *sp;
+            ++tile_layer;
         }
 
         search = layer.below;
     }
-
-    storage.cached_sprites[position] = {0, RGB15(31, 31, 31)};
+    if (tile_layer < CHUNK_LAYERS)
+    {
+        layered_sprite.layers[tile_layer] = {0, RGB15(31, 31, 31)};
+        ++tile_layer;
+    }
+    layered_sprite.layer_count = tile_layer;
 }
 
 static void ChunkRemoveLayer(entt::registry& r, entt::entity entity)
@@ -264,7 +279,6 @@ static void ChunkRemoveLayer(entt::registry& r, entt::entity entity)
         entt::entity chunk_e = r.ctx().get<ChunkLookup>().GetChunk(grid);
         Chunk& chunk = r.get<Chunk>(chunk_e);
         u8 chunk_grid_pos = grid.CropTo8x8Grid();
-        printf("aa %d, %d\n", chunk.top_entity_ids[chunk_grid_pos], layer.below);
         chunk.top_entity_ids[chunk_grid_pos] = layer.below;
     }
 

@@ -34,6 +34,7 @@ set(SOURCE_FILES
     src/Parent.cpp
     src/BuildMode.cpp
     src/Pause.cpp
+    src/debug_menu/stacktrace_debug_menu.cpp
 )
 
 set(HEADER_FILES
@@ -62,9 +63,8 @@ set(HEADER_FILES
     src/BuildMode.h
     src/Pause.h
     src/debug_menu/DebugLog.h
-        src/debug_menu/stacktrace_debug_menu.cpp
-        src/debug_menu/stacktrace_debug_menu.h
-        src/Parent.h
+    src/debug_menu/stacktrace_debug_menu.h
+    src/Parent.h
 )
 
 # Create fake executable target
@@ -100,11 +100,20 @@ if(NINTENDO_DS)
 
     foreach(file_path ${GRIT_SRCS})
         get_filename_component(filename_wle ${file_path} NAME_WLE)
+        get_filename_component(filename_dir ${file_path} DIRECTORY)
+        set(grit_file "${filename_dir}/${filename_wle}.grit")
         list(APPEND GRIT_OUT_FILES generated/${filename_wle}.c)
 
         # Test if we need to remake textures
         if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c")
-            if("${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c" IS_NEWER_THAN ${file_path})
+            set(FOUND_GRIT_MODIFY OFF)
+            if(${file_path} IS_NEWER_THAN "${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c")
+                set(FOUND_GRIT_MODIFY ON)
+            endif()
+            if(${grit_file} IS_NEWER_THAN "${CMAKE_CURRENT_BINARY_DIR}/generated/${filename_wle}.c")
+                set(FOUND_GRIT_MODIFY ON)
+            endif()
+            if(NOT FOUND_GRIT_MODIFY)
                 continue()
             endif()
         endif()

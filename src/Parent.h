@@ -19,6 +19,7 @@ public:
     entt::entity GetParent();
 
     bool follow_destroy = true; // If true, destroyed when parent is
+    friend void setup_parents(entt::registry& registry);
 };
 
 class Children
@@ -30,7 +31,9 @@ class Children
 
 public:
     const std::array<entt::entity, 9>& GetChildren();
-    const int GetChildCount();
+    int GetChildCount() const;
+
+    bool follow_destroy = true; // If true, destroys parent when destroyed
 
     friend Parent;
     friend void setup_parents(entt::registry& registry);

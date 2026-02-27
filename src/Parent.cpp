@@ -34,6 +34,11 @@ entt::entity Parent::GetParent()
     return parent;
 }
 
+int Children::GetChildCount() const
+{
+    return m_child_count;
+}
+
 Children::Children(entt::entity e)
 {
     m_children[0] = e;
@@ -50,7 +55,9 @@ void setup_parents(entt::registry& registry)
 {
     registry.on_destroy<Parent>().connect<[](entt::registry& r, entt::entity e)
     {
-        entt::entity p = r.get<Parent>(e).GetParent();
+        Parent& parent = r.get<Parent>(e);
+        entt::entity p = parent.GetParent();
+        parent.parent = entt::null;
         Children* children = r.try_get<Children>(p);
         auto& children_e= children->m_children;
         if (children == nullptr) return;
@@ -58,8 +65,9 @@ void setup_parents(entt::registry& registry)
         {
             if (children_e[i] == e)
             {
-                std::swap(children[i], children[children->m_child_count - 1]);
+                std::swap(children->m_children[i], children->m_children[children->m_child_count - 1]);
                 children->m_child_count -= 1;
+                if (parent.follow_destroy) r.destroy(p);
                 return;
             }
         }

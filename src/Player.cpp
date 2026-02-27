@@ -65,7 +65,6 @@ static inline bool CheckCollision(entt::registry const& r, const Vec2& pos)
     int32 playerTileY = pos.Y().GetInt();
 
     consoleClear();
-    printf("%d, %d\n", playerTileX, playerTileY);
 
     for (int indexX = -1; indexX <= 1; ++indexX) {
         for (int indexY = -1; indexY <= 1; ++indexY) {
@@ -74,7 +73,10 @@ static inline bool CheckCollision(entt::registry const& r, const Vec2& pos)
 
             GridTransform t = {checkX, checkY};
             Chunk const& c = r.get<Chunk>(r.ctx().get<ChunkLookup>().GetChunk(t));
-            if (c.top_entity_ids[t.CropTo8x8Grid()] == entt::null)
+            auto& layer = c.cached_sprites[t.CropTo8x8Grid()];
+
+            // If sprite doesn't use collision
+            if (!core::g_tileset[layer.layers[0].tile_pack].collision)
                 continue;
 
             fixed minX = fixed(static_cast<int32>(checkX));
@@ -175,19 +177,19 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
             entt::entity parent = registry.create();
 
             entt::entity e_0 = registry.create();
-            registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
+            registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(31, 31, 31) });
             registry.emplace<GridTransform>(e_0, grid.x, grid.y);
 
             entt::entity e_1 = registry.create();
-            registry.emplace<ChunkSprite>(e_1, ChunkSprite { 2, RGB15(15, 15, 0) });
+            registry.emplace<ChunkSprite>(e_1, ChunkSprite { 2, RGB15(31, 31, 31) });
             registry.emplace<GridTransform>(e_1, grid.x + 1, grid.y);
 
             entt::entity e_2 = registry.create();
-            registry.emplace<ChunkSprite>(e_2, ChunkSprite { 8, RGB15(15, 15, 0) });
+            registry.emplace<ChunkSprite>(e_2, ChunkSprite { 9, RGB15(31, 31, 31) });
             registry.emplace<GridTransform>(e_2, grid.x, grid.y + 1);
 
             entt::entity e_3 = registry.create();
-            registry.emplace<ChunkSprite>(e_3, ChunkSprite { 9, RGB15(15, 15, 0) });
+            registry.emplace<ChunkSprite>(e_3, ChunkSprite { 10, RGB15(31, 31, 31) });
             registry.emplace<GridTransform>(e_3, grid.x + 1, grid.y + 1);
 
             Parent::AttachEntities(registry, parent, e_0);
@@ -201,7 +203,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
             ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
             Chunk& chunk = chl.GetChunkObj(registry, chp);
             if (chunk.top_entity_ids[grid.CropTo8x8Grid()] != entt::null)
-                registry.destroy(registry.get<Parent>(chunk.top_entity_ids[grid.CropTo8x8Grid()]).GetParent());
+                registry.destroy(chunk.top_entity_ids[grid.CropTo8x8Grid()]);
         }
         // TODO: End remove
 

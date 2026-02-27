@@ -57,8 +57,8 @@ namespace core {
             // Print error
             printf("fatInitDefault() failed: %d", errno);
 
-            while (1)
-                swiWaitForVBlank();
+            // while (1)
+            //     swiWaitForVBlank();
         }
 
         // Add Systems Here
