@@ -79,21 +79,21 @@ namespace core {
         buildingRecipes.push_back(tempRecipie);
 
         FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
-
         building.InputItems(ItemType::Coal, 20);
-
         building.status = BuildingStatus::Idle;
 
-		std::vector<Conveyer*> convTest = InitTest();
-
+        std::vector<Conveyer*> convTest = InitTest();
         convTest[0]->inputs[0] = &building;
 
-
-        const entt::entity entityLink = m_registry.create();
-        m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
+        // Create entity for the factory building
+        const entt::entity buildingEntity = m_registry.create();
+        m_registry.emplace<FactoryBuilding>(buildingEntity, building);
+        
+        // Create separate entities for each conveyor
         for (Conveyer* n : convTest)
         {
-            m_registry.emplace<FactoryBuilding>(entityLink, *n);
+            const entt::entity conveyorEntity = m_registry.create();
+            m_registry.emplace<Conveyer>(conveyorEntity, *n);
         }
         //end of testing stuffs
     }
