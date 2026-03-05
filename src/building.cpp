@@ -55,6 +55,7 @@ bool FactoryBuilding::InputItems(ItemType item, int count)
 {
 	inputInventoryChanged = true;
 	inputInventory.AddItem(item, count);
+	return true;
 }
 
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)

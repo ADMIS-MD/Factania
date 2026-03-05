@@ -25,8 +25,9 @@
 #include "Pause.h"
 #include "Player.h"
 #include "Math.h"
-#include "Conveyer.h"
 #include "building.h"
+
+#include "Conveyer.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -42,7 +43,6 @@
 // are translucent pieces of plastic.
 
 // Test code? might have to remove later
-std::vector<Conveyer*> convTest = InitTest();
 
 namespace core {
 
@@ -79,17 +79,22 @@ namespace core {
         buildingRecipes.push_back(tempRecipie);
 
         FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
+
         building.InputItems(ItemType::Coal, 20);
 
         building.status = BuildingStatus::Idle;
 
-		//convTest[0]->inputs[0] = &building;
+		std::vector<Conveyer*> convTest = InitTest();
+
+        convTest[0]->inputs[0] = &building;
+
 
         const entt::entity entityLink = m_registry.create();
         m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
-        //if (auto* convBuilding = dynamic_cast<FactoryBuilding*>(convTest[0])) {
-        //    m_registry.emplace<FactoryBuilding>(entityLink, *convBuilding);
-        //}
+        for (Conveyer* n : convTest)
+        {
+            m_registry.emplace<FactoryBuilding>(entityLink, *n);
+        }
         //end of testing stuffs
     }
 
@@ -111,9 +116,6 @@ namespace core {
             m_registry.ctx().get<PauseControl>().pause = !m_registry.ctx().get<PauseControl>().pause;
         }
 
-        if (down & KEY_A) {
-            convTest[2]->UpdateBuilding(1.0f);
-        }
 
         if ((up & KEY_L) || (up & KEY_R)) {
             if (ConsoleVisible()) {
