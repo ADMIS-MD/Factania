@@ -24,6 +24,16 @@ inline const char* InventoryTagName(InventoryTag tag)
 	}
 }
 
+struct InventorySlot
+{
+	ItemType type;
+	int quantity;
+
+	bool IsEmpty() const { return quantity == 0; }
+	const char* Name() const { return ItemName(type); }
+	int Index() const { return (int)type; }
+};
+
 struct Inventory
 {
 	static constexpr int MAX_ITEMS = (int)ItemType::Count;
@@ -41,6 +51,49 @@ struct Inventory
 	*/
 	Inventory() = default;
 	explicit Inventory(InventoryTag tag_, int capacity_ = UNLIMITED) : capacity(capacity_), tag(tag_) {}
+
+	InventorySlot GetSLot(ItemType type) const
+	{
+		return { type, quantities[(int)type] };
+	}
+
+	InventorySlot GetSlotByIndex(int index) const
+	{
+		if (index < 0 || index >= MAX_ITEMS)
+		{
+			return { ItemType::Count, 0 };
+		}
+
+		return { (ItemType)index, quantities[index] };
+	}
+
+	// calls t(InventorySlot) for non-empty slot
+	// pick this over a manyal loop if you care about *occupied* slots
+	template<typename T>
+	void ForEachOccupied(T t) const
+	{
+		for (int i = 0; i < MAX_ITEMS; ++i)
+		{
+			if (quantities[i] > 0)
+			{
+				t(GetSlotByIndex(i));
+			}
+		}
+	}
+
+	int OccupiedSlotCount() const
+	{
+		int n = 0;
+		for (int i = 0; i < MAX_ITEMS; ++i)
+		{
+			if (quantities[i] > 0)
+			{
+				++n;
+			}
+		}
+
+		return n;
+	}
 
 	int TotalCount() const
 	{
