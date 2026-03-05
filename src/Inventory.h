@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Item.h"
+#include "ItemType.h"
 
 struct Inventory
 {
@@ -28,5 +28,17 @@ struct Inventory
 	int GetItem(ItemType type) const
 	{
 		return quantities[(int)type];
+	}
+	
+	bool IsEmpty() const
+	{
+		for (int i = 0; i < MAX_ITEMS; ++i)
+		{
+			if (quantities[i] > 0)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 };

@@ -25,8 +25,9 @@
 #include "Pause.h"
 #include "Player.h"
 #include "Math.h"
-#include "Conveyer.h"
 #include "building.h"
+
+#include "Conveyer.h"
 
 //-----------------------------------------------------------------------------
 //	Method Declarations
@@ -42,7 +43,6 @@
 // are translucent pieces of plastic.
 
 // Test code? might have to remove later
-std::vector<Conveyer*> convTest = InitTest();
 
 namespace core {
 
@@ -69,25 +69,39 @@ namespace core {
         m_registry.ctx().emplace<ChunkLookup>();
 
         //temp testing stuff
-        ItemQuantity ironIngot = ItemQuantity(Item(100, "iron_ingot"), 1);
-        ItemQuantity ironPlate = ItemQuantity(Item(101, "air"), 0);
-
+        //std::vector<Conveyer*> convTest = InitTest();
         Recipe tempRecipie;
-        tempRecipie.inputItems.push_back(ironPlate);
-        tempRecipie.outputItems.push_back(ironIngot);
+        tempRecipie.inputs.quantities[(int)ItemType::Coal] = 1;
+        tempRecipie.outputs.quantities[(int)ItemType::Iron] = 1;
         tempRecipie.recipeDuration = 1;
 
         std::vector<Recipe> buildingRecipes;
         buildingRecipes.push_back(tempRecipie);
 
-        FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
-        ironIngot.quantity = 10;
-        building.InputItems(ironIngot);
-
+        // Create entity and emplace FIRST
+        const entt::entity buildingEntity = m_registry.create();
+        auto& building = m_registry.emplace<FactoryBuilding>(buildingEntity, buildingRecipes, 0);
+        
+        // Now modify the component that's stored in the registry
+        building.InputItems(ItemType::Coal, 20);
         building.status = BuildingStatus::Idle;
 
-        const entt::entity entityLink = m_registry.create();
-        m_registry.emplace<FactoryBuilding>(entityLink, std::forward<FactoryBuilding>(building));
+        std::vector<Conveyer*> convTest = InitTest();
+        
+        // Create entities for conveyers FIRST, before setting up links
+        std::vector<entt::entity> conveyorEntities;
+        for (Conveyer* n : convTest)
+        {
+            const entt::entity conveyorEntity = m_registry.create();
+            m_registry.emplace<Conveyer>(conveyorEntity, *n);
+            conveyorEntities.push_back(conveyorEntity);
+            delete n;  // Clean up heap memory
+        }
+        
+        // NOW set up the pointer to building on the REGISTRY version
+        auto& conv0 = m_registry.get<Conveyer>(conveyorEntities[0]);
+        conv0.inputs.push_back(&building);
+        
         //end of testing stuffs
     }
 
@@ -109,9 +123,6 @@ namespace core {
             m_registry.ctx().get<PauseControl>().pause = !m_registry.ctx().get<PauseControl>().pause;
         }
 
-        if (down & KEY_A) {
-            convTest[2]->UpdateBuilding(1.0f);
-        }
 
         if ((up & KEY_L) || (up & KEY_R)) {
             if (ConsoleVisible()) {

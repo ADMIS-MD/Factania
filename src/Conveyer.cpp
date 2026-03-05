@@ -26,10 +26,8 @@ std::vector<Conveyer*> InitTest()
     convs.push_back(conv3);
 
     // seed first conveyor with an item (conv1)
-    ItemQuantity itemA = ItemQuantity(Item(100, "iron_ingot"), 10);
-    itemA.item = Item(1);
-    itemA.quantity = 5;
-    conv1->outputInventory.push_back(itemA);
+    /*ItemType itemA = ItemType(100, "iron_ingot");
+    conv1->outputInventory.push_back(itemA);*/
 
     return convs;
 }
@@ -41,38 +39,57 @@ void printTest(std::vector<Conveyer*> &testVec)
     for (size_t i = 0; i < testVec.size(); ++i) {
         Conveyer* c = testVec[i];
         if (!c) { printf("[   ]"); }
-        else if (!c->outputInventory.empty()) { printf("[ %d ]", c->outputInventory.back().quantity); }
+        //else if (!c->outputInventory.RemoveItem()) { printf("[ %d ]", c->outputInventory.back().quantity); }
         else { printf("[   ]"); }
         if (i + 1 < testVec.size()) printf("->");
     }
     printf("\n");
 }
 
-bool Conveyer::InputItems(ItemQuantity items)
+bool Conveyer::InputItems(ItemType items, int count)
 {
-    outputInventory.push_back(items);
+    outputInventory.AddItem(items, count);
     return true;
 }
 
 // safe TakeItems: move a single item and RETURN a value
 bool Conveyer::TakeItems()
 {
-    if (inputs.empty()) return false; 
-    ItemBuilding* upstream = (ItemBuilding*)inputs[0];
+    if (inputs.empty()) return false;
+    ItemBuilding* upstream = nullptr;
+
+	bool upstreamIsConveyer = true;
+
+    try
+    {
+        upstream = (Conveyer*)inputs[0];
+    }
+    catch (const std::bad_cast& e)
+    {
+		upstream = dynamic_cast<ItemBuilding*>(inputs[0]);
+		upstreamIsConveyer = false;
+	}
+
     if (!upstream) return false;
 
-    if (inputInventory.empty() && !upstream->outputInventory.empty())
+    if (inputInventory.IsEmpty() && !upstream->outputInventory.IsEmpty())
     {
-        ItemQuantity q = upstream->outputInventory.back();
-        upstream->outputInventory.pop_back();
-        outputInventory.push_back(q);
-        upstream->TakeItems();
+        inputInventory = upstream->outputInventory;
+		upstream->outputInventory = Inventory(); // REPLACE WITH CLEAR METHOD IF IMPLEMENTED
+		outputInventory = inputInventory;
+        if (upstreamIsConveyer)
+        {
+            dynamic_cast<Conveyer*>(upstream)->TakeItems();
+        }
         return false;
 
     }
     else
     {
-        upstream->TakeItems();
+        if (upstreamIsConveyer)
+        {
+            dynamic_cast<Conveyer*>(upstream)->TakeItems();
+        }
     }
 
 
