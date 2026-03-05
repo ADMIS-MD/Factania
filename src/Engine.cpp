@@ -78,23 +78,30 @@ namespace core {
         std::vector<Recipe> buildingRecipes;
         buildingRecipes.push_back(tempRecipie);
 
-        FactoryBuilding building = FactoryBuilding(buildingRecipes, 0);
+        // Create entity and emplace FIRST
+        const entt::entity buildingEntity = m_registry.create();
+        auto& building = m_registry.emplace<FactoryBuilding>(buildingEntity, buildingRecipes, 0);
+        
+        // Now modify the component that's stored in the registry
         building.InputItems(ItemType::Coal, 20);
         building.status = BuildingStatus::Idle;
 
         std::vector<Conveyer*> convTest = InitTest();
-        convTest[0]->inputs[0] = &building;
-
-        // Create entity for the factory building
-        const entt::entity buildingEntity = m_registry.create();
-        m_registry.emplace<FactoryBuilding>(buildingEntity, building);
         
-        // Create separate entities for each conveyor
+        // Create entities for conveyers FIRST, before setting up links
+        std::vector<entt::entity> conveyorEntities;
         for (Conveyer* n : convTest)
         {
             const entt::entity conveyorEntity = m_registry.create();
             m_registry.emplace<Conveyer>(conveyorEntity, *n);
+            conveyorEntities.push_back(conveyorEntity);
+            delete n;  // Clean up heap memory
         }
+        
+        // NOW set up the pointer to building on the REGISTRY version
+        auto& conv0 = m_registry.get<Conveyer>(conveyorEntities[0]);
+        conv0.inputs.push_back(&building);
+        
         //end of testing stuffs
     }
 
