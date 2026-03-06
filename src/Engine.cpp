@@ -71,9 +71,11 @@ namespace core {
         //temp testing stuff
         //std::vector<Conveyer*> convTest = InitTest();
         Recipe tempRecipie;
-        tempRecipie.inputs.quantities[(int)ItemType::Coal] = 1;
-        tempRecipie.outputs.quantities[(int)ItemType::Iron] = 1;
-        tempRecipie.recipeDuration = 1;
+        // Build input/output using ItemQuantity (Item(itemID, name), quantity)
+        tempRecipie.inputItems.push_back(ItemQuantity(Item((int)ItemType::Coal, "Coal"), 1));
+        tempRecipie.outputItems.push_back(ItemQuantity(Item((int)ItemType::IronPlate, "Iron Plate"), 1));
+        tempRecipie.recipeDuration = 1.0f;
+        tempRecipie.powerDraw = 0.0f;
 
         std::vector<Recipe> buildingRecipes;
         buildingRecipes.push_back(tempRecipie);
@@ -85,17 +87,28 @@ namespace core {
         // Now modify the component that's stored in the registry
         building.InputItems(ItemType::Coal, 20);
         building.status = BuildingStatus::Idle;
-
-        std::vector<Conveyer*> convTest = InitTest();
         
         // Create entities for conveyers FIRST, before setting up links
         std::vector<entt::entity> conveyorEntities;
-        for (Conveyer* n : convTest)
+        std::vector<entt::entity> createdEntities;
+        for (int i = 0; i <= 2; i++)
         {
-            const entt::entity conveyorEntity = m_registry.create();
-            m_registry.emplace<Conveyer>(conveyorEntity, *n);
-            conveyorEntities.push_back(conveyorEntity);
-            delete n;  // Clean up heap memory
+            const entt::entity convEntity = m_registry.create();
+            auto& conv1 = m_registry.emplace<Conveyer>(convEntity);
+            conv1.id = i + 1;
+            conveyorEntities.push_back(convEntity);
+        }
+
+        // Now wire them using entities -> get components from registry
+        for (size_t i = 1; i < conveyorEntities.size(); ++i)
+        {
+            auto& prev = m_registry.get<Conveyer>(conveyorEntities[i - 1]);
+            auto& cur  = m_registry.get<Conveyer>(conveyorEntities[i]);
+
+            // cur.inputs <- prev
+            cur.inputs.push_back(&prev);
+            // prev.outputs <- cur
+            prev.outputs.push_back(&cur);
         }
         
         // NOW set up the pointer to building on the REGISTRY version

@@ -10,9 +10,12 @@ void FactoryBuilding::UpdateBuilding(float dt)
 
 	if (inputInventoryChanged == true)
 	{
-		for (int i = 0; i < inputInventory.MAX_ITEMS; i++) //loop through inventory
+		// Use recipe.inputItems (vector<ItemQuantity>) instead of old inputs array
+		const Recipe& recipe = recipes[selectedRecipe];
+		for (const ItemQuantity& req : recipe.inputItems)
 		{
-			if (recipes[selectedRecipe].inputs.quantities[i] > inputInventory.quantities[i]) //see if we have enough items to craft
+			ItemType reqType = static_cast<ItemType>(req.item.itemID);
+			if (req.quantity > inputInventory.GetItem(reqType)) // see if we have enough items to craft
 			{
 				status = BuildingStatus::Idle;
 				inputInventoryChanged = false;
@@ -38,15 +41,11 @@ void FactoryBuilding::UpdateBuilding(float dt)
 
 void FactoryBuilding::SelectRecipe(int recipeNum)
 {
-	if (!(recipeNum >= 0 && recipeNum <= recipes.size())) //check if selecting valid recipe
+	if (!(recipeNum >= 0 && recipeNum <= (int)recipes.size())) //check if selecting valid recipe
 	{
 		return; //out of bounds
 	}
 	
-
-	//output items inside into player inv if any inside
-	//empty all items in building
-
 	inputInventoryChanged = true;
 	selectedRecipe = recipeNum;
 }
@@ -60,16 +59,23 @@ bool FactoryBuilding::InputItems(ItemType item, int count)
 
 void FactoryBuilding::ResolveRecipe(Recipe* recipe)
 {
+	// Consume inputs and add outputs
 	inputInventoryChanged = true;
-	for (int i = 0; i < recipe->inputs.MAX_ITEMS; i++)
+
+	// Consume inputs
+	for (const ItemQuantity& in : recipe->inputItems)
 	{
-		inputInventory.AddItem((ItemType)i, recipe->inputs.quantities[i]);
+		ItemType t = static_cast<ItemType>(in.item.itemID);
+		// best-effort: remove what we can (should be available if we started crafting)
+		inputInventory.RemoveItem(t, in.quantity);
 	}
-	for (int i = 0; i < recipe->outputs.MAX_ITEMS; i++)
+
+	// Add outputs to the building's outputInventory
+	for (const ItemQuantity& out : recipe->outputItems)
 	{
-		inputInventory.AddItem((ItemType)i, recipe->outputs.quantities[i]);
+		ItemType t = static_cast<ItemType>(out.item.itemID);
+		outputInventory.AddItem(t, out.quantity);
 	}
-	//std::cout << "Factory Output: " << outputInventory[0].quantity << " " << recipe->outputItems[0].item.name;
 }
 
 FactoryBuilding::FactoryBuilding(std::vector<Recipe> recipes_, int selectedRecipe_)

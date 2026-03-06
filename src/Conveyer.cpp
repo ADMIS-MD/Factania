@@ -5,33 +5,6 @@
 #include <nds.h>
 
 
-// safe InitTest: seed the FIRST conveyor (convs[0]) and wire pointers
-std::vector<Conveyer*> InitTest()
-{
-    static std::vector<Conveyer*> convs;
-
-    Conveyer* conv1 = new Conveyer();
-    conv1->id = 1;
-    Conveyer* conv2 = new Conveyer();
-    conv2->id = 2;
-    Conveyer* conv3 = new Conveyer();
-    conv3->id = 3;
-
-    // wire: conv1 -> conv2 -> conv3 (conv2 inputs conv1, conv3 inputs conv2)
-    conv2->inputs.push_back(conv1);
-    conv3->inputs.push_back(conv2);
-
-    convs.push_back(conv1);
-    convs.push_back(conv2);
-    convs.push_back(conv3);
-
-    // seed first conveyor with an item (conv1)
-    /*ItemType itemA = ItemType(100, "iron_ingot");
-    conv1->outputInventory.push_back(itemA);*/
-
-    return convs;
-}
-
 // Simple, safe printer — iterate the vector and print each conveyor's last quantity (if any)
 void printTest(std::vector<Conveyer*> &testVec)
 {
@@ -56,55 +29,41 @@ bool Conveyer::InputItems(ItemType items, int count)
 bool Conveyer::TakeItems()
 {
     if (inputs.empty()) return false;
-    ItemBuilding* upstream = nullptr;
 
-	bool upstreamIsConveyer = true;
-
-    try
-    {
-        upstream = (Conveyer*)inputs[0];
-    }
-    catch (const std::bad_cast& e)
-    {
-		upstream = dynamic_cast<ItemBuilding*>(inputs[0]);
-		upstreamIsConveyer = false;
-	}
-
+    // Expect first input to be an ItemBuilding (could be a Conveyer or Factory)
+    ItemBuilding* upstream = dynamic_cast<ItemBuilding*>(inputs[0]);
     if (!upstream) return false;
 
-    if (inputInventory.IsEmpty() && !upstream->outputInventory.IsEmpty())
-    {
-        inputInventory = upstream->outputInventory;
-		upstream->outputInventory = Inventory(); // REPLACE WITH CLEAR METHOD IF IMPLEMENTED
-		outputInventory = inputInventory;
-        if (upstreamIsConveyer)
+    // Prevent attempting to transfer to self (same inventory)
+    if (&upstream->outputInventory == &outputInventory) return false;
+
+    // If we have an empty input buffer and upstream has outputs, grab up to one item
+    if (outputInventory.IsEmpty() && !upstream->outputInventory.IsEmpty())
+    {;
+        //Move at most one item — safe, non-blocking, deterministic
+        outputInventory = upstream->outputInventory;
+        upstream->outputInventory = Inventory();
+        
+        if (upstream->type == BuildingType::Conveyer)
         {
             dynamic_cast<Conveyer*>(upstream)->TakeItems();
         }
-        return false;
-
-    }
-    else
-    {
-        if (upstreamIsConveyer)
-        {
-            dynamic_cast<Conveyer*>(upstream)->TakeItems();
-        }
+        return true;
     }
 
-
-    // move one item from upstream to this conveyor
-
-    return true;
+    // no-op if we already have items or nothing upstream
+    return false;
 }
 
 void Conveyer::UpdateBuilding(float dt)
 {
-    printf("updating");
-    // If we have an item and a downstream, push one item
-
-    // Otherwise try to pull one from upstream
+    // Debug: show Update being called for conveyors (can be noisy)
+    //printf("Conveyer::UpdateBuilding id=%d\n", id);
+    //ItemBuilding* upstream = dynamic_cast<Conveyer*>(outputs[0]);
+    //if (upstream)
+    //{
+    //    return;
+    //}
     TakeItems();
-	//printf("its working");
-	return;
+    return;
 }

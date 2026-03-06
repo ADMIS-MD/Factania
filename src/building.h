@@ -12,7 +12,8 @@ enum class BuildingType {
     Transformer,
     Transporter,
     Battery,
-    Sink
+    Sink,
+    Conveyer
 };
 
 enum class BuildingStatus {

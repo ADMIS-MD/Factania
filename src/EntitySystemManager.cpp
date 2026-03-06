@@ -22,6 +22,7 @@
 #include "Pause.h"
 
 #include "cursor.h"
+#include "Conveyer.h"
 
 //-----------------------------------------------------------------------------
 //	Methods
@@ -60,6 +61,14 @@ void EntitySystemManager::Update(entt::registry& registry)
     {
         auto& component = factoryBuildingView.get<FactoryBuilding>(entity);
         component.UpdateBuilding(0.0166f);
+    }
+
+    // Ensure conveyors also get updated each tick
+    auto conveyerView = registry.view<Conveyer>();
+    for (auto entity : conveyerView)
+    {
+        auto& conv = conveyerView.get<Conveyer>(entity);
+        conv.UpdateBuilding(0.0166f);
     }
 
     // Test Cursor Entity Update
