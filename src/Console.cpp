@@ -65,7 +65,7 @@ void ToggleConsole(bool drawConsole)
         s_prevPal255 = BG_PALETTE_SUB[255];
 
         // Show only sub BG0 (console)
-        REG_DISPCNT_SUB &= ~(DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE);
+        REG_DISPCNT_SUB &= ~(DISPLAY_BG1_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE);
         REG_DISPCNT_SUB |= (DISPLAY_BG0_ACTIVE);
 
         // Black background + White text

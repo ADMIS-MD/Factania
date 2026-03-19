@@ -24,6 +24,7 @@ public:
     virtual const char* child_menu_name() const { return ""; }
 
     virtual void on_enter() {}
+    virtual void on_select() {}
 };
 
 class SubmenuDebugNode : public DebugNode {
@@ -43,6 +44,7 @@ public:
     MarkerDebugNode(const char* _text) : text(_text) {};
     const char* text;
     void update(bool& selected) override;
+    void on_select() override;
 };
 
 class FunctionResultNode : public DebugNode {
@@ -53,6 +55,7 @@ public:
     std::function<std::string()> func;
     std::function<void(bool& selected)> selectedUpdate;
     void update(bool& selected) override;
+    void on_select() override;
 };
 
 class CallbackDebugNode : public DebugNode {

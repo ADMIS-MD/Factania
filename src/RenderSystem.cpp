@@ -35,7 +35,7 @@ namespace core {
 
     // Adapted from https://codeberg.org/blocksds/sdk/src/branch/master/examples/gl2d/tileset_background/source/main.c
 
-    RenderSystem::RenderSystem() : m_activeCam(Camera())
+    RenderSystem::RenderSystem(entt::registry& registry) : m_activeCam(Camera())
     {
         glScreen2D();
 
@@ -75,6 +75,7 @@ namespace core {
 
         // Sub (bottom)
         videoSetModeSub(MODE_5_2D
+            | DISPLAY_BG1_ACTIVE
             | DISPLAY_BG3_ACTIVE
             | DISPLAY_SPR_ACTIVE
             | DISPLAY_SPR_1D_BMP
@@ -96,6 +97,9 @@ namespace core {
 
         // BuildMode initialization
         m_buildMode.Init();
+
+        // Inventory initialization
+        m_inventoryUI.Init(registry);
     }
 
     RenderSystem::~RenderSystem()
@@ -127,6 +131,7 @@ namespace core {
 
         // Build mode update
         m_buildMode.Update(registry, m_activeCam);
+        m_inventoryUI.Update(registry, m_buildMode);
 
         if (m_buildMode.IsTransitioning()) {
             registry.ctx().get<PauseControl>().transition = true;
@@ -243,21 +248,32 @@ namespace core {
             int sx = tr.pos.X().GetInt();
             int sy = tr.pos.Y().GetInt();
 
+            bool hide = ss.hide;
+            int priority = 2;
+
+            if (registry.any_of<InvIcon, InvArrow, InvDragIcon, InvOverlay>(e)) {
+                if (!m_buildMode.ShouldInventoryUiVisible()) {
+                    hide = true;
+                }
+            }
+
             oamSet(&oamSub,
                 ss.oamId,
                 sx, sy,
-                0, 0,
+                priority, 0,
                 ss.size,
                 SpriteColorFormat_256Color,
                 ss.gfx,
                 -1,
                 false,
-                ss.hide,
+                hide,
                 ss.xFlip,
                 false,
                 false
             );
         }
+
+        m_inventoryUI.Draw();
 
         // Build mode capture on Sub screen
         m_buildMode.DrawSubOverlay();
