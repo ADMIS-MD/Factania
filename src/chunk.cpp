@@ -5,18 +5,11 @@
 #include "Engine.h"
 #include "Sprite.h"
 #include "RenderSystem.h"
-#include <chrono>
 
 Chunk::Chunk()
 {
     std::fill(std::begin(top_entity_ids), std::end(top_entity_ids), entt::null);
     std::fill(std::begin(surrounding_chunks), std::end(surrounding_chunks), entt::null);
-    std::fill(std::begin(cached_sprites), std::end(cached_sprites), ChunkSprite{0, RGB15(15, 15, 15)});
-
-    auto now = std::chrono::system_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-
-    g_perlin.Seed(ms);
 }
 
 void Chunk::Draw(Camera const& cam, ChunkPosition pos)
@@ -99,29 +92,6 @@ entt::entity Chunk::MakeChunk(ChunkLookup& lookup, entt::registry& registry, Chu
 
     registry.emplace<Chunk>(entity, std::forward<Chunk>(c));
     lookup.m_chunks.insert({pos, entity});
-
-    for (unsigned x = 0; x < 8; ++x)
-    {
-        for (unsigned y = 0; y < 8; ++y)
-        {
-            float scale = 0.02f;
-
-            GridTransform gt(pos.x * 8 + x, pos.y * 8 + y);
-
-            float value = g_perlin.Noise(gt.x * scale, gt.y * scale);
-
-            value = (value + 1.0f) * 0.5f;
-
-            if (value > 0.8f)
-            {
-                entt::entity e_0 = registry.create();
-                registry.emplace<ChunkSprite>(e_0, ChunkSprite{ 7, RGB15(15, 15, 0) });
-                registry.emplace<GridTransform>(e_0, gt);
-            }
-        }
-    }
-
-
 
     return entity;
 }

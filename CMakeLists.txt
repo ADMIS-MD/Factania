@@ -26,17 +26,14 @@ set(SOURCE_FILES
     src/chunk.cpp
     src/Math.cpp
     src/Player.cpp
-    src/Perlin.cpp
     src/Conveyer.cpp
     src/building.cpp
     src/Console.cpp
     src/InventoryDebugSystem.cpp
     src/debug_menu/DebugLog.cpp
-    src/debug_menu/inventory_debug_menu.cpp
     src/Parent.cpp
     src/BuildMode.cpp
     src/Pause.cpp
-    src/InventoryUI.cpp
 )
 
 set(HEADER_FILES
@@ -55,7 +52,6 @@ set(HEADER_FILES
     src/Transform.cpp
     src/Transform.h
     src/Player.h
-    src/Perlin.h
     src/Sprite.h
     src/Conveyer.h
     src/building.h
@@ -66,11 +62,9 @@ set(HEADER_FILES
     src/BuildMode.h
     src/Pause.h
     src/debug_menu/DebugLog.h
-    src/debug_menu/stacktrace_debug_menu.cpp
-    src/debug_menu/stacktrace_debug_menu.h
-    src/debug_menu/inventory_debug_menu.h
-    src/Parent.h
-    src/InventoryUI.h
+        src/debug_menu/stacktrace_debug_menu.cpp
+        src/debug_menu/stacktrace_debug_menu.h
+        src/Parent.h
 )
 
 # Create fake executable target

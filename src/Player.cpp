@@ -133,9 +133,8 @@ void CreatePlayerComponent(entt::registry& registry)
     auto& an = registry.emplace<Animation>(entity);
     auto& inv = registry.emplace<Inventory>(entity, InventoryTag::Player); // add capacity later 
     registry.emplace<PlayerMove>(entity);
-    inv.AddItem(ItemType::Coal, 10);
-    inv.AddItem(ItemType::Iron, 5);
-    inv.AddItem(ItemType::Copper, 2);
+    inv.AddItem(ItemType::IronOre, 5);
+    inv.AddItem(ItemType::CopperOre, 2);
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);

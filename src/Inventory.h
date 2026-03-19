@@ -125,28 +125,6 @@ struct Inventory
 		}
 
 		quantities[(int)type] += amount;
-	int discoveryOrder[MAX_ITEMS];
-	int nextDiscoveryOrder = 0;
-
-	Inventory()
-	{
-		for (int i = 0; i < MAX_ITEMS; ++i) {
-			discoveryOrder[i] = -1;
-		}
-	}
-
-	bool AddItem(ItemType type, int amount = 1)
-	{
-		if (amount <= 0) {
-			return true;
-		}
-
-		const int index = (int)type;
-		if (quantities[index] <= 0 && discoveryOrder[index] < 0) {
-			discoveryOrder[index] = nextDiscoveryOrder++;
-		}
-
-		quantities[index] += amount;
 		return true;
 	}
 
@@ -227,10 +205,5 @@ struct Inventory
 		target.AddItem(type, toMove);
 		RemoveItem(type, toMove);
 		return toMove;
-	}
-};
-	int GetDiscoveryOrder(ItemType type) const
-	{
-		return discoveryOrder[(int)type];
 	}
 };

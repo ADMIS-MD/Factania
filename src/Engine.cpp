@@ -62,7 +62,7 @@ namespace core {
         }
 
         // Add Systems Here
-        m_systems.push_back(new RenderSystem(m_registry));
+        m_systems.push_back(new RenderSystem());
         m_systems.push_back(new EntitySystemManager(m_registry));
 
         m_registry.ctx().emplace<PauseControl>();
