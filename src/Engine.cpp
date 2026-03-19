@@ -113,7 +113,7 @@ namespace core {
             convTest[2]->UpdateBuilding(1.0f);
         }
 
-        if ((up & KEY_L) || (up & KEY_R)) {
+        if ((up & KEY_L)) {
             if (ConsoleVisible()) {
                 ToggleConsole(false);
             }
@@ -145,7 +145,7 @@ namespace core {
             swiWaitForVBlank();
 
             scanKeys();
-            check_debug_menu();
+            //check_debug_menu(); // commenting out for now
 
             Update();
 

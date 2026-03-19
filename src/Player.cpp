@@ -131,10 +131,10 @@ void CreatePlayerComponent(entt::registry& registry)
     auto& st = registry.emplace<PlayerState>(entity);
     auto& sp = registry.emplace<Sprite>(entity, g_playerImages, 0, PLAYER_SPR, false, false);
     auto& an = registry.emplace<Animation>(entity);
-    auto& inv = registry.emplace<Inventory>(entity);
+    auto& inv = registry.emplace<Inventory>(entity, InventoryTag::Player); // add capacity later 
     registry.emplace<PlayerMove>(entity);
-    inv.AddItem(ItemType::Iron, 5);
-    inv.AddItem(ItemType::Copper, 2);
+    inv.AddItem(ItemType::IronOre, 5);
+    inv.AddItem(ItemType::CopperOre, 2);
 
     st.mode = PlayerMode::IDLE;
     SetAnim(sp, an, 0, 5);
@@ -155,7 +155,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
         dir *= fixed(0.707f);
     }
 
-    auto view = registry.view<Transform, GridTransform, PlayerState, Sprite, Animation, PlayerMove>();
+    auto view = registry.view<Transform, GridTransform, PlayerState, Sprite, Animation, Inventory, PlayerMove>();
 
     for (auto player : view) {
         auto& tr = view.get<Transform>(player);
@@ -163,6 +163,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
         auto& st = view.get<PlayerState>(player);
         auto& sp = view.get<Sprite>(player);
         auto& an = view.get<Animation>(player);
+        auto& inv = view.get<Inventory>(player);
         const auto& mv = view.get<PlayerMove>(player);
 
         // TODO: Remove
@@ -284,7 +285,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
             if (miningTimer >= 60)
             {
                 miningTimer = 0;
-                printf("GET IRON.\n");
+                inv.AddItem(ItemType::IronOre);
             }
 
             break;
