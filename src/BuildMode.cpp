@@ -9,6 +9,7 @@
 #include "Console.h"
 
 #include "Build.h"
+#include "BG.h"
 
 #define SCREENW 256
 #define SCREENH 192
@@ -106,7 +107,8 @@ void BuildMode::Init()
     bgSetPriority(m_subBg3Id, 3);
     m_subBg3Gfx = bgGetGfxPtr(m_subBg3Id);
 
-    dmaFillHalfWords(0, m_subBg3Gfx, 256 * 256);
+    dmaCopy(BGBitmap, m_subBg3Gfx, BGBitmapLen);
+    dmaCopy(BGPal, BG_PALETTE_SUB, BGPalLen);
 
     // Allocate Sprite memory
     vramSetBankB(kVramBMainObj);
@@ -455,19 +457,6 @@ bool BuildMode::IsBankBCapture() const
         m_slideState == SlideState::ExitSliding);
 }
 
-bool BuildMode::ShouldInventoryUiVisible() const
-{
-    return (m_slideState == SlideState::Idle) ||
-        (m_slideState == SlideState::WaitingCapture) ||
-        (m_slideState == SlideState::Sliding) ||
-        ((m_slideState == SlideState::ExitSliding) && (m_startDelay == 0));
-}
-
-bool BuildMode::ShouldInventoryRunNormally() const
-{
-    return m_slideState == SlideState::Idle;
-}
-
 int BuildMode::GetFlashLevel() const
 {
     return m_flashLevel;
@@ -490,7 +479,6 @@ void BuildMode::HandleToggle()
 
     if (m_slideState == SlideState::Idle) {
         m_request = Request::Enter;
-        m_ignoreTouchUntilRelease = true;
     }
     else if (m_slideState == SlideState::Finished) {
         if (m_mirrorInitialized) {
@@ -510,19 +498,6 @@ void BuildMode::HandleTouchBuild(entt::registry& registry, const Camera& camera)
     }
 
     const uint16_t held = keysHeld();
-
-    if (m_ignoreTouchUntilRelease) {
-        if ((held & KEY_TOUCH) == 0) {
-            m_ignoreTouchUntilRelease = false;
-        }
-
-        m_dragActive = false;
-        m_dragMode = DragMode::None;
-        m_lastGridX = 0x7fffffff;
-        m_lastGridY = 0x7fffffff;
-        return;
-    }
-
     if ((held & KEY_TOUCH) == 0) {
         m_dragActive = false;
         m_dragMode = DragMode::None;
@@ -688,7 +663,8 @@ void BuildMode::SubBg3ToBmp8()
     bgSetPriority(m_subBg3Id, 3);
     m_subBg3Gfx = bgGetGfxPtr(m_subBg3Id);
 
-    dmaFillHalfWords(0, m_subBg3Gfx, 256 * 256);
+    dmaCopy(BGBitmap, m_subBg3Gfx, BGBitmapLen);
+    dmaCopy(BGPal, BG_PALETTE_SUB, BGPalLen);
 }
 
 //------------------------------------------------------------------------------

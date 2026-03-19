@@ -10,7 +10,6 @@
 #include "Math.h"
 
 #include "BuildMode.h"
-#include "InventoryUI.h"
 
 #define TILE_ROWS    2
 #define TILE_COLUMNS 7
@@ -23,7 +22,7 @@ namespace core {
     class RenderSystem : public System
     {
     public:
-        RenderSystem(entt::registry& registry);
+        RenderSystem();
         ~RenderSystem();
 
         void Update(entt::registry& registry) override;
@@ -35,7 +34,6 @@ namespace core {
         Camera m_activeCam;
 
         BuildMode m_buildMode;
-        InventoryUI m_inventoryUI;
 
         int m_tileset_texture_id;
         int scroll_x = 0;

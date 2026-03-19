@@ -13,7 +13,6 @@
 #include "DebugLog.h"
 #include "memory_debug_info.h"
 #include "stacktrace_debug_menu.h"
-#include "inventory_debug_menu.h"
 
 std::vector<DebugNode*> main_nodes = {
     new SubmenuDebugNode{"Memory Info", memory_info_debug_page},
@@ -31,8 +30,7 @@ std::vector<DebugNode*> main_nodes = {
         {
             selected = false;
             StackTraceDisplay();
-        }},
-    GetInventoryTempToggleNode()
+        }}
 };
 
 void add_debug_node_to_root(DebugNode* node) {
@@ -78,8 +76,7 @@ void debug_print(std::vector<DebugState>& node_stack, bool& selected) {
                 top = &node_stack.back();
             }
             else {
-                curr->on_select();
-                selected = false;
+                selected = true;
             }
         }
     }
@@ -114,11 +111,8 @@ void MarkerDebugNode::update(bool &selected) {
 
 void FunctionResultNode::update(bool &selected) {
     printf("%s\n", func().c_str());
-}
-
-void FunctionResultNode::on_select() {
-    bool selected = false;
-    selectedUpdate(selected);
+    if (selected)
+        selectedUpdate(selected);
 }
 
 __attribute__((noreturn))

@@ -25,8 +25,6 @@ public:
 
     bool IsTransitioning() const;
     bool IsBankBCapture() const;
-    bool ShouldInventoryUiVisible() const;
-    bool ShouldInventoryRunNormally() const;
     int GetFlashLevel() const;
     void SkipCapture();
 
@@ -95,7 +93,6 @@ private:
     bool m_mirrorActive = false;
     bool m_mirrorInitialized = false;
     bool m_skipCapture = false;
-    bool m_ignoreTouchUntilRelease = false;
 
     // Mirror/Background data toggle
     int  m_subBg3Id = -1;
