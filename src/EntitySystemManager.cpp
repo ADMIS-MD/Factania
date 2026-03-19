@@ -13,6 +13,7 @@
 #include "EntitySystemManager.h"
 
 #include <nds.h>
+#include <Parent.h>
 
 #include "Player.h"
 #include "Transform.h"
@@ -30,6 +31,7 @@ EntitySystemManager::EntitySystemManager(entt::registry& registry)
 	CreatePlayerComponent(registry);
 
     SetupChunkCallbacks(registry);
+    setup_parents(registry);
 }
 
 EntitySystemManager::~EntitySystemManager()

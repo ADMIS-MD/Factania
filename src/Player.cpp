@@ -6,6 +6,7 @@
 #include "Inventory.h"
 
 #include <chunk.hpp>
+#include <Parent.h>
 
 #include "RenderSystem.h"
 #include "Transform.h"
@@ -176,19 +177,24 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
 
             entt::entity e_0 = registry.create();
             registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
-            registry.emplace<GridTransform>(e_0, grid);
+            registry.emplace<GridTransform>(e_0, grid.x, grid.y);
 
-            // entt::entity e_0 = registry.create();
-            // registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
-            // registry.emplace<GridTransform>(e_0, grid);
-            //
-            // entt::entity e_0 = registry.create();
-            // registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
-            // registry.emplace<GridTransform>(e_0, grid);
-            //
-            // entt::entity e_0 = registry.create();
-            // registry.emplace<ChunkSprite>(e_0, ChunkSprite { 1, RGB15(15, 15, 0) });
-            // registry.emplace<GridTransform>(e_0, grid);
+            entt::entity e_1 = registry.create();
+            registry.emplace<ChunkSprite>(e_1, ChunkSprite { 2, RGB15(15, 15, 0) });
+            registry.emplace<GridTransform>(e_1, grid.x + 1, grid.y);
+
+            entt::entity e_2 = registry.create();
+            registry.emplace<ChunkSprite>(e_2, ChunkSprite { 8, RGB15(15, 15, 0) });
+            registry.emplace<GridTransform>(e_2, grid.x, grid.y + 1);
+
+            entt::entity e_3 = registry.create();
+            registry.emplace<ChunkSprite>(e_3, ChunkSprite { 9, RGB15(15, 15, 0) });
+            registry.emplace<GridTransform>(e_3, grid.x + 1, grid.y + 1);
+
+            Parent::AttachEntities(registry, parent, e_0);
+            Parent::AttachEntities(registry, parent, e_1);
+            Parent::AttachEntities(registry, parent, e_2);
+            Parent::AttachEntities(registry, parent, e_3);
         }
         if (down & KEY_B)
         {
@@ -196,7 +202,7 @@ void UpdatePlayerComponent(entt::registry& registry, ChunkLookup& chl)
             ChunkPosition chp = ChunkPosition::FromGridTransform(grid);
             Chunk& chunk = chl.GetChunkObj(registry, chp);
             if (chunk.top_entity_ids[grid.CropTo8x8Grid()] != entt::null)
-                registry.destroy(chunk.top_entity_ids[grid.CropTo8x8Grid()]);
+                registry.destroy(registry.get<Parent>(chunk.top_entity_ids[grid.CropTo8x8Grid()]).GetParent());
         }
         // TODO: End remove
 
