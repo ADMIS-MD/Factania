@@ -90,11 +90,11 @@ private:
         void Reset() { slot = -1; arrow = 0; mode = 0; }
     };
 
-    static constexpr Rect kHeaderBox{ 2, 2, 253, 29 };
-    static constexpr Rect kLeftArrowBox{ 2, 32, 17, 159 };
-    static constexpr Rect kRightArrowBox{ 237, 32, 253, 159 };
-    static constexpr Rect kModeLeftButtonBox{ 2, 162, 126, 189 };
-    static constexpr Rect kModeRightButtonBox{ 129, 162, 253, 189 };
+    static constexpr Rect kHeaderBox{ 0, 0, 255, 29 };
+    static constexpr Rect kLeftArrowBox{ 0, 32, 17, 159 };
+    static constexpr Rect kRightArrowBox{ 237, 32, 255, 159 };
+    static constexpr Rect kModeLeftButtonBox{ 0, 162, 126, 191 };
+    static constexpr Rect kModeRightButtonBox{ 129, 162, 255, 191 };
     static constexpr std::array<Rect, kItemsPerPage> kSlotRects = {{
         {27, 39, 58, 70},   {61, 39, 92, 70},   {95, 39, 126, 70},
         {129, 39, 160, 70}, {163, 39, 194, 70}, {197, 39, 228, 70},

@@ -93,6 +93,10 @@ void InventoryUI::Update(entt::registry& registry, const BuildMode& buildMode)
         UpdateSelectedText();
     }
 
+    if (m_bgDirty) {
+        ApplyBackgroundFrame();
+    }
+
     RefreshSlotEntities(registry);
     RefreshArrowEntities(registry);
 
